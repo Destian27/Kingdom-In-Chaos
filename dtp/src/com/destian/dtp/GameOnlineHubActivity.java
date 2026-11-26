@@ -1,6 +1,7 @@
 package com.destian.dtp;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -82,6 +83,17 @@ public final class GameOnlineHubActivity extends Activity {
         page.addView(note, matchWrap());
 
         heading(page, "1. Akun");
+        addButton(page, "Login ke Kingdom In Chaos DTP (Google)", new Runnable() {
+            @Override public void run() {
+                startActivity(new Intent(GameOnlineHubActivity.this, GameAuthActivity.class));
+            }
+        });
+        TextView authHint = new TextView(this);
+        authHint.setText("Login Google adalah cara utama. Login email/password lama tetap tersedia sebagai alternatif.");
+        authHint.setTextSize(12);
+        page.addView(authHint, matchWrap());
+
+        heading(page, "Login email lama (alternatif)");
         email = addInput(page, "Email", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         password = addInput(page, "Password", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         username = addInput(page, "Username (untuk daftar)", InputType.TYPE_CLASS_TEXT);
@@ -314,6 +326,11 @@ public final class GameOnlineHubActivity extends Activity {
     }
 
     private void runBackend(final String label, final BackendTask task) {
+        if (!backend.hasSession() && !"Daftar".equals(label) && !"Login".equals(label)) {
+            output.setText("Login diperlukan untuk fitur ini. Silakan masuk ke Kingdom In Chaos DTP memakai Google.");
+            startActivity(new Intent(GameOnlineHubActivity.this, GameAuthActivity.class));
+            return;
+        }
         output.setText(label + ": sedang menghubungi Supabase...");
         if (executor == null || executor.isShutdown()) {
             output.setText("Activity sudah ditutup. Buka ulang Online Hub.");

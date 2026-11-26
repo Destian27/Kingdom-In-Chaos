@@ -1,0 +1,4 @@
+Kingdom In Chaos DTP source update: v17.6 Google Auth
+Date: 2026-11-26
+Auth flow: Supabase Google OAuth + PKCE
+Android redirect: kingdominchaosdtp://auth

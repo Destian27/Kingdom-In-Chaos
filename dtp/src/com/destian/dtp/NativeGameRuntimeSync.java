@@ -17,6 +17,8 @@ final class NativeGameRuntimeSync {
     private static final String TAG = "KIC-NativeSync";
     private static final String PREFS = "kic_server_runtime_state";
     private static final int MAX_RETRIES = 8;
+    private static final long START_GRACE_MS = 20000L;
+    private static final long RETRY_MS = 5000L;
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
 
     private NativeGameRuntimeSync() { }
@@ -45,12 +47,13 @@ final class NativeGameRuntimeSync {
         final long eventEyes = newTarget(economy, "event_eyes", eventEyesRevision, prefs, eventEyesKey);
         if (coins < 0 && crystals < 0 && goblin < 0 && eventEyes < 0) return;
 
-        MAIN.post(new Runnable() {
+        // Beri waktu game selesai memuat (menu awal / tombol Start) sebelum menyentuh state native.
+        MAIN.postDelayed(new Runnable() {
             @Override public void run() {
                 attempt(activity, prefs, coinsRevision, crystalsRevision, goblinRevision, eventEyesRevision,
                         coinsKey, crystalsKey, goblinKey, eventEyesKey, coins, crystals, goblin, eventEyes, 0);
             }
-        });
+        }, START_GRACE_MS);
     }
 
     private static long newTarget(JSONObject economy, String field, String revision,
@@ -121,7 +124,7 @@ final class NativeGameRuntimeSync {
                 attempt(activity, prefs, coinsRevision, crystalsRevision, goblinRevision, eventEyesRevision,
                         coinsKey, crystalsKey, goblinKey, eventEyesKey, coins, crystals, goblin, eventEyes, retry + 1);
             }
-        }, 1500L);
+        }, RETRY_MS);
     }
 
     private static GLSurfaceView findGameSurface(Activity activity) {

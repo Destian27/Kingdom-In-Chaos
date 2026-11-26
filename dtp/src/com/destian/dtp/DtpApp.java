@@ -87,9 +87,15 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
                     public void run() {
                         busy = false;
                         if (game != a || kicking) return;
-                        // Fail closed: a network error or malformed/missing config is not permission.
+                        // Gerbang awal (MaintenanceActivity) tetap ketat: tanpa status server valid game
+                        // tidak dibuka. Saat game SUDAH berjalan, gangguan jaringan sesaat (mis. ketika
+                        // menekan Start / loading berat) tidak boleh mengeluarkan pemain dari game.
+                        // Pemain hanya dikeluarkan jika server secara eksplisit menyatakan maintenance.
                         if (!r.ok) {
-                            kick(a);
+                            a.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                            if (again) {
+                                again = false;
+                            }
                             return;
                         }
                         boolean under = r.active

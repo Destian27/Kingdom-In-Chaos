@@ -289,3 +289,30 @@ Baca `CHANGELOG-V16-CAVE-BOSS-NATIVE-BRIDGE.md` untuk batas fitur dan daftar uji
 - New databases use `kingdom-in-chaos-dtp-SQL-GABUNGAN-v17.3-ALL-IN-ONE.sql`.
 - Event Shop updates use Broadcast invalidation plus Postgres Changes; player profile/save/economy updates use per-player Broadcast topics plus Postgres Changes.
 - Android keeps the 1-second polling fallback; successful Realtime pushes cause an immediate authenticated RPC refresh.
+
+
+## v17.6 — Google Auth untuk akun game (26 November 2026)
+
+Pembaruan ini menambahkan login Google melalui Supabase Auth dengan Authorization Code + PKCE:
+
+- Deep link callback Android: `kingdominchaosdtp://auth`.
+- Layar autentikasi memakai ikon game dari resource `@drawable/icon`; tidak memakai logo Google.
+- Judul layar: **Login ke Kingdom In Chaos DTP**.
+- Tombol `LOGIN` / `AKUN` pada overlay game membuka login Google atau Online Hub sesuai status sesi.
+- Token akses dan refresh Supabase disimpan terenkripsi menggunakan Android Keystore, melanjutkan mekanisme penyimpanan sesi yang sudah ada.
+- Fitur akun/avatar, teman, ranking, presence, PvP dan World Boss di Online Hub meminta login bila belum ada sesi. Login email lama tetap disediakan sebagai alternatif.
+
+### Konfigurasi Supabase yang wajib
+
+1. Dashboard Supabase → Authentication → Providers → Google: aktifkan Google dan masukkan **Web OAuth Client ID** serta **Client Secret** dari Google Cloud.
+2. Google Cloud → OAuth Client (Web application): Authorized redirect URI harus menggunakan callback Supabase project, yaitu `https://gunzwimrxspbmiducphg.supabase.co/auth/v1/callback`.
+3. Supabase → Authentication → URL Configuration → Redirect URLs: tambahkan persis `kingdominchaosdtp://auth`.
+4. Simpan dan uji login pada APK yang dibangun dari source versi ini.
+
+Jika Google Provider belum aktif atau Redirect URL belum diizinkan, proses login akan gagal dan aplikasi menampilkan pesan dari Supabase.
+
+### Batas integrasi UI native
+
+Tombol akun/login Android ditambahkan sebagai pintu masuk ke autentikasi. Source C++ untuk layar asli game tidak tersedia dalam paket ini, sehingga sentuhan langsung pada tombol avatar/menu online bawaan native belum dapat dialihkan satu per satu ke layar login. Operasi online yang tersedia melalui Java Online Hub sudah meminta sesi terlebih dahulu; ini bukan klaim bahwa seluruh layar online C++ lama sudah tersambung.
+
+Build memakai workflow GitHub Actions atau `python3 build_dtp.py` pada lingkungan yang sudah memiliki JDK, Android SDK, Android NDK dan apktool. ZIP ini berisi source yang diperbarui, bukan APK yang sudah dibangun dan diuji di perangkat.

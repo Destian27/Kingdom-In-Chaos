@@ -12,7 +12,7 @@ def test_maintenance_gate_fails_closed():
 
 def test_running_game_kicks_on_unverified_status():
     s = read("dtp/src/com/destian/dtp/DtpApp.java")
-    assert "if (!r.ok)" in s and "kick(a);" in s
+    assert "if (!r.ok)" in s and "kick(a);" in s  # kick tetap dipakai untuk maintenance eksplisit
     assert "startPlayerStateRealtime(a)" in s
     assert "FLAG_NOT_TOUCHABLE" in s
 
