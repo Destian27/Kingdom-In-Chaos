@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Kingdom In Chaos DTP — v16 Cave Boss</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#1d4ed8;--blue-d:#1e3a8a;--blue-l:#eff6ff;--line:#cfdcf5;--ink:#0f1f45;--mute:#5b6b8f;--red:#b42318;--ok:#067647}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font:15px/1.5 "Plus Jakarta Sans",system-ui,sans-serif}
+.wrap{max-width:520px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:22px;font-weight:800;margin:8px 0 2px;color:var(--blue-d)}
+.sub{color:var(--mute);margin:0 0 20px}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px;background:#fff}
+label{display:block;font-weight:600;margin:12px 0 6px}
+input,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;color:var(--ink);background:#fff}
+input:focus,textarea:focus,button:focus-visible{outline:3px solid #93b4ff;outline-offset:1px}
+textarea{min-height:84px;resize:vertical}
+button{font:inherit;font-weight:600;border-radius:8px;border:1px solid var(--blue);background:var(--blue);color:#fff;padding:11px 16px;cursor:pointer}
+button.ghost{background:#fff;color:var(--blue)}
+button:disabled{opacity:.55;cursor:wait}
+.full{width:100%;margin-top:16px}
+.err{color:var(--red);min-height:20px;margin-top:10px;font-weight:600}
+.status{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--blue-l);border-color:var(--line)}
+.status b{font-size:18px;display:block}
+.status.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.status.on .mute{color:#dbe7ff}
+.mute{color:var(--mute);font-size:13px}
+.sw{position:relative;width:64px;height:36px;flex:none;padding:0;border-radius:18px;background:#fff;border:2px solid var(--blue)}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:var(--blue);transition:transform .2s}
+.sw[aria-checked=true]::after{transform:translateX(28px)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chips button{padding:7px 12px;font-size:13px}
+.count{font-size:26px;font-weight:800;color:var(--blue-d);margin-top:4px;font-variant-numeric:tabular-nums}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.dur{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.dur div{text-align:center}.dur input{text-align:center;padding:11px 4px}.dur span{display:block;font-size:13px;color:var(--mute);margin-top:4px}
+.chk{display:flex;gap:8px;align-items:center;font-weight:600;margin-top:14px}.chk input{width:auto}
+.two{display:flex;gap:10px;margin-top:14px}.two button{flex:1}
+.hint{color:var(--mute);font-size:13px;margin-top:10px}
+.hide{display:none}
+
+.sectionTitle{font-size:18px;color:var(--blue-d);font-weight:800;margin:0 0 6px}
+.safeNote{background:#fff7e6;border:1px solid #f2d28b;border-radius:8px;padding:10px 12px;font-size:13px;color:#6b4a00;margin:10px 0}
+.dataGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dataGrid label{margin-top:4px;font-size:13px}
+.dataGrid input{min-width:0}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.toolbar button{flex:1;min-width:100px}
+.tableWrap{overflow-x:auto;margin-top:12px;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:12px;min-width:600px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--blue-l);color:var(--blue-d);white-space:nowrap}
+.usersTable tbody tr{cursor:pointer}
+.usersTable tbody tr:hover{background:#f5f8ff}
+.preBox{white-space:pre-wrap;overflow-wrap:anywhere;background:#f6f8fc;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12px;max-height:230px;overflow:auto}
+.mini{font-size:12px;color:var(--mute)}
+.detailBlock{margin:14px 0 0}
+.dataButton{margin-top:10px}
+
+.bossStatus{white-space:pre-wrap;overflow-wrap:anywhere;background:#f6f8fc;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12px;max-height:180px;overflow:auto}
+.bossSlots{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+.bossSlot{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff}
+.bossSlotHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.bossGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bossGrid label{font-size:12px;margin:4px 0}
+.bossGrid input,.bossGrid select,.bossGrid textarea{width:100%;min-width:0;padding:9px 8px;font-size:13px}
+.bossGrid textarea{min-height:54px;font-family:ui-monospace,monospace;grid-column:1/-1}
+.bossToggle{display:flex;align-items:center;gap:6px;margin:0;font-size:13px}
+.bossToggle input{width:auto}
+ .bossActionMsg{min-height:20px;margin-top:10px;color:var(--mute);font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+.storeItem{border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0;background:#fbfcff}
+.storeItemGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.storeItemGrid label{font-size:12px;margin:4px 0}
+.storeItemGrid input,.storeItemGrid select,.storeItemGrid textarea{width:100%;min-width:0;padding:9px 8px;font-size:13px}
+.storeItemGrid textarea{min-height:54px;font-family:ui-monospace,monospace;grid-column:1/-1}
+.storeItemHead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.storeItemHead button{padding:6px 10px;font-size:12px}
+@media(max-width:480px){.storeItemGrid{grid-template-columns:1fr}.storeItemGrid textarea{grid-column:auto}}
+@media(max-width:480px){.bossGrid{grid-template-columns:1fr}.bossGrid textarea{grid-column:auto}.bossSlotHead{align-items:flex-start}}
+
+@media(max-width:480px){.dataGrid{grid-template-columns:1fr}.wrap{padding-left:12px;padding-right:12px}table{min-width:540px}}
+@media (prefers-reduced-motion:reduce){.sw::after{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p id="boot" class="sub hide">Memuat...</p>
+<section id="login">
+  <h1>Admin Kingdom In Chaos DTP</h1>
+  <p class="sub">Masuk untuk mengatur maintenance game.</p>
+  <div class="card">
+    <label for="name">Nama</label>
+    <input id="name" autocomplete="username" autocapitalize="characters">
+    <label for="pass">Password</label>
+    <input id="pass" type="password" autocomplete="current-password">
+    <button class="full" id="btnLogin">Masuk</button>
+    <div class="err" id="loginErr" role="alert"></div>
+  </div>
+</section>
+
+<section id="panel" class="hide">
+  <h1>Maintenance game</h1>
+  <p class="sub">Perubahan terbaca game dalam sekitar 2 detik, termasuk pemain yang sedang main.</p>
+
+  <div class="card status" id="statusCard">
+    <div><b id="statusText">Game normal</b><span class="mute" id="statusSub">Pemain bisa masuk game.</span></div>
+    <button class="sw" id="sw" role="switch" aria-checked="false" aria-label="Aktifkan maintenance"></button>
+  </div>
+
+  <div class="card">
+    <label for="title">Judul</label>
+    <input id="title" maxlength="80">
+    <label for="msg">Pesan untuk pemain</label>
+    <textarea id="msg" maxlength="500"></textarea>
+
+    <label>Waktu maintenance</label>
+    <div class="dur">
+      <div><input id="d" type="number" min="0" inputmode="numeric" placeholder="0"><span>Hari</span></div>
+      <div><input id="h" type="number" min="0" inputmode="numeric" placeholder="0"><span>Jam</span></div>
+      <div><input id="m" type="number" min="0" inputmode="numeric" placeholder="0"><span>Menit</span></div>
+      <div><input id="s" type="number" min="0" inputmode="numeric" placeholder="0"><span>Detik</span></div>
+    </div>
+    <div class="two">
+      <button id="btnAdd">Tambah waktu</button>
+      <button class="ghost" id="btnSub">Kurangi waktu</button>
+    </div>
+    <div class="hint">Isi hari, jam, menit, atau detik. Tambah dan Kurangi menggeser waktu selesai yang sedang berjalan. Simpan perubahan menghitung waktu selesai dari sekarang.</div>
+    <label class="chk"><input type="checkbox" id="noEnd"> Tanpa batas waktu</label>
+    <div class="mute" id="endInfo" style="margin-top:12px"></div>
+    <div class="mute" style="margin-top:14px">Sisa waktu yang dilihat pemain sekarang</div>
+    <div class="count" id="count">-</div>
+
+    <button class="full" id="btnSave">Simpan perubahan</button>
+    <div class="err" id="saveMsg" role="status"></div>
+  </div>
+
+  <div class="two">
+    <button class="ghost" id="btnDataPanel">Manajemen Data Pemain</button>
+    <button class="ghost" id="btnOut">Keluar</button>
+  </div>
+</section>
+
+<section id="dataPanel" class="hide">
+  <h1>Manajemen Data Pemain</h1>
+  <p class="sub">Kelola profil, data save cloud, coins, crystals, Goblin Coins, XP hero, level, dan statistik lainnya.</p>
+  <div class="safeNote">Akses memakai akun Supabase Auth yang harus didaftarkan sebagai admin di tabel <b>game_admin_users</b>. Password dan token pemain tidak pernah ditampilkan. Coins, Crystals, dan Goblin Coins yang secara khusus diubah admin akan diterapkan ke wallet native game setelah APK v16 dibangun dengan JNI bridge. Revisi per mata uang menjaga saldo lokal lama agar tidak ditimpa angka awal database. XP, level, energi, stamina, honor, arena, skill point, dan statistik lain masih backend-only.</div>
+
+  <div class="card" id="gameAdminLoginCard">
+    <p class="sectionTitle">Login admin Supabase</p>
+    <label for="gameAdminEmail">Email akun admin Supabase</label>
+    <input id="gameAdminEmail" type="email" autocomplete="username" placeholder="email admin">
+    <label for="gameAdminPassword">Password</label>
+    <input id="gameAdminPassword" type="password" autocomplete="current-password" placeholder="password Supabase">
+    <button class="full" id="btnGameAdminLogin">Masuk ke data pemain</button>
+    <div class="err" id="gameAdminLoginMsg" role="alert"></div>
+  </div>
+
+  <div id="gameAdminApp" class="hide">
+    <div class="card">
+      <p class="sectionTitle">Daftar pengguna</p>
+      <div class="mini" id="adminWhoami"></div>
+
+      <div class="card" id="caveBossAdminCard">
+        <p class="sectionTitle">Boss Mode Gua — Kontrol Super Lengkap</p>
+        <p class="mini">Jadwal berulang setiap hari berdasarkan WIB (Asia/Jakarta). Isi Boss ID dengan ID internal yang benar-benar dikenal game.</p>
+        <div id="caveBossLiveStatus" class="bossStatus" role="status">Jadwal Boss belum dimuat. Login lalu tekan Muat Ulang.</div>
+        <div class="toolbar">
+          <button id="btnCaveBossRefresh" class="ghost">Muat Ulang Jadwal</button>
+        </div>
+
+        <div class="detailBlock">
+          <p class="sectionTitle">Panggil Boss Sekarang (Override Manual)</p>
+          <p class="mini">Override ini mengambil prioritas dari jadwal per jam dan berakhir otomatis setelah durasi habis.</p>
+          <div class="dataGrid">
+            <div><label for="caveBossNowId">Boss ID internal</label><input id="caveBossNowId" maxlength="80" placeholder="mis. cave_boss_01"></div>
+            <div><label for="caveBossNowName">Nama Boss</label><input id="caveBossNowName" maxlength="120" placeholder="Nama yang tampil"></div>
+            <div><label for="caveBossNowDifficulty">Difficulty</label><select id="caveBossNowDifficulty"><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option><option value="nightmare">Nightmare</option><option value="custom">Custom</option></select></div>
+            <div><label for="caveBossNowHp">Pengali HP (0,1–10.000)</label><input id="caveBossNowHp" type="number" min="0.1" max="10000" step="0.1" value="1"></div>
+            <div><label for="caveBossNowDuration">Durasi override (menit; 1–180)</label><input id="caveBossNowDuration" type="number" min="1" max="180" step="1" value="30"></div>
+          </div>
+          <label for="caveBossNowRewards">Reward JSON</label>
+          <textarea id="caveBossNowRewards" rows="3" spellcheck="false">{}</textarea>
+          <label for="caveBossManualReason">Alasan aksi (wajib, minimal 4 karakter)</label>
+          <input id="caveBossManualReason" maxlength="500" placeholder="Contoh: event boss spesial">
+          <div class="two">
+            <button id="btnCaveBossTrigger">Panggil Boss Sekarang</button>
+            <button id="btnCaveBossClear" class="ghost">Hentikan Override</button>
+          </div>
+          <div id="caveBossManualMsg" class="bossActionMsg" role="status"></div>
+        </div>
+
+        <div class="detailBlock">
+          <p class="sectionTitle">Jadwal Otomatis 24 Jam</p>
+          <p class="mini">Setiap slot mewakili jam mulai. Contoh: slot 14:00 menjalankan boss selama durasi yang dipilih, maksimal sampai 15:00. Slot akan berulang setiap hari.</p>
+          <div id="caveBossHourRows" class="bossSlots"><span class="mini">Memuat slot jam...</span></div>
+          <label for="caveBossScheduleReason">Alasan perubahan jadwal (wajib, minimal 4 karakter)</label>
+          <input id="caveBossScheduleReason" maxlength="500" placeholder="Contoh: jadwal event mingguan">
+          <button id="btnCaveBossSaveSchedule" class="full">Simpan Jadwal 24 Jam</button>
+          <div id="caveBossScheduleMsg" class="bossActionMsg" role="status"></div>
+        </div>
+
+        <div class="detailBlock">
+          <p class="sectionTitle">Riwayat Kontrol Boss</p>
+          <div class="tableWrap"><table><thead><tr><th>Waktu</th><th>Aksi</th><th>Admin</th><th>Alasan / Detail</th></tr></thead><tbody id="caveBossLogRows"><tr><td colspan="4">Belum ada riwayat Boss.</td></tr></tbody></table></div>
+        </div>
+        <div class="safeNote">Integrasi game v16: Android membaca RPC <b>get_active_cave_boss()</b> dan menampilkan banner status event Boss Gua di atas layar game. Ini belum membuat musuh Boss benar-benar spawn atau memulai pertarungan: source native C++ dan scene/asset Cave Boss tidak tersedia dalam paket game yang diberikan. Boss ID, HP, difficulty, durasi, dan reward belum dipetakan ke sistem pertarungan native.</div>
+      </div>
+
+      <div class="card" id="eventStoreAdminCard">
+        <p class="sectionTitle">Event Shop — Toko Mata Event</p>
+        <p class="mini">Atur katalog toko seperti gambar: nama item, ikon, harga Mata Event, waktu mulai/berakhir, dan pengulangan. Waktu memakai WIB (Asia/Jakarta).</p>
+        <div class="safeNote">Toko ini ditampilkan melalui layar Event Shop dalam APK. Saldo Mata Event disimpan terpisah dari Coins/Crystals native. Pembelian dan pemasukan gear ke inventory native belum diaktifkan sampai adapter inventori native untuk build game ini terverifikasi.</div>
+        <label class="chk"><input id="eventStoreEnabled" type="checkbox"> Tampilkan Event Shop</label>
+        <div class="dataGrid">
+          <div><label for="eventStoreTitle">Judul event</label><input id="eventStoreTitle" maxlength="80" value="Halloween Store"></div>
+          <div><label for="eventStoreBanner">Teks banner</label><input id="eventStoreBanner" maxlength="160" value="REFRESH IN"></div>
+          <div><label for="eventStoreStart">Mulai (WIB)</label><input id="eventStoreStart" type="datetime-local"></div>
+          <div><label for="eventStoreEnd">Berakhir (WIB)</label><input id="eventStoreEnd" type="datetime-local"></div>
+          <div><label for="eventStoreRepeat">Pengulangan</label><select id="eventStoreRepeat"><option value="once">Sekali saja</option><option value="daily">Setiap hari</option><option value="weekly">Setiap minggu</option></select></div>
+          <div><label for="eventStoreRepeatUntil">Ulangi sampai (opsional, WIB)</label><input id="eventStoreRepeatUntil" type="datetime-local"></div>
+          <div><label for="eventStoreRefresh">Interval refresh item (menit)</label><input id="eventStoreRefresh" type="number" min="1" max="1440" value="120"></div>
+        </div>
+        <div class="detailBlock">
+          <p class="sectionTitle">Daftar item toko</p>
+          <div id="eventStoreItems"></div>
+          <button class="ghost" type="button" id="btnEventStoreAddItem">+ Tambah item</button>
+        </div>
+        <label for="eventStoreReason">Alasan perubahan (wajib, minimal 4 karakter)</label>
+        <input id="eventStoreReason" maxlength="500" placeholder="Contoh: event Halloween dibuka kembali">
+        <button class="full" id="btnEventStoreSave">Simpan Event Shop</button>
+        <div id="eventStoreStatus" class="bossActionMsg" role="status"></div>
+        <div class="detailBlock"><p class="sectionTitle">Riwayat Event Shop</p>
+          <div class="tableWrap"><table><thead><tr><th>Waktu</th><th>Aksi</th><th>Admin</th><th>Alasan</th></tr></thead><tbody id="eventStoreLogRows"><tr><td colspan="4">Belum ada riwayat.</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <label for="userSearch">Cari email, ID, username, atau nickname (halaman saat ini)</label>
+      <input id="userSearch" placeholder="Cari pengguna..." autocomplete="off">
+      <div class="toolbar">
+        <button id="btnUserSearch">Cari / Muat ulang</button>
+        <button id="btnUserPrev" class="ghost">Sebelumnya</button>
+        <button id="btnUserNext" class="ghost">Berikutnya</button>
+      </div>
+      <div class="mini" id="userListStatus" role="status"></div>
+      <div class="tableWrap">
+        <table class="usersTable">
+          <thead><tr><th>Email / ID</th><th>Nickname</th><th>Coins</th><th>Crystals</th><th>Status</th></tr></thead>
+          <tbody id="userRows"><tr><td colspan="5">Masuk lalu muat pengguna.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card hide" id="userDetailCard">
+      <p class="sectionTitle">Detail akun</p>
+      <div id="authDetails" class="preBox"></div>
+      <div class="detailBlock">
+        <p class="sectionTitle">Profil game</p>
+        <div class="dataGrid">
+          <div><label for="editUsername">Username</label><input id="editUsername" maxlength="32"></div>
+          <div><label for="editNickname">Nickname</label><input id="editNickname" maxlength="32"></div>
+          <div><label for="editAvatar">Avatar ID</label><input id="editAvatar" type="number" min="0" max="1000000" inputmode="numeric"></div>
+          <div><label for="editRegion">Region</label><input id="editRegion" maxlength="16"></div>
+        </div>
+        <label for="profileReason">Alasan perubahan profil (wajib)</label><input id="profileReason" maxlength="500" placeholder="Contoh: koreksi nama pemain">
+        <button class="full" id="btnSaveProfile">Simpan profil</button>
+      </div>
+
+      <div class="detailBlock">
+        <p class="sectionTitle">Mata uang, XP, dan statistik</p>
+        <div class="dataGrid">
+          <div><label for="ecoCoins">Coins</label><input id="ecoCoins" inputmode="numeric" type="text" pattern="[0-9]*" autocomplete="off"></div>
+          <div><label for="ecoCrystals">Crystals</label><input id="ecoCrystals" inputmode="numeric" type="text" pattern="[0-9]*" autocomplete="off"></div>
+          <div><label for="ecoGoblin">Goblin Coins</label><input id="ecoGoblin" inputmode="numeric" type="text" pattern="[0-9]*" autocomplete="off"></div>
+          <div><label for="ecoEventEyes">Mata Event (contoh: 500 / 7000)</label><input id="ecoEventEyes" inputmode="numeric" type="text" pattern="[0-9]*" autocomplete="off" placeholder="0"></div>
+          <div><label for="ecoHeroXp">XP Hero</label><input id="ecoHeroXp" inputmode="numeric" type="text" pattern="[0-9]*" autocomplete="off"></div>
+          <div><label for="ecoHeroLevel">Level Hero</label><input id="ecoHeroLevel" inputmode="numeric" type="number" min="1"></div>
+          <div><label for="ecoPlayerXp">XP Pemain</label><input id="ecoPlayerXp" inputmode="numeric" type="text" pattern="[0-9]*" autocomplete="off"></div>
+          <div><label for="ecoPlayerLevel">Level Pemain</label><input id="ecoPlayerLevel" inputmode="numeric" type="number" min="1"></div>
+          <div><label for="ecoEnergy">Energy</label><input id="ecoEnergy" inputmode="numeric" type="text" pattern="[0-9]*" autocomplete="off"></div>
+          <div><label for="ecoStamina">Stamina</label><input id="ecoStamina" inputmode="numeric" type="text" pattern="[0-9]*" autocomplete="off"></div>
+          <div><label for="ecoHonor">Honor Points</label><input id="ecoHonor" inputmode="numeric" type="text" pattern="[0-9]*" autocomplete="off"></div>
+          <div><label for="ecoArena">Arena Tokens</label><input id="ecoArena" inputmode="numeric" type="text" pattern="[0-9]*" autocomplete="off"></div>
+          <div><label for="ecoSkill">Skill Points</label><input id="ecoSkill" inputmode="numeric" type="text" pattern="[0-9]*" autocomplete="off"></div>
+        </div>
+        <label for="eventEyesReason">Alasan perubahan Mata Event (wajib)</label><input id="eventEyesReason" maxlength="500" placeholder="Contoh: hadiah event untuk pemain">
+        <button class="full" id="btnSaveEventEyes">Simpan Mata Event saja</button>
+        <p class="mini">Tombol ini hanya mengubah Mata Event akun yang dipilih. Tidak menyentuh Coins, Crystals, atau Goblin Coins.</p>
+        <label for="ecoExtra">Statistik tambahan (JSON)</label>
+        <textarea id="ecoExtra" spellcheck="false" placeholder='{"custom_stat": 10}'></textarea>
+        <label for="economyReason">Alasan perubahan statistik (wajib)</label><input id="economyReason" maxlength="500" placeholder="Contoh: kompensasi event">
+        <button class="full" id="btnSaveEconomy">Simpan mata uang dan statistik</button>
+      </div>
+
+      <div class="detailBlock">
+        <p class="sectionTitle">Save cloud lengkap (JSON)</p>
+        <p class="mini">Admin dapat melihat dan mengedit payload yang tersimpan di Supabase. Ini tidak sama dengan file save lokal native yang belum dihubungkan.</p>
+        <textarea id="saveJson" rows="12" spellcheck="false"></textarea>
+        <label for="saveReason">Alasan perubahan save (wajib)</label><input id="saveReason" maxlength="500" placeholder="Contoh: perbaikan save rusak">
+        <button class="full" id="btnSaveCloud">Simpan JSON cloud</button>
+      </div>
+
+      <div class="detailBlock">
+        <p class="sectionTitle">Riwayat perubahan admin</p>
+        <div class="tableWrap"><table><thead><tr><th>Waktu</th><th>Aksi</th><th>Admin</th><th>Alasan</th></tr></thead><tbody id="auditRows"><tr><td colspan="4">Belum ada riwayat.</td></tr></tbody></table></div>
+      </div>
+    </div>
+    <div class="two"><button class="ghost" id="btnBackMaintenance">Kembali ke maintenance</button><button class="ghost" id="btnGameAdminLogout">Keluar dari data admin</button></div>
+  </div>
+</section>
+
+</div>
+<script>
+const API = "https://gunzwimrxspbmiducphg.supabase.co/functions/v1/maintenance-admin";
+const $ = id => document.getElementById(id);
+let creds = null, active = false, curEnd = null;
+
+async function call(action, extra) {
+  let r;
+  try {
+    r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...creds, action, ...extra }) });
+  } catch (e) { throw new Error("Tidak bisa terhubung ke server. Periksa internet kamu."); }
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401) clearCreds();
+  if (!r.ok) throw new Error(j.error || "Gagal terhubung ke server");
+  return j.data;
+}
+const KEY = "kic_admin_session";
+const saveCreds = () => { try { sessionStorage.setItem(KEY, JSON.stringify(creds)); } catch (e) {} };
+const loadCreds = () => { try { return JSON.parse(sessionStorage.getItem(KEY)); } catch (e) { return null; } };
+function clearCreds() { try { sessionStorage.removeItem(KEY); } catch (e) {} }
+function showPanel() { $("boot").classList.add("hide"); $("login").classList.add("hide"); $("panel").classList.remove("hide"); }
+function showLogin() { $("boot").classList.add("hide"); $("panel").classList.add("hide"); $("login").classList.remove("hide"); }
+const busy = v => ["btnSave", "btnAdd", "btnSub"].forEach(i => $(i).disabled = v);
+const pad = n => String(n).padStart(2, "0");
+const num = id => Math.max(0, Math.floor(Number($(id).value) || 0));
+const totalSec = () => num("d") * 86400 + num("h") * 3600 + num("m") * 60 + num("s");
+
+function setActive(v) {
+  active = v;
+  $("sw").setAttribute("aria-checked", v);
+  $("statusCard").classList.toggle("on", v);
+  $("statusText").textContent = v ? "Maintenance aktif" : "Game normal";
+  $("statusSub").textContent = v ? "Pemain tidak bisa masuk game." : "Pemain bisa masuk game.";
+}
+function fill(d) {
+  setActive(!!d.is_active);
+  $("title").value = d.title || "";
+  $("msg").value = d.message || "";
+  curEnd = d.end_at ? new Date(d.end_at).getTime() : null;
+  ["d", "h", "m", "s"].forEach(i => $(i).value = "");
+  $("noEnd").checked = !!d.is_active && !d.end_at;
+  tick();
+}
+function tick() {
+  const no = $("noEnd").checked;
+  ["d", "h", "m", "s"].forEach(i => $(i).disabled = no);
+  const t = totalSec();
+  $("endInfo").textContent = no ? "Setelah disimpan: tanpa batas waktu."
+    : t > 0 ? "Setelah disimpan, selesai: " + new Date(Date.now() + t * 1000).toLocaleString("id-ID", { dateStyle: "full", timeStyle: "medium" })
+    : curEnd ? "Kosongkan durasi untuk mempertahankan waktu selesai saat ini." : "";
+  if (!curEnd) { $("count").textContent = "Tanpa batas waktu"; return; }
+  let s = Math.floor((curEnd - Date.now()) / 1000);
+  if (s <= 0) { $("count").textContent = "Waktu sudah lewat"; return; }
+  const d = Math.floor(s / 86400); s %= 86400;
+  const h = Math.floor(s / 3600); s %= 3600;
+  $("count").textContent = `${d} hari ${pad(h)}:${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
+}
+setInterval(tick, 1000);
+["d", "h", "m", "s", "noEnd"].forEach(i => $(i).addEventListener("input", tick));
+$("sw").onclick = () => setActive(!active);
+
+$("btnLogin").onclick = async () => {
+  $("loginErr").textContent = "";
+  creds = { name: $("name").value, password: $("pass").value };
+  $("btnLogin").disabled = true;
+  try {
+    fill(await call("login"));
+    saveCreds(); showPanel();
+  } catch (e) { creds = null; $("loginErr").textContent = e.message; }
+  $("btnLogin").disabled = false;
+};
+$("pass").addEventListener("keydown", e => { if (e.key === "Enter") $("btnLogin").click(); });
+
+$("btnSave").onclick = async () => {
+  const msg = $("saveMsg"); msg.style.color = ""; msg.textContent = "";
+  let endIso = null;
+  if (active && !$("noEnd").checked) {
+    if (totalSec() > 0) endIso = new Date(Date.now() + totalSec() * 1000).toISOString();
+    else if (curEnd && curEnd > Date.now()) endIso = new Date(curEnd).toISOString();
+    else { msg.textContent = "Isi durasi (hari, jam, menit, detik) atau centang Tanpa batas waktu."; return; }
+  }
+  busy(true);
+  try {
+    fill(await call("save", { is_active: active, title: $("title").value, message: $("msg").value, end_at: endIso }));
+    msg.style.color = "var(--ok)"; msg.textContent = "Tersimpan. Game membaca perubahan dalam sekitar 2 detik.";
+  } catch (e) { msg.textContent = e.message; }
+  busy(false);
+};
+$("btnOut").onclick = () => { creds = null; clearCreds(); $("pass").value = ""; $("loginErr").textContent = ""; showLogin(); };
+
+function dur(sec) {
+  const p = [[86400, "hari"], [3600, "jam"], [60, "menit"], [1, "detik"]], o = [];
+  for (const [n, l] of p) { const v = Math.floor(sec / n); sec %= n; if (v) o.push(v + " " + l); }
+  return o.join(" ");
+}
+async function shift(sign) {
+  const msg = $("saveMsg"); msg.style.color = ""; msg.textContent = "";
+  const t = totalSec();
+  if (t <= 0) { msg.textContent = "Isi hari, jam, menit, atau detik dulu."; return; }
+  busy(true);
+  try {
+    const cur = await call("get");
+    if (!cur.is_active) { msg.textContent = "Maintenance belum aktif. Nyalakan saklar lalu Simpan perubahan dulu."; return; }
+    const now = Date.now();
+    const endMs = cur.end_at ? new Date(cur.end_at).getTime() : null;
+    if (sign < 0 && !endMs) { msg.textContent = "Maintenance tanpa batas waktu, tidak ada waktu yang bisa dikurangi."; return; }
+    const next = Math.max(endMs || now, now) + sign * t * 1000;
+    const row = { is_active: true, title: cur.title, message: cur.message, end_at: new Date(next).toISOString() };
+    if (next <= now) {
+      if (!confirm("Waktu akan habis dan game langsung terbuka. Lanjut?")) return;
+      row.is_active = false; row.end_at = null;
+    }
+    fill(await call("save", row));
+    msg.style.color = "var(--ok)";
+    msg.textContent = (sign > 0 ? "Waktu ditambah " : "Waktu dikurangi ") + dur(t) + ". Game membaca perubahan dalam sekitar 2 detik.";
+  } catch (e) { msg.textContent = e.message; }
+  finally { busy(false); }
+}
+$("btnAdd").onclick = () => shift(1);
+$("btnSub").onclick = () => shift(-1);
+
+(async () => {
+  const c = loadCreds();
+  if (!c || !c.name || !c.password) return;
+  creds = c;
+  $("login").classList.add("hide"); $("boot").classList.remove("hide");
+  try { fill(await call("login")); showPanel(); }
+  catch (e) { creds = null; showLogin(); $("loginErr").textContent = /salah/i.test(e.message) ? "" : e.message; }
+})();
+
+
+// ---------------- Secure Supabase player administration ----------------
+const GAME_SUPABASE_URL = "https://gunzwimrxspbmiducphg.supabase.co";
+const GAME_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1bnp3aW1yeHNwYm1pZHVjcGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU2Njk0NDYsImV4cCI6MjExMTI0NTQ0Nn0.OQn69Q-IZ4k1ZyXc6hk8oBi7vFyOBfWTgRUXuKZqocY";
+const GAME_ADMIN_API = GAME_SUPABASE_URL + "/functions/v1/game-admin";
+let gameAdminToken = null;
+let currentUserId = null;
+let usersPage = 1;
+let usersHasMore = false;
+let loadedDetail = null;
+const admin$ = id => document.getElementById(id);
+const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pretty = value => JSON.stringify(value ?? {}, null, 2);
+const formatDate = value => value ? new Date(value).toLocaleString("id-ID") : "-";
+
+async function gameAdminRequest(action, payload = {}) {
+  if (!gameAdminToken) throw new Error("Silakan login ke Supabase Admin terlebih dahulu.");
+  let response;
+  try {
+    response = await fetch(GAME_ADMIN_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": GAME_SUPABASE_ANON_KEY, "Authorization": "Bearer " + gameAdminToken },
+      body: JSON.stringify({ action, ...payload })
+    });
+  } catch (_) { throw new Error("Tidak bisa terhubung ke Supabase. Periksa koneksi internet."); }
+  const result = await response.json().catch(() => ({}));
+  if (response.status === 401) { gameAdminToken = null; admin$ ("gameAdminApp").classList.add("hide"); admin$ ("gameAdminLoginCard").classList.remove("hide"); }
+  if (!response.ok || result.ok === false) throw new Error(result.error || "Permintaan admin gagal.");
+  return result.data;
+}
+
+function switchAdminPage(showData) {
+  admin$("panel").classList.toggle("hide", showData);
+  admin$("dataPanel").classList.toggle("hide", !showData);
+}
+admin$("btnDataPanel").onclick = () => switchAdminPage(true);
+admin$("btnBackMaintenance").onclick = () => switchAdminPage(false);
+admin$("btnGameAdminLogin").onclick = async () => {
+  const msg = admin$("gameAdminLoginMsg"); msg.textContent = "";
+  const email = admin$("gameAdminEmail").value.trim();
+  const password = admin$("gameAdminPassword").value;
+  if (!email || !password) { msg.textContent = "Isi email dan password akun Supabase Admin."; return; }
+  const btn = admin$("btnGameAdminLogin"); btn.disabled = true;
+  try {
+    const response = await fetch(GAME_SUPABASE_URL + "/auth/v1/token?grant_type=password", {
+      method: "POST", headers: { "Content-Type": "application/json", "apikey": GAME_SUPABASE_ANON_KEY },
+      body: JSON.stringify({ email, password })
+    });
+    const session = await response.json().catch(() => ({}));
+    if (!response.ok || !session.access_token) throw new Error(session.msg || session.message || session.error_description || "Login Supabase gagal. Periksa email/password.");
+    gameAdminToken = session.access_token;
+    const me = await gameAdminRequest("whoami");
+    admin$("adminWhoami").textContent = "Admin: " + (me.admin.email || me.admin.user_id) + " • peran: " + me.admin.role;
+    admin$("gameAdminLoginCard").classList.add("hide");
+    admin$("gameAdminApp").classList.remove("hide");
+    admin$("gameAdminLoginMsg").textContent = "";
+    await loadUsers();
+    await loadCaveBossAdmin();
+    await loadEventStoreAdmin();
+  } catch (e) { gameAdminToken = null; msg.textContent = e.message; }
+  finally { btn.disabled = false; }
+};
+admin$("gameAdminPassword").addEventListener("keydown", e => { if (e.key === "Enter") admin$("btnGameAdminLogin").click(); });
+admin$("btnGameAdminLogout").onclick = () => {
+  gameAdminToken = null; currentUserId = null; loadedDetail = null;
+  admin$("gameAdminPassword").value = "";
+  admin$("gameAdminApp").classList.add("hide"); admin$("gameAdminLoginCard").classList.remove("hide");
+  admin$("userDetailCard").classList.add("hide"); admin$("userRows").innerHTML = "<tr><td colspan='5'>Login untuk melihat pengguna.</td></tr>";
+};
+admin$("btnUserSearch").onclick = () => { usersPage = 1; loadUsers(); };
+admin$("userSearch").addEventListener("keydown", e => { if (e.key === "Enter") { usersPage = 1; loadUsers(); } });
+admin$("btnUserPrev").onclick = () => { if (usersPage > 1) { usersPage--; loadUsers(); } };
+admin$("btnUserNext").onclick = () => { if (usersHasMore) { usersPage++; loadUsers(); } };
+
+async function loadUsers() {
+  const status = admin$("userListStatus");
+  status.textContent = "Memuat pengguna...";
+  admin$("btnUserSearch").disabled = true;
+  try {
+    const result = await gameAdminRequest("list_users", { page: usersPage, q: admin$("userSearch").value.trim() });
+    usersHasMore = !!result.has_more;
+    admin$("btnUserPrev").disabled = usersPage <= 1;
+    admin$("btnUserNext").disabled = !usersHasMore;
+    status.textContent = "Halaman " + usersPage + " • " + result.users.length + " pengguna ditampilkan. Klik baris untuk detail.";
+    if (!result.users.length) { admin$("userRows").innerHTML = "<tr><td colspan='5'>Tidak ada pengguna pada halaman ini.</td></tr>"; return; }
+    admin$("userRows").innerHTML = result.users.map(item => {
+      const u = item.auth_user || {}, p = item.profile || {}, e = item.economy || {}, pr = item.presence || {};
+      const online = pr.is_online && pr.last_seen && (Date.now() - new Date(pr.last_seen).getTime() < 120000);
+      return `<tr data-user-id="${escapeHtml(u.id)}"><td><b>${escapeHtml(u.email || "(tanpa email)")}</b><br><span class="mini">${escapeHtml(u.id)}</span></td><td>${escapeHtml(p.nickname || "-")}<br><span class="mini">${escapeHtml(p.username || "")}</span></td><td>${escapeHtml(e.coins ?? "0")}</td><td>${escapeHtml(e.crystals ?? "0")}</td><td>${online ? "Online" : "Offline"}</td></tr>`;
+    }).join("");
+    admin$("userRows").querySelectorAll("tr[data-user-id]").forEach(row => row.onclick = () => loadUserDetail(row.getAttribute("data-user-id")));
+  } catch (e) { status.textContent = e.message; }
+  finally { admin$("btnUserSearch").disabled = false; }
+}
+
+function assignInput(id, value) { admin$(id).value = value == null ? "" : String(value); }
+async function loadUserDetail(id) {
+  if (!id) return;
+  const card = admin$("userDetailCard"); card.classList.remove("hide");
+  admin$("authDetails").textContent = "Memuat detail akun...";
+  currentUserId = id;
+  try {
+    const d = await gameAdminRequest("get_user", { target_user_id: id });
+    if (currentUserId !== id) return;
+    loadedDetail = d;
+    const u = d.auth_user || {}, p = d.profile || {}, e = d.economy || {}, pr = d.presence || {}, rk = d.ranking || {}, sv = d.save || {};
+    admin$("authDetails").textContent = pretty({
+      id: u.id, email: u.email, email_confirmed_at: u.email_confirmed_at,
+      phone: u.phone, phone_confirmed_at: u.phone_confirmed_at, created_at: u.created_at,
+      updated_at: u.updated_at, last_sign_in_at: u.last_sign_in_at, banned_until: u.banned_until,
+      app_metadata: u.app_metadata, user_metadata: u.user_metadata,
+      online_presence: pr, ranking: rk, cloud_save_meta: { save_version: sv.save_version, updated_at: sv.updated_at },
+      save_history: d.save_history
+    });
+    assignInput("editUsername", p.username); assignInput("editNickname", p.nickname);
+    assignInput("editAvatar", p.avatar_id ?? 1); assignInput("editRegion", p.region || "global");
+    assignInput("ecoCoins", e.coins ?? "0"); assignInput("ecoCrystals", e.crystals ?? "0"); assignInput("ecoGoblin", e.goblin_coins ?? "0"); assignInput("ecoEventEyes", e.event_eyes ?? "0");
+    admin$("eventEyesReason").value = "";
+    assignInput("ecoHeroXp", e.hero_xp ?? "0"); assignInput("ecoHeroLevel", e.hero_level ?? 1); assignInput("ecoPlayerXp", e.player_xp ?? "0"); assignInput("ecoPlayerLevel", e.player_level ?? 1);
+    assignInput("ecoEnergy", e.energy ?? "0"); assignInput("ecoStamina", e.stamina ?? "0"); assignInput("ecoHonor", e.honor_points ?? "0"); assignInput("ecoArena", e.arena_tokens ?? "0"); assignInput("ecoSkill", e.skill_points ?? "0");
+    admin$("ecoExtra").value = pretty(e.extra_stats || {});
+    admin$("saveJson").value = pretty(sv.save_data || {});
+    admin$("profileReason").value = ""; admin$("economyReason").value = ""; admin$("saveReason").value = "";
+    renderAudit(d.audit || []);
+    card.scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (e) { admin$("authDetails").textContent = e.message; }
+}
+function renderAudit(rows) {
+  admin$("auditRows").innerHTML = !rows.length ? "<tr><td colspan='4'>Belum ada riwayat perubahan.</td></tr>" : rows.map(r =>
+    `<tr><td>${escapeHtml(formatDate(r.created_at))}</td><td>${escapeHtml(r.action)}</td><td>${escapeHtml(r.admin_user_id || "-")}</td><td>${escapeHtml(r.reason)}</td></tr>`
+  ).join("");
+}
+function requiredReason(id) {
+  const v = admin$(id).value.trim();
+  if (v.length < 4) throw new Error("Isi alasan perubahan minimal 4 karakter.");
+  return v;
+}
+async function withAdminButton(buttonId, messageId, work) {
+  const btn = admin$(buttonId); btn.disabled = true;
+  try { await work(); admin$(messageId).textContent = ""; }
+  catch (e) { alert(e.message); }
+  finally { btn.disabled = false; }
+}
+admin$("btnSaveEconomy").onclick = () => withAdminButton("btnSaveEconomy", "userListStatus", async () => {
+  if (!currentUserId) throw new Error("Pilih pengguna terlebih dahulu.");
+  const reason = requiredReason("economyReason");
+  let extra; try { extra = JSON.parse(admin$("ecoExtra").value || "{}"); } catch { throw new Error("Statistik tambahan harus JSON valid."); }
+  if (!extra || Array.isArray(extra) || typeof extra !== "object") throw new Error("Statistik tambahan harus objek JSON.");
+  const fields = {
+    coins: admin$("ecoCoins").value || "0", crystals: admin$("ecoCrystals").value || "0", goblin_coins: admin$("ecoGoblin").value || "0",
+    hero_xp: admin$("ecoHeroXp").value || "0", hero_level: Number(admin$("ecoHeroLevel").value || 1),
+    player_xp: admin$("ecoPlayerXp").value || "0", player_level: Number(admin$("ecoPlayerLevel").value || 1),
+    energy: admin$("ecoEnergy").value || "0", stamina: admin$("ecoStamina").value || "0",
+    honor_points: admin$("ecoHonor").value || "0", arena_tokens: admin$("ecoArena").value || "0", skill_points: admin$("ecoSkill").value || "0", extra_stats: extra
+  };
+  await gameAdminRequest("update_economy", { target_user_id: currentUserId, fields, reason });
+  alert("Statistik backend berhasil diperbarui dan dicatat di audit log.");
+  await loadUserDetail(currentUserId); await loadUsers();
+});
+admin$("btnSaveProfile").onclick = () => withAdminButton("btnSaveProfile", "userListStatus", async () => {
+  if (!currentUserId) throw new Error("Pilih pengguna terlebih dahulu.");
+  const reason = requiredReason("profileReason");
+  const fields = { username: admin$("editUsername").value.trim(), nickname: admin$("editNickname").value.trim(), avatar_id: Number(admin$("editAvatar").value), region: admin$("editRegion").value.trim() };
+  await gameAdminRequest("update_profile", { target_user_id: currentUserId, fields, reason });
+  alert("Profil berhasil diperbarui dan dicatat di audit log."); await loadUserDetail(currentUserId); await loadUsers();
+});
+admin$("btnSaveCloud").onclick = () => withAdminButton("btnSaveCloud", "userListStatus", async () => {
+  if (!currentUserId) throw new Error("Pilih pengguna terlebih dahulu.");
+  const reason = requiredReason("saveReason");
+  let saveData; try { saveData = JSON.parse(admin$("saveJson").value || "{}"); } catch { throw new Error("Save JSON harus valid."); }
+  if (!saveData || Array.isArray(saveData) || typeof saveData !== "object") throw new Error("Save JSON harus berupa objek.");
+  if (!confirm("Mengganti data save cloud pengguna? Pastikan JSON sudah benar.")) return;
+  await gameAdminRequest("update_save", { target_user_id: currentUserId, save_data: saveData, reason });
+  alert("Save cloud berhasil diperbarui dan dicatat di audit log."); await loadUserDetail(currentUserId);
+});
+
+
+
+// ---------------- Cave Boss scheduler UI (v16) ----------------
+const CAVE_BOSS_DIFFICULTIES = ["normal", "hard", "elite", "nightmare", "custom"];
+const bossPad = n => String(n).padStart(2, "0");
+function bossInputValue(row, key, fallback) {
+  const v = row && row[key] !== undefined && row[key] !== null ? row[key] : fallback;
+  return String(v);
+}
+function renderCaveBossHours(rows) {
+  const byHour = new Map((Array.isArray(rows) ? rows : []).map(r => [Number(r.hour_local), r]));
+  const host = admin$("caveBossHourRows");
+  host.innerHTML = Array.from({length: 24}, (_, hour) => {
+    const r = byHour.get(hour) || {};
+    const nextHour = (hour + 1) % 24;
+    const enabled = !!r.enabled;
+    const id = `caveBossSlot${hour}`;
+    const options = CAVE_BOSS_DIFFICULTIES.map(d => `<option value="${d}" ${bossInputValue(r,"difficulty","normal")===d?"selected":""}>${d[0].toUpperCase()+d.slice(1)}</option>`).join("");
+    return `<div class="bossSlot" data-cave-boss-hour="${hour}">
+      <div class="bossSlotHead"><strong>${bossPad(hour)}:00–${bossPad(nextHour)}:00 WIB</strong><label class="bossToggle"><input type="checkbox" class="boss-enabled" ${enabled?"checked":""}> Aktif</label></div>
+      <div class="bossGrid">
+        <label for="${id}Id">Boss ID<input id="${id}Id" data-field="boss_id" maxlength="80" value="${escapeHtml(bossInputValue(r,"boss_id",""))}" placeholder="cave_boss_01"></label>
+        <label for="${id}Name">Nama Boss<input id="${id}Name" data-field="boss_name" maxlength="120" value="${escapeHtml(bossInputValue(r,"boss_name",""))}" placeholder="Nama Boss"></label>
+        <label for="${id}Difficulty">Difficulty<select id="${id}Difficulty" data-field="difficulty">${options}</select></label>
+        <label for="${id}Hp">Pengali HP<input id="${id}Hp" data-field="hp_multiplier" type="number" min="0.1" max="10000" step="0.1" value="${escapeHtml(bossInputValue(r,"hp_multiplier",1))}"></label>
+        <label for="${id}Duration">Durasi (menit)<input id="${id}Duration" data-field="spawn_minutes" type="number" min="1" max="60" step="1" value="${escapeHtml(bossInputValue(r,"spawn_minutes",60))}"></label>
+        <label for="${id}Rewards">Reward JSON<textarea id="${id}Rewards" data-field="reward_config" rows="2" spellcheck="false">${escapeHtml(pretty(r.reward_config || {}))}</textarea></label>
+      </div>
+    </div>`;
+  }).join("");
+}
+function collectCaveBossHours() {
+  const slots = [...admin$("caveBossHourRows").querySelectorAll("[data-cave-boss-hour]")];
+  return slots.map(slot => {
+    const read = key => slot.querySelector(`[data-field="${key}"]`).value;
+    let rewards;
+    try { rewards = JSON.parse(read("reward_config") || "{}"); }
+    catch { throw new Error(`Reward JSON di slot jam ${bossPad(Number(slot.dataset.caveBossHour))}:00 tidak valid.`); }
+    if (!rewards || Array.isArray(rewards) || typeof rewards !== "object") throw new Error(`Reward di slot jam ${bossPad(Number(slot.dataset.caveBossHour))}:00 harus berupa objek JSON.`);
+    return {
+      hour_local: Number(slot.dataset.caveBossHour),
+      enabled: slot.querySelector(".boss-enabled").checked,
+      boss_id: read("boss_id").trim(), boss_name: read("boss_name").trim(),
+      difficulty: read("difficulty"), hp_multiplier: Number(read("hp_multiplier")),
+      spawn_minutes: Number(read("spawn_minutes")), reward_config: rewards
+    };
+  });
+}
+function showCaveBossStatus(msg, good=false, target="caveBossLiveStatus") {
+  const node = admin$(target); if (!node) return;
+  node.style.color = good ? "var(--ok)" : ""; node.textContent = msg;
+}
+function renderCaveBossLogs(rows) {
+  admin$("caveBossLogRows").innerHTML = !rows || !rows.length
+    ? "<tr><td colspan='4'>Belum ada riwayat Boss.</td></tr>"
+    : rows.map(r => `<tr><td>${escapeHtml(formatDate(r.created_at))}</td><td>${escapeHtml(r.action)}</td><td>${escapeHtml(r.admin_user_id || "-")}</td><td>${escapeHtml(r.reason || "")}<br><span class="mini">${escapeHtml(pretty(r.details || {}))}</span></td></tr>`).join("");
+}
+function renderCaveBossState(data) {
+  const current = data.active_boss || {active:false, reason:"state unavailable"};
+  const override = data.override || {};
+  const overrideActive = !!override.enabled && !!override.expires_at && new Date(override.expires_at).getTime() > Date.now();
+  const state = {
+    WIB: new Date().toLocaleString("id-ID", {timeZone:"Asia/Jakarta", dateStyle:"full", timeStyle:"medium"}),
+    boss_yang_akan_dipakai: current,
+    override_manual: {active: overrideActive, boss_id: override.boss_id || "", boss_name: override.boss_name || "", starts_at: override.starts_at || null, expires_at: override.expires_at || null},
+    slot_aktif_dikonfigurasi: (data.hours || []).filter(r => !!r.enabled).length + "/24"
+  };
+  showCaveBossStatus(pretty(state));
+  if (override.boss_id) {
+    admin$("caveBossNowId").value = override.boss_id;
+    admin$("caveBossNowName").value = override.boss_name || "";
+    admin$("caveBossNowDifficulty").value = override.difficulty || "normal";
+    admin$("caveBossNowHp").value = override.hp_multiplier || 1;
+    admin$("caveBossNowDuration").value = override.spawn_minutes || 30;
+    admin$("caveBossNowRewards").value = pretty(override.reward_config || {});
+  }
+}
+async function loadCaveBossAdmin() {
+  const status = admin$("caveBossLiveStatus");
+  if (!gameAdminToken) { status.textContent = "Login admin Supabase untuk membaca konfigurasi Boss."; return; }
+  status.textContent = "Memuat jadwal dan status Boss dari Supabase...";
+  admin$("btnCaveBossRefresh").disabled = true;
+  try {
+    const data = await gameAdminRequest("get_cave_boss_admin");
+    renderCaveBossHours(data.hours || []);
+    renderCaveBossState(data);
+    renderCaveBossLogs(data.logs || []);
+    showCaveBossStatus(pretty({
+      WIB: new Date().toLocaleString("id-ID", {timeZone:"Asia/Jakarta", dateStyle:"full", timeStyle:"medium"}),
+      boss_aktif: data.active_boss || {active:false},
+      override_manual: data.override || null,
+      slot_otomatis_aktif: (data.hours || []).filter(r => !!r.enabled).length + "/24"
+    }));
+    return data;
+  } catch (e) {
+    showCaveBossStatus("Gagal memuat pengaturan Boss: " + e.message + "\nPastikan migrasi SQL v16 dan Edge Function game-admin v16 sudah dideploy.");
+  } finally { admin$("btnCaveBossRefresh").disabled = false; }
+}
+admin$("btnCaveBossRefresh").onclick = () => loadCaveBossAdmin();
+admin$("btnCaveBossSaveSchedule").onclick = async () => {
+  const btn = admin$("btnCaveBossSaveSchedule"); btn.disabled = true;
+  showCaveBossStatus("Menyimpan semua 24 slot...", false, "caveBossScheduleMsg");
+  try {
+    const reason = admin$("caveBossScheduleReason").value.trim();
+    if (reason.length < 4) throw new Error("Alasan perubahan jadwal minimal 4 karakter.");
+    const hours = collectCaveBossHours();
+    if (!confirm("Simpan konfigurasi seluruh 24 slot Boss Gua? Slot yang tidak diaktifkan akan tetap nonaktif.")) return;
+    await gameAdminRequest("save_cave_boss_schedule", {hours, reason});
+    showCaveBossStatus("Berhasil menyimpan 24 slot di Supabase. Gameplay akan mengikuti jadwal setelah versi game membaca RPC get_active_cave_boss().", true, "caveBossScheduleMsg");
+    await loadCaveBossAdmin();
+  } catch (e) { showCaveBossStatus(e.message, false, "caveBossScheduleMsg"); }
+  finally { btn.disabled = false; }
+};
+admin$("btnCaveBossTrigger").onclick = async () => {
+  const btn = admin$("btnCaveBossTrigger"); btn.disabled = true;
+  showCaveBossStatus("Mengirim perintah override...", false, "caveBossManualMsg");
+  try {
+    const reason = admin$("caveBossManualReason").value.trim();
+    if (reason.length < 4) throw new Error("Alasan pemanggilan Boss minimal 4 karakter.");
+    let rewards; try { rewards = JSON.parse(admin$("caveBossNowRewards").value || "{}"); } catch { throw new Error("Reward JSON tidak valid."); }
+    if (!rewards || Array.isArray(rewards) || typeof rewards !== "object") throw new Error("Reward harus berupa objek JSON.");
+    const payload = {
+      boss_id: admin$("caveBossNowId").value.trim(), boss_name: admin$("caveBossNowName").value.trim(),
+      difficulty: admin$("caveBossNowDifficulty").value, hp_multiplier: Number(admin$("caveBossNowHp").value),
+      duration_minutes: Number(admin$("caveBossNowDuration").value), reward_config: rewards, reason
+    };
+    if (!confirm(`Panggil Boss ${payload.boss_name || payload.boss_id} sekarang selama ${payload.duration_minutes} menit? Override aktif akan menggantikan boss dari jadwal.`)) return;
+    await gameAdminRequest("trigger_cave_boss_now", payload);
+    showCaveBossStatus("Override Boss berhasil disimpan. Pastikan klien Mode Gua membaca RPC agar perubahan terlihat di dalam game.", true, "caveBossManualMsg");
+    await loadCaveBossAdmin();
+  } catch (e) { showCaveBossStatus(e.message, false, "caveBossManualMsg"); }
+  finally { btn.disabled = false; }
+};
+admin$("btnCaveBossClear").onclick = async () => {
+  const btn = admin$("btnCaveBossClear"); btn.disabled = true;
+  showCaveBossStatus("Menghentikan override...", false, "caveBossManualMsg");
+  try {
+    const reason = admin$("caveBossManualReason").value.trim();
+    if (reason.length < 4) throw new Error("Isi alasan menghentikan override minimal 4 karakter.");
+    if (!confirm("Hentikan Boss override sekarang? Sistem akan kembali ke jadwal otomatis untuk jam berjalan.")) return;
+    await gameAdminRequest("clear_cave_boss_override", {reason});
+    showCaveBossStatus("Override dihentikan. Jadwal otomatis kembali menjadi sumber Boss.", true, "caveBossManualMsg");
+    await loadCaveBossAdmin();
+  } catch (e) { showCaveBossStatus(e.message, false, "caveBossManualMsg"); }
+  finally { btn.disabled = false; }
+};
+
+
+
+// ---------------- Event Shop admin UI (v17) ----------------
+function toLocalDateTimeInput(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const wib = new Date(d.getTime() + 7 * 60 * 60 * 1000);
+  const pad = n => String(n).padStart(2, "0");
+  return `${wib.getUTCFullYear()}-${pad(wib.getUTCMonth()+1)}-${pad(wib.getUTCDate())}T${pad(wib.getUTCHours())}:${pad(wib.getUTCMinutes())}`;
+}
+function fromLocalDateTimeInput(id, required) {
+  const value = admin$(id).value;
+  if (!value) { if (required) throw new Error("Tanggal dan waktu mulai/berakhir wajib diisi."); return null; }
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) throw new Error("Format tanggal Event Shop tidak valid.");
+  return value + ":00+07:00";
+}
+function addEventStoreItem(item) {
+  item = item || {};
+  const host = admin$("eventStoreItems");
+  const index = host.querySelectorAll(".storeItem").length;
+  const card = document.createElement("div");
+  card.className = "storeItem";
+  card.innerHTML = `
+    <div class="storeItemHead"><strong>Item #${index+1}</strong><button type="button" class="ghost removeStoreItem">Hapus</button></div>
+    <div class="storeItemGrid">
+      <label>Kunci item<input data-field="item_key" maxlength="64" value="${escapeHtml(item.item_key || "item_"+(index+1))}"></label>
+      <label>Nama item<input data-field="item_name" maxlength="80" value="${escapeHtml(item.item_name || "")}"></label>
+      <label>Harga Mata Event<input data-field="price_eyes" inputmode="numeric" value="${escapeHtml(item.price_eyes ?? 0)}"></label>
+      <label>Tipe item<input data-field="item_type" maxlength="32" value="${escapeHtml(item.item_type || "gear")}"></label>
+      <label>ID item native (opsional)<input data-field="native_item_id" type="number" value="${escapeHtml(item.native_item_id ?? "")}"></label>
+      <label>Urutan<input data-field="sort_order" type="number" min="0" max="100000" value="${escapeHtml(item.sort_order ?? index)}"></label>
+      <label>URL gambar (HTTPS)<input data-field="image_url" maxlength="2048" value="${escapeHtml(item.image_url || "")}" placeholder="https://..."></label>
+      <label>Deskripsi<input data-field="description" maxlength="180" value="${escapeHtml(item.description || "")}"></label>
+      <label style="display:flex;align-items:center;gap:8px"><input data-field="enabled" type="checkbox" ${item.enabled === false ? "" : "checked"}> Tampilkan item</label>
+      <label>Payload JSON<textarea data-field="item_payload" spellcheck="false">${escapeHtml(pretty(item.item_payload || {}))}</textarea></label>
+    </div>`;
+  card.querySelector(".removeStoreItem").onclick = () => card.remove();
+  host.appendChild(card);
+}
+function renderEventStoreItems(items) {
+  admin$("eventStoreItems").innerHTML = "";
+  (Array.isArray(items) ? items : []).forEach(addEventStoreItem);
+  if (!items || !items.length) addEventStoreItem({});
+}
+function collectEventStoreItems() {
+  return Array.from(admin$("eventStoreItems").querySelectorAll(".storeItem")).map((card, i) => {
+    const val = key => card.querySelector(`[data-field="${key}"]`);
+    let payload; try { payload = JSON.parse(val("item_payload").value || "{}"); } catch { throw new Error(`Payload JSON item #${i+1} tidak valid.`); }
+    if (!payload || Array.isArray(payload) || typeof payload !== "object") throw new Error(`Payload item #${i+1} harus objek JSON.`);
+    const nativeId = val("native_item_id").value.trim();
+    const price = val("price_eyes").value.trim();
+    const order = val("sort_order").value.trim();
+    if (!/^\d{1,19}$/.test(price)) throw new Error(`Harga item #${i+1} harus bilangan bulat non-negatif.`);
+    if (!/^\d{1,6}$/.test(order)) throw new Error(`Urutan item #${i+1} tidak valid.`);
+    if (nativeId && !/^-?\d+$/.test(nativeId)) throw new Error(`ID native item #${i+1} harus bilangan bulat.`);
+    return {
+      item_key: val("item_key").value.trim(), item_name: val("item_name").value.trim(),
+      description: val("description").value.trim(), image_url: val("image_url").value.trim(),
+      price_eyes: price, item_type: val("item_type").value.trim() || "gear",
+      native_item_id: nativeId ? Number(nativeId) : null, item_payload: payload,
+      enabled: val("enabled").checked, sort_order: Number(order)
+    };
+  });
+}
+async function loadEventStoreAdmin() {
+  const status = admin$("eventStoreStatus"); status.textContent = "Memuat konfigurasi Event Shop...";
+  try {
+    const data = await gameAdminRequest("get_event_store_admin");
+    const c = data.config || {};
+    admin$("eventStoreEnabled").checked = !!c.enabled;
+    assignInput("eventStoreTitle", c.title || "Halloween Store");
+    assignInput("eventStoreBanner", c.banner_text || "REFRESH IN");
+    assignInput("eventStoreStart", toLocalDateTimeInput(c.starts_at));
+    assignInput("eventStoreEnd", toLocalDateTimeInput(c.ends_at));
+    assignInput("eventStoreRepeat", c.recurrence || "once");
+    assignInput("eventStoreRepeatUntil", toLocalDateTimeInput(c.repeat_until));
+    assignInput("eventStoreRefresh", c.refresh_minutes ?? 120);
+    renderEventStoreItems(data.items || []);
+    const logs = data.logs || [];
+    admin$("eventStoreLogRows").innerHTML = !logs.length ? "<tr><td colspan='4'>Belum ada riwayat.</td></tr>" : logs.map(r =>
+      `<tr><td>${escapeHtml(formatDate(r.created_at))}</td><td>${escapeHtml(r.action)}</td><td>${escapeHtml(r.admin_user_id || "-")}</td><td>${escapeHtml(r.reason)}</td></tr>`
+    ).join("");
+    status.textContent = "Event Shop berhasil dimuat. " + (data.items || []).length + " item tersimpan.";
+  } catch (e) { status.textContent = "Gagal memuat Event Shop: " + e.message + ". Jalankan migrasi v17 dan deploy Edge Function terbaru."; }
+}
+admin$("btnEventStoreAddItem").onclick = () => addEventStoreItem({});
+admin$("btnEventStoreSave").onclick = async () => {
+  const btn = admin$("btnEventStoreSave"); btn.disabled = true;
+  const status = admin$("eventStoreStatus"); status.textContent = "Menyimpan Event Shop...";
+  try {
+    const config = {
+      enabled: admin$("eventStoreEnabled").checked,
+      title: admin$("eventStoreTitle").value.trim(),
+      banner_text: admin$("eventStoreBanner").value.trim(),
+      starts_at: fromLocalDateTimeInput("eventStoreStart", admin$("eventStoreEnabled").checked),
+      ends_at: fromLocalDateTimeInput("eventStoreEnd", admin$("eventStoreEnabled").checked),
+      recurrence: admin$("eventStoreRepeat").value,
+      repeat_until: fromLocalDateTimeInput("eventStoreRepeatUntil", false),
+      refresh_minutes: Number(admin$("eventStoreRefresh").value || 120)
+    };
+    const items = collectEventStoreItems();
+    const reason = requiredReason("eventStoreReason");
+    if (!confirm(`Simpan Event Shop ${config.enabled ? "AKTIF" : "NONAKTIF"} dengan ${items.length} item?`)) return;
+    await gameAdminRequest("save_event_store", {config, items, reason});
+    status.textContent = "Event Shop berhasil disimpan. APK akan membaca status dan katalog server maksimal sekitar 15 detik setelah polling berjalan.";
+    await loadEventStoreAdmin();
+  } catch (e) { status.textContent = e.message; }
+  finally { btn.disabled = false; }
+};
+
+admin$("btnSaveEventEyes").onclick = () => withAdminButton("btnSaveEventEyes", "userListStatus", async () => {
+  if (!currentUserId) throw new Error("Pilih pengguna terlebih dahulu.");
+  const value = admin$("ecoEventEyes").value.trim();
+  if (!/^\d{1,10}$/.test(value) || Number(value) > 2147483647) throw new Error("Mata Event harus bilangan bulat 0 sampai 2147483647 (batas native game).");
+  const reason = requiredReason("eventEyesReason");
+  await gameAdminRequest("update_economy", {target_user_id: currentUserId, fields: {event_eyes: value}, reason});
+  alert("Mata Event berhasil diperbarui. Saldo ini hanya untuk Event Shop dan tidak mengubah Coins/Crystals/Goblin Coins native.");
+  await loadUserDetail(currentUserId); await loadUsers();
+});
+
+</script>
+</body>
+</html>

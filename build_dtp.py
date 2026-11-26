@@ -16,6 +16,7 @@ KS_PASS = os.environ.get("KEYSTORE_PASS", "android123")
 KS_ALIAS = os.environ.get("KEYSTORE_ALIAS", "kingdomchaosdtp")
 OUTPUT_APK = os.path.join(ROOT, "KingdomInChaosDTP.apk")
 MIN_API = "24"
+NDK_VERSION = os.environ.get("ANDROID_NDK_VERSION", "27.2.12479018")
 IS_WIN = os.name == "nt"
 
 
@@ -51,6 +52,43 @@ def android_jar():
         if os.path.exists(jar):
             return jar
     sys.exit("android.jar tidak ditemukan, install platform Android SDK")
+
+
+def ndk_root():
+    for key in ("ANDROID_NDK_HOME", "ANDROID_NDK_ROOT"):
+        value = os.environ.get(key)
+        if value and os.path.isdir(value):
+            return value
+    exact = os.path.join(sdk_root(), "ndk", NDK_VERSION)
+    if os.path.isdir(exact):
+        return exact
+    candidates = glob.glob(os.path.join(sdk_root(), "ndk", "*"))
+    candidates = [p for p in candidates if os.path.isdir(p)]
+    if candidates:
+        return sorted(candidates)[-1]
+    sys.exit("Android NDK tidak ditemukan. Install NDK " + NDK_VERSION + " atau set ANDROID_NDK_HOME")
+
+
+def compile_native_bridge():
+    ndk = ndk_root()
+    host = "windows-x86_64" if IS_WIN else ("darwin-arm64" if sys.platform == "darwin" and os.uname().machine == "arm64" else "darwin-x86_64" if sys.platform == "darwin" else "linux-x86_64")
+    prebuilt = os.path.join(ndk, "toolchains", "llvm", "prebuilt", host)
+    compiler = os.path.join(prebuilt, "bin", "clang++.exe" if IS_WIN else "clang++")
+    if not os.path.isfile(compiler):
+        sys.exit("NDK clang++ tidak ditemukan: " + compiler)
+    source = os.path.join(ROOT, "dtp", "native", "game_runtime_bridge.cpp")
+    target_dir = os.path.join(DECOMPILED, "lib", "armeabi-v7a")
+    os.makedirs(target_dir, exist_ok=True)
+    output = os.path.join(target_dir, "libkicgamebridge.so")
+    cmd = [compiler, "--target=armv7a-linux-androideabi" + MIN_API,
+           "--sysroot=" + os.path.join(prebuilt, "sysroot"),
+           "-shared", "-fPIC", "-std=c++17", "-O2", "-nostdlib++",
+           "-Wl,--no-undefined", "-Wl,-soname,libkicgamebridge.so",
+           "-o", output, source, "-ldl"]
+    run(cmd)
+    if not os.path.isfile(output) or os.path.getsize(output) < 1024:
+        sys.exit("Native bridge .so tidak berhasil dibuat")
+    print("Native game bridge:", output, os.path.getsize(output), "bytes")
 
 
 def ensure_keystore():
@@ -96,6 +134,7 @@ def add_dex(apk_in, apk_out, dex_path):
 def main():
     if not os.path.exists(APKTOOL_JAR):
         sys.exit("apktool.jar tidak ada: " + APKTOOL_JAR)
+    compile_native_bridge()
     dex = compile_dex()
 
     unsigned = os.path.join(BUILD, "unsigned.apk")

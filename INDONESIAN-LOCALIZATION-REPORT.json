@@ -1,0 +1,51 @@
+{
+  "locale_file": "assets/public/config/string/id.xml",
+  "runtime_alias": "assets/public/config/string/de.xml",
+  "language_picker_label": "Bahasa Indonesia (uses former Deutsch slot)",
+  "text_nodes_processed": 2254,
+  "section_counts": {
+    "global": 501,
+    "tips": 72,
+    "skill": 238,
+    "heroname": 15,
+    "heronameOnly": 15,
+    "herodescribe": 15,
+    "activeskillname": 66,
+    "passiveskillname": 30,
+    "superioractivename": 65,
+    "gearname": 688,
+    "achievementname": 60,
+    "achievementdescribe": 60,
+    "scene_name": 9,
+    "toponymy": 36,
+    "storyline": 230,
+    "mission": 114,
+    "notices_desc": 7,
+    "store_desc": 13,
+    "card_name": 20
+  },
+  "global_missing": 0,
+  "resource_labels_updated": [],
+  "resource_labels_verified": [
+    "res/values/strings.xml"
+  ],
+  "placeholder_nodes_checked": 2279,
+  "placeholder_mismatches": 0,
+  "storyline_entries": 230,
+  "gear_names_translated_by_glossary": 688,
+  "limitations": [
+    "Native enum has no extra locale slot; German option is replaced in this build.",
+    "Text baked into bitmap images and hardcoded native-library strings is not localized by XML changes.",
+    "A rebuilt APK and on-device review are required to validate layout/line wrapping."
+  ],
+  "source_tests": {
+    "passed": 38,
+    "skipped": 2,
+    "failed": 0,
+    "command": "python -m pytest -q tests"
+  },
+  "apk_build": {
+    "built": false,
+    "reason": "Android SDK android.jar and tools/apktool.jar are not available in this working environment; build_dtp.py is the supported build entry point."
+  }
+}

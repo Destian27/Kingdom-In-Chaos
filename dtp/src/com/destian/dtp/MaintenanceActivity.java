@@ -38,13 +38,13 @@ import java.util.TimeZone;
 public class MaintenanceActivity extends Activity {
 
     private static final String SUPABASE_URL = "https://gunzwimrxspbmiducphg.supabase.co/rest/v1/";
-    private static final String SUPABASE_ANON_KEY =
+    static final String SUPABASE_ANON_KEY =
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1bnp3aW1yeHNwYm1pZHVjcGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU2Njk0NDYsImV4cCI6MjExMTI0NTQ0Nn0.OQn69Q-IZ4k1ZyXc6hk8oBi7vFyOBfWTgRUXuKZqocY";
     private static final String TABLE = "app_maintenance";
 
-    private static final boolean BLOCK_WHEN_OFFLINE = false;
+    private static final boolean BLOCK_WHEN_OFFLINE = true;
     private static final int TIMEOUT_MS = 8000;
-    private static final int RECHECK_SECONDS = 15;
+    private static final int RECHECK_SECONDS = 3;
     private static final String GAME_ACTIVITY = "com.droidhang.ph.GameActivity";
 
     private static final int GOLD = 0xFFF2C14E;
@@ -52,7 +52,7 @@ public class MaintenanceActivity extends Activity {
     private static final int TEXT_DIM = 0xFFB79C7A;
     private static final int TEXT_ERROR = 0xFFE57373;
 
-    private static final class Result {
+    static final class Result {
         boolean ok;
         boolean active;
         String title;
@@ -65,9 +65,12 @@ public class MaintenanceActivity extends Activity {
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     private boolean checking;
+    private boolean pendingRecheck;
+    private RealtimeClient rt;
     private boolean destroyed;
     private boolean launched;
     private boolean maintenanceShown;
+    private boolean blockedOffline;
     private long endMs;
     private long serverNowAtFetch;
     private long elapsedAtFetch;
@@ -111,6 +114,7 @@ public class MaintenanceActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        startRt();
         if (maintenanceShown && !launched) {
             handler.removeCallbacks(tick);
             handler.postDelayed(tick, 1000);
@@ -121,14 +125,23 @@ public class MaintenanceActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        stopRt();
         handler.removeCallbacks(tick);
     }
 
     @Override
     protected void onDestroy() {
         destroyed = true;
+        stopRt();
         handler.removeCallbacksAndMessages(null);
         super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // The maintenance/unverified-server gate is intentionally non-dismissible.
+        if (maintenanceShown || blockedOffline || !launched) return;
+        super.onBackPressed();
     }
 
     @Override
@@ -272,11 +285,12 @@ public class MaintenanceActivity extends Activity {
                 startCheck(true);
             }
         });
-        Button exit = makeButton("Keluar", 0x66000000, GOLD);
+        Button exit = makeButton("Tutup Game", 0x66000000, GOLD);
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                // Close the task; never return to a game activity behind this gate.
+                finishAndRemoveTask();
             }
         });
         LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(
@@ -302,12 +316,17 @@ public class MaintenanceActivity extends Activity {
     }
 
     private void showError() {
-        statusView.setText("Tidak bisa terhubung ke server");
-        messageView.setText("Periksa koneksi internet kamu lalu coba lagi.");
+        blockedOffline = true;
+        statusView.setText("AKSES DITAHAN — SERVER TIDAK DAPAT DIVERIFIKASI");
+        messageView.setText("Game tidak dapat dibuka sebelum status maintenance berhasil diverifikasi. Periksa koneksi lalu tekan Cek Lagi.");
         endInfoView.setText("");
         loadingBar.setVisibility(View.GONE);
         countdownRow.setVisibility(View.GONE);
         buttonRow.setVisibility(View.VISIBLE);
+        // Automatically retry in case connectivity returns; Back/Exit cannot reopen GameActivity.
+        handler.removeCallbacks(tick);
+        tickCount = 0;
+        handler.postDelayed(tick, 1000);
     }
 
     private void showMaintenance(Result r) {
@@ -364,8 +383,38 @@ public class MaintenanceActivity extends Activity {
         boxNumbers[3].setText(String.format(Locale.US, "%02d", seconds));
     }
 
+    private void startRt() {
+        if (rt != null || launched || destroyed) {
+            return;
+        }
+        rt = new RealtimeClient(new RealtimeClient.Listener() {
+            @Override
+            public void onChange() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!destroyed && !launched) {
+                            startCheck(true);
+                        }
+                    }
+                });
+            }
+        });
+        rt.start();
+    }
+
+    private void stopRt() {
+        if (rt != null) {
+            rt.stop();
+            rt = null;
+        }
+    }
+
     private void startCheck(final boolean silent) {
         if (checking || launched) {
+            if (checking) {
+                pendingRecheck = true;
+            }
             return;
         }
         checking = true;
@@ -384,6 +433,10 @@ public class MaintenanceActivity extends Activity {
                             return;
                         }
                         onResult(r);
+                        if (pendingRecheck) {
+                            pendingRecheck = false;
+                            startCheck(true);
+                        }
                     }
                 });
             }
@@ -392,15 +445,15 @@ public class MaintenanceActivity extends Activity {
 
     private void onResult(Result r) {
         if (!r.ok) {
-            if (maintenanceShown) {
-                noteView.setText("Tidak bisa terhubung ke server. Mencoba lagi otomatis...");
-            } else if (BLOCK_WHEN_OFFLINE) {
+            if (BLOCK_WHEN_OFFLINE) {
                 showError();
+                noteView.setText("Pemeriksaan server gagal. Akses tetap ditahan; game tidak akan dibuka tanpa status server yang valid.");
             } else {
                 launchGame();
             }
             return;
         }
+        blockedOffline = false;
         serverNowAtFetch = r.serverNow;
         elapsedAtFetch = SystemClock.elapsedRealtime();
         boolean underMaintenance = r.active
@@ -426,7 +479,7 @@ public class MaintenanceActivity extends Activity {
         finish();
     }
 
-    private Result fetchStatus() {
+    static Result fetchStatus() {
         Result r = new Result();
         HttpURLConnection c = null;
         try {
@@ -447,16 +500,18 @@ public class MaintenanceActivity extends Activity {
             long date = c.getDate();
             String body = readAll(c.getInputStream());
             JSONArray arr = new JSONArray(body);
-            r.serverNow = date > 0 ? date : System.currentTimeMillis();
-            r.ok = true;
-            if (arr.length() > 0) {
-                JSONObject o = arr.getJSONObject(0);
-                r.active = !o.isNull("is_active") && o.optBoolean("is_active", false);
-                r.title = str(o, "title");
-                r.message = str(o, "message");
-                r.startMs = parseTime(str(o, "start_at"));
-                r.endMs = parseTime(str(o, "end_at"));
+            if (arr.length() != 1) throw new IOException("Maintenance config missing or duplicated");
+            JSONObject o = arr.getJSONObject(0);
+            if (!o.has("is_active") || o.isNull("is_active")) {
+                throw new IOException("Maintenance config is invalid");
             }
+            r.serverNow = date > 0 ? date : System.currentTimeMillis();
+            r.active = o.optBoolean("is_active", true);
+            r.title = str(o, "title");
+            r.message = str(o, "message");
+            r.startMs = parseTime(str(o, "start_at"));
+            r.endMs = parseTime(str(o, "end_at"));
+            r.ok = true;
         } catch (Exception e) {
             r.ok = false;
         } finally {

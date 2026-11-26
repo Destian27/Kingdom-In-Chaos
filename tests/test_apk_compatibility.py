@@ -1,16 +1,32 @@
 import os
+import glob
+import re
 import struct
 import subprocess
 import unittest
 import zipfile
+import zlib
 
-REPO_ROOT = r"C:\Koding\rea\kingdom"
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DECOMPILED_DIR = os.path.join(REPO_ROOT, "kingdom-in-chaos-decompiled")
 TOOLS_DIR = os.path.join(REPO_ROOT, "tools")
-OUTPUT_APK = os.path.join(REPO_ROOT, "kingdom-in-chaos-1-0-5-r5.apk")
-SDK_BUILD_TOOLS = r"C:\Users\Colorful\AppData\Local\Android\Sdk\build-tools\36.1.0"
-AAPT2_EXE = os.path.join(SDK_BUILD_TOOLS, "aapt2.exe")
-APKSIGNER_BAT = os.path.join(SDK_BUILD_TOOLS, "apksigner.bat")
+OUTPUT_APK = os.path.join(REPO_ROOT, "KingdomInChaosDTP.apk")
+
+
+def find_build_tool(name):
+    sdk_root = os.environ.get("ANDROID_SDK_ROOT") or os.environ.get("ANDROID_HOME")
+    if sdk_root:
+        roots = sorted(glob.glob(os.path.join(sdk_root, "build-tools", "*")))
+        for root in reversed(roots):
+            for candidate in [name, name + ".exe", name + ".bat"]:
+                path = os.path.join(root, candidate)
+                if os.path.isfile(path):
+                    return path
+    return None
+
+
+AAPT2_EXE = find_build_tool("aapt2")
+APKSIGNER = find_build_tool("apksigner")
 
 
 def has_textrel(elf_bytes: bytes) -> bool:
@@ -66,8 +82,8 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
         self.assertIn('android:requestLegacyExternalStorage="true"', xml)
         self.assertIn('android:name="org.apache.http.legacy"', xml)
         self.assertIn('android:usesCleartextTraffic="true"', xml)
-        self.assertIn('android:name="com.droidhang.ph.GameActivity"', xml)
-        self.assertIn('android:exported="true"', xml)
+        self.assertIn('android:name="com.destian.dtp.MaintenanceActivity" android:exported="true"', xml)
+        self.assertIn('android:name="com.droidhang.ph.GameActivity" android:exported="false"', xml)
         self.assertNotIn('android.permission.READ_PHONE_STATE', xml)
         self.assertIn(
             'android:enabled="false" android:exported="false" android:name="com.vungle.publisher.VungleService"',
@@ -83,9 +99,11 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
         )
 
     def test_built_and_signed_apk_is_valid_for_android_13_plus(self):
-        self.assertTrue(os.path.isfile(OUTPUT_APK), "Output APK has not been built yet")
+        if not os.path.isfile(OUTPUT_APK):
+            self.skipTest("Build_dtp.py has not produced KingdomInChaosDTP.apk yet")
+        if not AAPT2_EXE or not APKSIGNER:
+            self.skipTest("Android SDK build tools are not configured for this environment")
 
-        # Verify with aapt2 dump badging
         badging = subprocess.run(
             [AAPT2_EXE, "dump", "badging", OUTPUT_APK],
             capture_output=True,
@@ -96,15 +114,13 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
         ).stdout
         self.assertIn("targetSdkVersion:'28'", badging)
 
-        # Verify signature schemes v1 and v2/v3 with apksigner
         sig = subprocess.run(
-            [APKSIGNER_BAT, "verify", "--verbose", OUTPUT_APK],
+            [APKSIGNER, "verify", "--verbose", OUTPUT_APK],
             capture_output=True,
             text=True,
             encoding="utf-8",
             errors="replace",
             check=True,
-            shell=True,
         ).stdout
         self.assertIn("Verified using v1 scheme (JAR signing): true", sig)
         self.assertIn("Verified using v2 scheme (APK Signature Scheme v2): true", sig)
@@ -134,6 +150,8 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
             )
 
     def test_fix2_packaged_apk_native_structure(self):
+        if not os.path.isfile(OUTPUT_APK):
+            self.skipTest("Build_dtp.py has not produced an APK yet")
         with zipfile.ZipFile(OUTPUT_APK, "r") as zf:
             namelist = zf.namelist()
             self.assertIn("lib/armeabi/libgame.so", namelist)
@@ -236,11 +254,13 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
                 f"DecreaseLife patch mismatch in {abi}/libgame.so",
             )
 
-    def test_fix7_hero_roster_unlocked_and_clean_progression(self):
+    def test_fix7_original_hero_purchase_flow_preserved(self):
+        # Normal hero lock/payment routines are restored; the former forced-unlock
+        # and free-purchase stubs must not remain.
         hero_expected = {
-            0x002E17DC: b"\x01\x20\x70\x47",  # isHeroUnlock -> true
-            0x0038C03C: b"\x70\x47",  # showLocks -> nop/return
-            0x002B9AD4: b"\x01\x20\x70\x47",  # payUnlockHero -> free/true
+            0x002E17DC: bytes.fromhex("70b584b0"),  # normal routine prologue
+            0x0038C03C: b"\x70\x47",  # existing visual-lock helper patch retained
+            0x002B9AD4: bytes.fromhex("10b5041c"),  # normal payUnlockHero prologue
         }
 
         for abi in ["armeabi", "armeabi-v7a"]:
@@ -253,7 +273,7 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
                 self.assertEqual(
                     actual,
                     expected,
-                    f"Hero unlock patch mismatch at 0x{off:08X} in {abi}/libgame.so",
+                    f"Hero purchase-flow bytes mismatch at 0x{off:08X} in {abi}/libgame.so",
                 )
 
     def test_fix8_be_util_focus_guarded_and_ads_stubbed(self):
@@ -383,33 +403,62 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
                     f"Texture/DHEncrypt patch mismatch at 0x{off:08X} in {abi}/libgame.so",
                 )
 
-    def test_fix16_unlimited_currencies_999999(self):
-        expected_patches = {
-            0x002DFA94: bytes.fromhex("25f08ebc"),
-            0x003053B2: bytes.fromhex("c046"),
-            0x003053B4: bytes.fromhex(
-                "0a1c"
-                "133a"
-                "022a"
-                "04d8"
-                "44f23f20"
-                "c0f20f00"
-                "7047"
-                "30b585b0"
-                "daf765bb"
-            ),
-        }
+    def test_fix16_unlimited_currency_injection_removed(self):
         for abi in ["armeabi", "armeabi-v7a"]:
             so_path = os.path.join(DECOMPILED_DIR, "lib", abi, "libgame.so")
             with open(so_path, "rb") as f:
                 data = f.read()
-            for off, expected in expected_patches.items():
-                actual = data[off : off + len(expected)]
-                self.assertEqual(
-                    actual,
-                    expected,
-                    f"Currencies 999999 patch mismatch at 0x{off:08X} in {abi}/libgame.so",
-                )
+            self.assertEqual(data[0x002DFA94:0x002DFA98], bytes.fromhex("30b585b0"))
+            self.assertNotEqual(data[0x002DFA94:0x002DFA98], bytes.fromhex("25f08ebc"))
+            self.assertNotEqual(
+                data[0x003053B4:0x003053B4 + 20],
+                bytes.fromhex("0a1c133a022a04d844f23f20c0f20f00704730b585b0daf765bb"),
+            )
+
+    def test_fix17_top_up_hidden_but_crystal_shop_enabled(self):
+        for abi in ["armeabi", "armeabi-v7a"]:
+            so_path = os.path.join(DECOMPILED_DIR, "lib", abi, "libgame.so")
+            with open(so_path, "rb") as f:
+                data = f.read()
+            self.assertEqual(data[0x0035769E:0x003576A0], bytes.fromhex("c046"))
+            self.assertEqual(data[0x00358958:0x0035895A], bytes.fromhex("7047"))
+
+    def test_crystal_shop_packed_configs(self):
+        config_dir = os.path.join(DECOMPILED_DIR, "assets", "public", "config")
+
+        def read_xml(filename):
+            with open(os.path.join(config_dir, filename), "rb") as f:
+                packed = f.read()
+            self.assertGreater(len(packed), 6)
+            self.assertEqual(packed[4], 0x78, f"{filename} should be prefixed zlib XML")
+            return zlib.decompress(packed[4:]).decode("utf-8")
+
+        hero_xml = read_xml("hero.xml")
+        expected_heroes = {"3": "140", "6": "350", "8": "1400", "12": "490", "14": "490", "15": "700"}
+        for key, cost in expected_heroes.items():
+            match = re.search(
+                rf'<role\b[^>]*\bkey\s*=\s*["\']{key}["\'][^>]*>.*?</role>',
+                hero_xml,
+                flags=re.DOTALL,
+            )
+            self.assertIsNotNone(match, f"Hero key {key} missing")
+            self.assertRegex(match.group(0), rf'<unlockCost\s+type="1">{cost}</unlockCost>')
+
+        price_xml = read_xml("price.xml")
+        expected_values = {
+            "gearGroupGiftCostType0": "1", "gearGroupGiftCostValue0": "70",
+            "gearGroupGiftCostType1": "1", "gearGroupGiftCostValue1": "350",
+            "gearGroupGiftCostType2": "1", "gearGroupGiftCostValue2": "280",
+            "gearGroupGiftBuyType": "1", "gearGroupGiftBuyValue": "420",
+            "heroGroupGiftBuyType": "1", "heroGroupGiftBuyValue": "560",
+            "weekGiftCostType0": "1", "weekGiftCostValue0": "490",
+            "weekGiftCostType1": "1", "weekGiftCostValue1": "392",
+            "weekGiftCostType2": "1", "weekGiftCostValue2": "224",
+            "luckGiftCostType0": "1", "luckGiftCostValue0": "210",
+            "luckGiftCostType1": "1", "luckGiftCostValue1": "140",
+        }
+        for tag, value in expected_values.items():
+            self.assertRegex(price_xml, rf'<{tag}>{value}</{tag}>')
 
 
 if __name__ == "__main__":
