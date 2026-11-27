@@ -8,7 +8,8 @@ const GOOGLE_WEB_OAUTH_CLIENT_ID = Deno.env.get("GOOGLE_WEB_OAUTH_CLIENT_ID") ??
   "709171564273-tgg9tklkjsp02tovhganpdr3cqspnc2r.apps.googleusercontent.com";
 // Optional Android OAuth client ID. Set this separately to the client created
 // for package com.destian.kingdominchaosdtp + the release signing SHA-1.
-const GOOGLE_ANDROID_OAUTH_CLIENT_ID = Deno.env.get("GOOGLE_ANDROID_OAUTH_CLIENT_ID") ?? "";
+const GOOGLE_ANDROID_OAUTH_CLIENT_ID = Deno.env.get("GOOGLE_ANDROID_OAUTH_CLIENT_ID") ??
+  "709171564273-sk6tcg5nk2tk13lghb1hb4sc1he3c7me.apps.googleusercontent.com";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
