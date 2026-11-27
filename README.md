@@ -40,6 +40,7 @@ The patches below resolve crash causes, obsolete APIs, and offline gameplay issu
 | **Fix 15** | Asset Decryption and Texture Guard | Initialized `DHEncrypt::_key` with the 32-character XXTEA key (`e3642530816912682978ad8c491ccbe7`) at startup (`0x0047B4FC`), bypassed broken dynamic key generation in `AndroidUtil::init` (`0x003D8F66`), and routed `CCTexture2D::hasPremultipliedAlpha` (`0x00484472` -> `0x002E17E0`) through a null guard to prevent crashes when loading decrypted textures. |
 | **Fix 16** | Crystal Shop Conversion | Converts the six cash-priced hero unlocks and configured gear/hero/week/luck-gift prices from payment type `5` to Crystals type `1` in the packed `hero.xml` and `price.xml` configs. Removes the unlimited-currency injection so Crystals purchases can check and deduct the real balance. |
 | **Fix 17** | Top Up UI Disabled | NOPs the native money-button insertion at `0x0035769E` and returns from `UIFloatingWindow::onBank` at `0x00358958`, hiding the Top Up button and blocking its navigation while leaving the normal Crystals shop enabled. |
+| **Fix 18** | Top Up button no longer dangles (v17.11) | Fix 17 removed the `addChild` of the money button, so the autoreleased button was freed while `UIFloatingWindow+0x12C` still pointed at it, causing SIGSEGV in `UIFloatingWindow::setAllEnabled` when the tutorial begins. The removed call (`0x35769E`) is now preceded by an inline `CCObject::retain` of the button (`0x357698`: `ldr r3,[r1,#12]; adds r3,#1; str r3,[r1,#12]`), so the button stays alive, unattached and invisible. |
 
 ---
 

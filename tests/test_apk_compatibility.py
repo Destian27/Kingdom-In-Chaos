@@ -10,7 +10,7 @@ import zlib
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DECOMPILED_DIR = os.path.join(REPO_ROOT, "kingdom-in-chaos-decompiled")
 TOOLS_DIR = os.path.join(REPO_ROOT, "tools")
-OUTPUT_APK = os.path.join(REPO_ROOT, "KingdomInChaosDTP-v17.9.apk")
+OUTPUT_APK = os.path.join(REPO_ROOT, "KingdomInChaosDTP-v17.11.apk")
 
 
 def find_build_tool(name):
@@ -100,7 +100,7 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
 
     def test_built_and_signed_apk_is_valid_for_android_13_plus(self):
         if not os.path.isfile(OUTPUT_APK):
-            self.skipTest("Build_dtp.py has not produced KingdomInChaosDTP-v17.9.apk yet")
+            self.skipTest("Build_dtp.py has not produced KingdomInChaosDTP-v17.11.apk yet")
         if not AAPT2_EXE or not APKSIGNER:
             self.skipTest("Android SDK build tools are not configured for this environment")
 
@@ -432,6 +432,21 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
                 data = f.read()
             self.assertEqual(data[0x0035769E:0x003576A0], bytes.fromhex("c046"))
             self.assertEqual(data[0x00358958:0x0035895A], bytes.fromhex("7047"))
+
+    def test_fix18_money_button_retained_no_dangling_pointer(self):
+        """v17.11: Top Up button stays unattached (hidden) but is retained, so this+0x12C never dangles."""
+        for abi in ["armeabi", "armeabi-v7a"]:
+            so_path = os.path.join(DECOMPILED_DIR, "lib", abi, "libgame.so")
+            with open(so_path, "rb") as f:
+                data = f.read()
+            # ldr r3,[r1,#12]; adds r3,#1; str r3,[r1,#12]; nop  (inline CCObject::retain on the money button)
+            self.assertEqual(data[0x00357698:0x003576A0], bytes.fromhex("cb680133cb60c046"))
+            # the preceding `mov r3,r8; ldr r1,[r4,r3]` must still load the button (this+0x12C)
+            self.assertEqual(data[0x00357694:0x00357698], bytes.fromhex("4346e158"))
+            # CCObject::retain layout this patch mirrors: ldr r3,[r0,#12]; adds r3,#1; str r3,[r0,#12]; bx lr
+            self.assertEqual(data[0x00454A60:0x00454A68], bytes.fromhex("c3680133c3607047"))
+            # setAllEnabled still guards each child with cmp r0,#0 and calls the 0x12C child
+            self.assertEqual(data[0x00358F54:0x00358F58], bytes.fromhex("96235b00"))
 
     def test_crystal_shop_packed_configs(self):
         config_dir = os.path.join(DECOMPILED_DIR, "assets", "public", "config")

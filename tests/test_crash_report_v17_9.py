@@ -59,12 +59,12 @@ def test_overlay_auto_shows_full_report_and_keeps_small_reopen_icon():
     assert "setPrimaryClip" in source
 
 
-def test_android_package_version_is_v17_9():
+def test_android_package_version_is_v17_11():
     source = read("kingdom-in-chaos-decompiled/apktool.yml")
-    assert "versionCode: 7" in source
-    assert "versionName: 17.9" in source
+    assert "versionCode: 8" in source
+    assert "versionName: 17.11" in source
     build = read("build_dtp.py")
-    assert "KingdomInChaosDTP-v17.9.apk" in build
+    assert "KingdomInChaosDTP-v17.11.apk" in build
 
 
 def test_maintenance_gate_and_realtime_fix_remain_intact():

@@ -205,7 +205,7 @@ final class CrashReporter {
     private static boolean buildReport(Context context, String breadcrumbs, String javaCrash) {
         StringBuilder sb = new StringBuilder();
         try {
-            sb.append("LAPORAN LENGKAP GAME KELUAR SENDIRI - Kingdom In Chaos DTP v17.9\n");
+            sb.append("LAPORAN LENGKAP GAME KELUAR SENDIRI - Kingdom In Chaos DTP v17.11\n");
             sb.append("Waktu laporan: ").append(stamp()).append('\n');
             sb.append("Package: ").append(context.getPackageName()).append('\n');
             sb.append("PID saat laporan: ").append(Process.myPid()).append('\n');

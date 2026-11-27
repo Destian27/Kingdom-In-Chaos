@@ -1,0 +1,7 @@
+Kingdom In Chaos DTP source update: v17.11 Money Button Crash Fix
+Date: 2026-11-27
+Base: v17.10 Story Dialog Wrap
+Scope: libgame.so (UIFloatingWindow::initMoneyInfo retain of money button), build_apk.py patch_map, tests, version metadata
+APK versionName: 17.11
+APK versionCode: 8
+Build output: KingdomInChaosDTP-v17.11.apk

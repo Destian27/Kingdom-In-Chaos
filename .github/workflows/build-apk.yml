@@ -47,5 +47,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: KingdomInChaosDTP-v17.9-apk
-          path: KingdomInChaosDTP-v17.9.apk
+          name: KingdomInChaosDTP-v17.11-apk
+          path: KingdomInChaosDTP-v17.11.apk

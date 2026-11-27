@@ -191,6 +191,12 @@ def patch_native_libraries():
         # (0x441CC0 = bx lr). It must NOT sit in 0x2E17E0: that is the body of the real isHeroUnlock.
         0x00484472: bytes.fromhex("bdf727bc00bf"),  # b.w #0x441cc4; nop (trampoline branch)
         0x00441CC4: bytes.fromhex("002801d0383000787047"),  # cmp r0, #0; beq +2; adds r0, #0x38; ldrb r0, [r0]; bx lr
+        # 9. v17.11: Top Up hidden without a dangling pointer.
+        # Fix 17 removed UIFloatingWindow::initMoneyInfo's addChild of the money button (0x35769E), so the autoreleased
+        # button was freed while this+0x12C still pointed to it -> SIGSEGV in UIFloatingWindow::setAllEnabled at the
+        # tutorial start. Replace the removed call with an inline CCObject::retain (m_uReference at +12) on that button.
+        0x00357698: bytes.fromhex("cb68" + "0133" + "cb60" + "c046"),  # ldr r3,[r1,#12]; adds r3,#1; str r3,[r1,#12]; nop
+        0x00358958: b"\x70\x47",  # UIFloatingWindow::onBank -> bx lr (Top Up stays unreachable)
     }
 
     for off, patch in patch_map.items():

@@ -198,7 +198,7 @@ public final class GameOnlineOverlay {
             text.setPadding(dp(activity, 12), dp(activity, 8), dp(activity, 12), dp(activity, 8));
             scroll.addView(text);
             new AlertDialog.Builder(activity)
-                    .setTitle("LAPORAN LENGKAP FORCE CLOSE • v17.9")
+                    .setTitle("LAPORAN LENGKAP FORCE CLOSE • v17.11")
                     .setView(scroll)
                     .setPositiveButton("Salin Semua", new DialogInterface.OnClickListener() {
                         @Override public void onClick(DialogInterface dialog, int which) {
@@ -206,7 +206,7 @@ public final class GameOnlineOverlay {
                                 ClipboardManager clipboard = (ClipboardManager)
                                         activity.getSystemService(Context.CLIPBOARD_SERVICE);
                                 if (clipboard != null) {
-                                    clipboard.setPrimaryClip(ClipData.newPlainText("Laporan KIC DTP v17.9", report));
+                                    clipboard.setPrimaryClip(ClipData.newPlainText("Laporan KIC DTP v17.11", report));
                                     Toast.makeText(activity, "Laporan lengkap disalin", Toast.LENGTH_SHORT).show();
                                 }
                             } catch (Throwable ignored) { }
