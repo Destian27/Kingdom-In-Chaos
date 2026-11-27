@@ -1,5 +1,6 @@
 # Build & Tooling artifacts
-tools/
+tools/*
+!tools/*.py
 kingdom-in-chaos-decompiled/build/
 kingdom-in-chaos-decompiled/dist/
 *.idsig
