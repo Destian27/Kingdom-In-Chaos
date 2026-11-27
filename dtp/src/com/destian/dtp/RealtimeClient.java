@@ -109,9 +109,34 @@ final class RealtimeClient {
 
     synchronized void stop() {
         running = false;
-        closeQuietly();
+        // Jangan menutup socket SSL di thread pemanggil: stop() dipanggil dari onPause() di thread
+        // utama, dan Socket.close() pada SSLSocket memicu NetworkOnMainThreadException (crash).
+        closeAsync();
         if (thread != null) {
             thread.interrupt();
+        }
+    }
+
+    private void closeAsync() {
+        final Socket s = socket;
+        if (s == null) {
+            return;
+        }
+        try {
+            Thread closer = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        s.close();
+                    } catch (Throwable ignored) {
+                        // abaikan
+                    }
+                }
+            }, "kic-realtime-close");
+            closer.setDaemon(true);
+            closer.start();
+        } catch (Throwable ignored) {
+            // abaikan
         }
     }
 
@@ -386,7 +411,7 @@ final class RealtimeClient {
         if (s != null) {
             try {
                 s.close();
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 // abaikan
             }
         }

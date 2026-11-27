@@ -388,8 +388,8 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
         expected_patches = {
             0x0047B4FC: bytes.fromhex("048d2200"),
             0x003D8F66: bytes.fromhex("0ce0"),
-            0x00484472: bytes.fromhex("5df6b5b900bf"),
-            0x002E17E0: bytes.fromhex("002801d0383000787047"),
+            0x00484472: bytes.fromhex("bdf727bc00bf"),
+            0x00441CC4: bytes.fromhex("002801d0383000787047"),
         }
         for abi in ["armeabi", "armeabi-v7a"]:
             so_path = os.path.join(DECOMPILED_DIR, "lib", abi, "libgame.so")
@@ -402,6 +402,16 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
                     expected,
                     f"Texture/DHEncrypt patch mismatch at 0x{off:08X} in {abi}/libgame.so",
                 )
+
+    def test_fix15b_is_hero_unlock_body_intact(self):
+        # v17.8: trampoline pernah menimpa badan isHeroUnlock (0x2E17E0) sehingga fungsi kembali
+        # tanpa memulihkan SP -> "stack corruption detected" di getHeroGearInfo saat MULAI.
+        expected = bytes.fromhex("70b584b0" "00230c1c01a901930293" "0393")
+        for abi in ["armeabi", "armeabi-v7a"]:
+            so_path = os.path.join(DECOMPILED_DIR, "lib", abi, "libgame.so")
+            with open(so_path, "rb") as f:
+                data = f.read()
+            self.assertEqual(data[0x2E17DC:0x2E17DC + len(expected)], expected)
 
     def test_fix16_unlimited_currency_injection_removed(self):
         for abi in ["armeabi", "armeabi-v7a"]:

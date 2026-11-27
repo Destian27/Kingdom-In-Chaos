@@ -1,0 +1,4 @@
+Kingdom In Chaos DTP source update: v17.8 Hero Stack Fix
+Date: 2026-11-27
+Base: v17.7 Crash Guard
+Scope: libgame.so (isHeroUnlock body, texture trampoline cave), RealtimeClient.stop, build_apk.py, tests

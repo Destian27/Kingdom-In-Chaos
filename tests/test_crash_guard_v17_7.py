@@ -32,3 +32,11 @@ def test_kick_and_maintenance_gate_untouched():
     s = read("dtp/src/com/destian/dtp/DtpApp.java")
     assert "kick(a);" in s and "FLAG_NOT_TOUCHABLE" in s
     assert "if (!r.ok)" in s
+
+
+def test_realtime_stop_never_closes_socket_on_caller_thread():
+    s = read("dtp/src/com/destian/dtp/RealtimeClient.java")
+    stop = s[s.index("synchronized void stop()"):s.index("private void closeAsync()")]
+    assert "closeQuietly()" not in stop
+    assert "closeAsync();" in stop
+    assert "kic-realtime-close" in s

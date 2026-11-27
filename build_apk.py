@@ -178,10 +178,8 @@ def patch_native_libraries():
         # 4. Unlimited stamina (5/5 clean UI) & zero food cost
         0x003053A0: bytes.fromhex("002802d005220260002902d000220a607047"),  # BalanceLifeStatus
         0x003055FC: b"\x01\x20\x70\x47",  # DecreaseLife
-        # 5. Full hero roster unlocked
-        0x002E17DC: b"\x01\x20\x70\x47",  # UserDataManager::isHeroUnlock -> true (1)
+        # 5. Normal hero purchase flow (isHeroUnlock / payUnlockHero keep original code)
         0x0038C03C: b"\x70\x47",  # UITeamLayer::showLocks -> bx lr
-        0x002B9AD4: b"\x01\x20\x70\x47",  # PriceManager::payUnlockHero -> true (1)
         # 6. PreloadLayer::init dhlogo null pointer crash prevention (Thumb)
         0x00271546: b"\xc7\xe0",  # b #0x2716d8: branch directly to scheduleUpdate/sound preload
         0x0027173E: bytes.fromhex("0028cad0"),  # cmp r0, #0; beq #0x2716d8: safeguard against null sprite
@@ -189,22 +187,10 @@ def patch_native_libraries():
         0x0047B4FC: bytes.fromhex("048d2200"),  # _GLOBAL__sub_I_DHEncrypt: point key string to "e3642530816912682978ad8c491ccbe7"
         0x003D8F66: bytes.fromhex("0ce0"),  # AndroidUtil::init: b #0x3d8f82 to skip broken key generation and keep valid key
         # 8. CCTexture2D::hasPremultipliedAlpha null guard trampoline (Thumb)
-        0x00484472: bytes.fromhex("5df6b5b900bf"),  # b.w #0x2e17e0; nop (trampoline branch)
-        0x002E17E0: bytes.fromhex("002801d0383000787047"),  # cmp r0, #0; beq 0x2e17e8; adds r0, #0x38; ldrb r0, [r0]; bx lr
-        # 9. Unlimited currency injection (999,999 Gold, Crystals, and Goblin Coins) via getGlobalInfo trampoline
-        0x002DFA94: bytes.fromhex("25f08ebc"),  # b.w #0x3053b4 (trampoline branch)
-        0x003053B2: bytes.fromhex("c046"),  # nop (halfword alignment)
-        0x003053B4: bytes.fromhex(
-            "0a1c"  # adds r2, r1, #0
-            "133a"  # subs r2, #0x13
-            "022a"  # cmp r2, #2 (matches 0x13=Gold, 0x14=Crystal, 0x15=Goblin Coin)
-            "04d8"  # bhi.n #0x3053c6
-            "44f23f20"  # movw r0, #0x423f
-            "c0f20f00"  # movt r0, #0xf (r0 = 999999)
-            "7047"  # bx lr
-            "30b585b0"  # push {r4, r5, lr}; sub sp, #0x14
-            "daf765bb"  # b.w #0x2dfa98
-        ),
+        # v17.8: trampoline lives in the dead tail of the stubbed TestinAgentHelper::initTestinAgent(char const*, char const*)
+        # (0x441CC0 = bx lr). It must NOT sit in 0x2E17E0: that is the body of the real isHeroUnlock.
+        0x00484472: bytes.fromhex("bdf727bc00bf"),  # b.w #0x441cc4; nop (trampoline branch)
+        0x00441CC4: bytes.fromhex("002801d0383000787047"),  # cmp r0, #0; beq +2; adds r0, #0x38; ldrb r0, [r0]; bx lr
     }
 
     for off, patch in patch_map.items():
