@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -34,6 +35,7 @@ public final class GameOnlineOverlay {
     private static final String TAG_CAVE_BOSS_STATUS = "com.destian.dtp.CAVE_BOSS_STATUS";
     private static final String TAG_EVENT_STORE_BUTTON = "com.destian.dtp.EVENT_STORE_BUTTON";
     private static final String TAG_CRASH_REPORT_BUTTON = "com.destian.dtp.CRASH_REPORT_BUTTON";
+    private static final String TAG_HOTSPOTS = "com.destian.dtp.GAME_HOTSPOTS";
     private static final String TAG_BARTER_BUTTON = "com.destian.dtp.BARTER_BUTTON";
     private static volatile WeakReference<Activity> activeActivity = new WeakReference<>(null);
 
@@ -47,49 +49,11 @@ public final class GameOnlineOverlay {
             final FrameLayout root = (FrameLayout) content;
             activeActivity = new WeakReference<>(activity);
 
-            Button accountButton = (Button) root.findViewWithTag(TAG_ACCOUNT_BUTTON);
-            if (accountButton == null) {
-                accountButton = new Button(activity);
-                accountButton.setTag(TAG_ACCOUNT_BUTTON);
-                accountButton.setTextSize(10f);
-                accountButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-                accountButton.setAllCaps(false);
-                accountButton.setTextColor(Color.WHITE);
-                accountButton.setPadding(dp(activity, 8), dp(activity, 3),
-                        dp(activity, 8), dp(activity, 3));
-                accountButton.setCompoundDrawablePadding(dp(activity, 5));
-                accountButton.setBackground(buttonBackground());
-                accountButton.setContentDescription("Login ke Kingdom In Chaos DTP");
-                int iconId = activity.getResources().getIdentifier("google_logo", "drawable",
-                        activity.getPackageName());
-                if (iconId != 0) {
-                    Drawable icon = activity.getResources().getDrawable(iconId).mutate();
-                    icon.setBounds(0, 0, dp(activity, 22), dp(activity, 22));
-                    accountButton.setCompoundDrawables(icon, null, null, null);
-                }
-                accountButton.setOnClickListener(new View.OnClickListener() {
-                    @Override public void onClick(View view) {
-                        try {
-                            GooglePlayerBackend backend =
-                                    new GooglePlayerBackend(activity.getApplicationContext());
-                            Intent target = new Intent(activity, backend.hasAccount()
-                                    ? GameOnlineHubActivity.class : GameAuthActivity.class);
-                            activity.startActivity(target);
-                        } catch (RuntimeException ignored) { }
-                    }
-                });
-                FrameLayout.LayoutParams accountParams = new FrameLayout.LayoutParams(
-                        dp(activity, 104), dp(activity, 42), Gravity.TOP | Gravity.LEFT);
-                accountParams.topMargin = dp(activity, 54);
-                accountParams.leftMargin = dp(activity, 8);
-                root.addView(accountButton, accountParams);
+            // v17.14.8: tombol GOOGLE, SURAT, dan BARTER dihapus (sudah ada di dalam game).
+            removeLegacyButtons(root);
+            if (root.findViewWithTag(TAG_HOTSPOTS) == null) {
+                root.addView(new Hotspots(activity), new FrameLayout.LayoutParams(-1, -1));
             }
-
-            GooglePlayerBackend sessionBackend =
-                    new GooglePlayerBackend(activity.getApplicationContext());
-            accountButton.setText(sessionBackend.hasAccount() ? "AKUN" : "GOOGLE");
-            accountButton.bringToFront();
-            addMailEntry(activity, root);
 
             Button eventButton = (Button) root.findViewWithTag(TAG_EVENT_STORE_BUTTON);
             if (eventButton == null) {
@@ -117,9 +81,7 @@ public final class GameOnlineOverlay {
                 eventButton.bringToFront();
             }
             addCrashReportEntry(activity, root);
-            addBarterEntry(activity, root);
             installEconomyHooksLater(activity, root, 0);
-            accountButton.bringToFront();
             showPendingCrashReport(activity);
         } catch (Throwable ignored) {
             // The original native game keeps working if an optional overlay cannot be added.
@@ -127,33 +89,68 @@ public final class GameOnlineOverlay {
     }
 
 
-    private static void addMailEntry(final Activity activity, FrameLayout root) {
-        Button button = (Button) root.findViewWithTag(TAG_MAIL_BUTTON);
-        if (button == null) {
-            button = new Button(activity);
-            button.setTag(TAG_MAIL_BUTTON);
-            button.setText("SURAT");
-            button.setTextSize(10f);
-            button.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            button.setAllCaps(false);
-            button.setTextColor(Color.WHITE);
-            button.setPadding(dp(activity, 8), dp(activity, 2), dp(activity, 8), dp(activity, 2));
-            button.setBackground(buttonBackground());
-            button.setContentDescription("Buka kotak Surat hadiah pemain");
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View view) {
-                    GooglePlayerBackend player = new GooglePlayerBackend(activity.getApplicationContext());
-                    Intent target = new Intent(activity, player.hasAccount() ? GameMailActivity.class : GameAuthActivity.class);
-                    activity.startActivity(target);
-                }
-            });
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                    dp(activity, 104), dp(activity, 38), Gravity.TOP | Gravity.LEFT);
-            params.topMargin = dp(activity, 100);
-            params.leftMargin = dp(activity, 8);
-            root.addView(button, params);
+    /**
+     * v17.14.8: area sentuh tak terlihat di atas tombol bawaan game.
+     * Tombol LOGIN (kiri atas) membuka pemilih akun Google; tombol Bakat (menu kanan)
+     * membuka Hub Online (Surat hadiah admin, Kode Hadiah, Daging). Sentuhan di luar area
+     * tidak dikonsumsi sehingga game tetap menerimanya. Koordinat relatif terhadap tinggi layar.
+     */
+    private static final class Hotspots extends View {
+        private final Activity activity;
+        private int downZone = -1;
+
+        Hotspots(Activity activity) {
+            super(activity);
+            this.activity = activity;
+            setTag(TAG_HOTSPOTS);
         }
-        button.bringToFront();
+
+        /** 0 = LOGIN, 1 = Bakat, -1 = di luar area. */
+        private int zoneAt(float x, float y) {
+            float h = getHeight(), w = getWidth();
+            if (h <= 0 || w <= 0) return -1;
+            // LOGIN: kiri 0.020H, atas 0.138H, lebar 0.264H, tinggi 0.107H
+            if (x >= 0.020f * h && x <= 0.284f * h && y >= 0.138f * h && y <= 0.245f * h) return 0;
+            // Bakat: 0.058H dari tepi kanan, lebar 0.130H, atas 0.352H, tinggi 0.139H
+            float right = w - 0.058f * h;
+            if (x >= right - 0.130f * h && x <= right && y >= 0.352f * h && y <= 0.491f * h) return 1;
+            return -1;
+        }
+
+        @Override public boolean onTouchEvent(MotionEvent e) {
+            switch (e.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    downZone = zoneAt(e.getX(), e.getY());
+                    return downZone >= 0;
+                case MotionEvent.ACTION_UP:
+                    int zone = downZone;
+                    downZone = -1;
+                    if (zone >= 0 && zone == zoneAt(e.getX(), e.getY())) open(zone);
+                    return zone >= 0;
+                case MotionEvent.ACTION_CANCEL:
+                    downZone = -1;
+                    return false;
+                default:
+                    return downZone >= 0;
+            }
+        }
+
+        private void open(int zone) {
+            try {
+                GooglePlayerBackend backend = new GooglePlayerBackend(activity.getApplicationContext());
+                // Belum login -> pemilih akun Google; sudah login -> Hub Online.
+                activity.startActivity(new Intent(activity, backend.hasAccount()
+                        ? GameOnlineHubActivity.class : GameAuthActivity.class));
+            } catch (RuntimeException ignored) { }
+        }
+    }
+
+    private static void removeLegacyButtons(FrameLayout root) {
+        String[] tags = {TAG_ACCOUNT_BUTTON, TAG_MAIL_BUTTON, TAG_BARTER_BUTTON};
+        for (String tag : tags) {
+            View old = root.findViewWithTag(tag);
+            if (old != null) root.removeView(old);
+        }
     }
 
 
@@ -170,39 +167,6 @@ public final class GameOnlineOverlay {
                 installEconomyHooksLater(activity, root, attempt + 1);
             }
         }, 1200L);
-    }
-
-    private static void addBarterEntry(final Activity activity, FrameLayout root) {
-        Button button = (Button) root.findViewWithTag(TAG_BARTER_BUTTON);
-        if (button == null) {
-            button = new Button(activity);
-            button.setTag(TAG_BARTER_BUTTON);
-            button.setText("BARTER");
-            button.setTextSize(11f);
-            button.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            button.setAllCaps(false);
-            button.setTextColor(Color.WHITE);
-            button.setPadding(dp(activity, 8), dp(activity, 2), dp(activity, 8), dp(activity, 2));
-            button.setBackground(buttonBackground());
-            button.setContentDescription("Buka menu barter Koin dan DM");
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View view) {
-                    String state = NativeGameRuntimeBridge.installEconomyHooks();
-                    if (state == null || !state.startsWith("OK|")) {
-                        Toast.makeText(activity, "Sistem barter belum siap: " + state,
-                                Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    showBarterDialog(activity);
-                }
-            });
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                    dp(activity, 112), dp(activity, 40), Gravity.TOP | Gravity.RIGHT);
-            params.topMargin = dp(activity, 54);
-            params.rightMargin = dp(activity, 8);
-            root.addView(button, params);
-        }
-        button.bringToFront();
     }
 
     public static void refreshBarterStatus() {

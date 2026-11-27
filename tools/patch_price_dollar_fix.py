@@ -27,14 +27,20 @@ PERBAIKAN:
 """
 from __future__ import annotations
 
+import json
 import os
 import re
 import struct
 import zlib
+import xml.etree.ElementTree as ET
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PRICE = os.path.join(
     ROOT, "kingdom-in-chaos-decompiled", "assets", "public", "config", "price.xml"
+)
+
+BARTER_JSON = os.path.join(
+    ROOT, "kingdom-in-chaos-decompiled", "assets", "dtp_barter_prices.json"
 )
 
 NILAI_HARGA = "0"      # teks pengisi agar node tidak null
@@ -58,11 +64,36 @@ def perbaiki(xml: str) -> str:
     return xml[:m.start()] + blok_baru + xml[m.end():]
 
 
+def keluarkan_barter(xml: str) -> str:
+    """v17.14.8: pindahkan blok <barter> keluar dari price.xml.
+
+    PriceManager::loadGameValue memproses SEMUA elemen saudara setelah <dollar>
+    dan memanggil tinyxml2 XMLElement::GetText() untuk tiap elemen. Elemen yang
+    tidak punya node teks (mis. <barter> yang isinya elemen anak, atau
+    <coinPack0 ... /> yang hanya punya atribut) mengembalikan NULL, lalu
+    string-nya dipakai langsung -> SIGSEGV (fault addr 0x0) di PreloadLayer,
+    sehingga game keluar sendiri sebelum menu muncul. Data barter disimpan di
+    assets/dtp_barter_prices.json (hanya rujukan; game tidak membacanya).
+    """
+    m = re.search(r"<barter\b.*?</barter>", xml, flags=re.DOTALL)
+    if not m:
+        return xml
+    root = ET.fromstring(m.group(0))
+    data = {"currency_exchange_rate": root.get("currency_exchange_rate")}
+    for child in root:
+        data[child.tag] = dict(child.attrib)
+    os.makedirs(os.path.dirname(BARTER_JSON), exist_ok=True)
+    with open(BARTER_JSON, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    return xml[:m.start()].rstrip() + "\n" + xml[m.end():]
+
+
 def main() -> None:
     with open(PRICE, "rb") as f:
         raw = f.read()
     xml = zlib.decompress(raw[4:]).decode("utf-8")
-    baru = perbaiki(xml)
+    baru = keluarkan_barter(perbaiki(xml))
     if baru == xml:
         print("price.xml sudah diperbaiki (tidak ada perubahan).")
         return

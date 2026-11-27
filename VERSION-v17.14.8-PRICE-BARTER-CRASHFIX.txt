@@ -1,0 +1,4 @@
+Kingdom In Chaos DTP v17.14.8
+versionCode=16
+Fix: game keluar sendiri (SIGSEGV PriceManager::loadGameValue) karena blok <barter> di price.xml; tombol GOOGLE/SURAT/BARTER dihapus; pemilih akun Google langsung muncul.
+Build output: KingdomInChaosDTP-v17.14.8-price-barter-crashfix.apk

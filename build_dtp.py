@@ -14,7 +14,7 @@ APKTOOL_JAR = os.environ.get("APKTOOL_JAR", os.path.join(TOOLS, "apktool.jar"))
 KEYSTORE = os.environ.get("KEYSTORE_PATH", os.path.join(TOOLS, "release.keystore"))
 KS_PASS = os.environ.get("KEYSTORE_PASS", "android123")
 KS_ALIAS = os.environ.get("KEYSTORE_ALIAS", "kingdomchaosdtp")
-OUTPUT_APK = os.path.join(ROOT, "KingdomInChaosDTP-v17.14.6-wallet-crashfix.apk")
+OUTPUT_APK = os.path.join(ROOT, "KingdomInChaosDTP-v17.14.8-price-barter-crashfix.apk")
 MIN_API = "24"
 NDK_VERSION = os.environ.get("ANDROID_NDK_VERSION", "27.2.12479018")
 IS_WIN = os.name == "nt"

@@ -1,3 +1,7 @@
+## v17.14.8 — Price/Barter crash fix (27 November 2026)
+
+Game keluar sendiri saat dibuka karena `SIGSEGV` di `PriceManager::loadGameValue` (blok `<barter>` di `price.xml` tanpa teks). Blok dipindah ke JSON; tombol GOOGLE/SURAT/BARTER dihapus; pemilih akun Google langsung muncul. Lihat `CHANGELOG-V17.14.8-PRICE-BARTER-CRASHFIX.md`.
+
 ## v17.14.6 — Wallet crash fix (27 November 2026)
 
 Game keluar sendiri tepat setelah layar maintenance lolos (tekan **Cek Lagi** atau buka dengan data seluler) karena `SIGSEGV` di `DHValue::getValue()`. Penyebab: pembacaan saldo native di thread UI saat game baru dibuka, sebelum data `LevelManager` dimuat. Lihat `CHANGELOG-V17.14.6-WALLET-CRASHFIX.md`.

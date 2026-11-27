@@ -24,9 +24,9 @@ def test_cloud_meat_is_explicitly_separate_from_native_food():
 def test_version_and_build_output_are_17_14_2():
     yml = (ROOT / "kingdom-in-chaos-decompiled/apktool.yml").read_text()
     build = (ROOT / "build_dtp.py").read_text()
-    assert "versionName: 17.14.6" in yml
-    assert "versionCode: 15" in yml
-    assert "KingdomInChaosDTP-v17.14.6-wallet-crashfix.apk" in build
+    assert "versionName: 17.14.8" in yml
+    assert "versionCode: 16" in yml
+    assert "KingdomInChaosDTP-v17.14.8-price-barter-crashfix.apk" in build
 
 
 def test_google_profile_identity_refreshes_on_each_verified_request():

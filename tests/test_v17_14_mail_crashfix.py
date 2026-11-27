@@ -52,7 +52,8 @@ def test_mail_is_delivered_to_game_inbox_and_not_by_email():
     assert 'Email Google hanya dipakai untuk menemukan pemain tujuan' in html
     assert 'Klaim Hadiah' in java and 'backend.claimMail' in java
     assert 'GameMailActivity' in read('kingdom-in-chaos-decompiled/AndroidManifest.xml')
-    assert 'addMailEntry(activity, root)' in read('dtp/src/com/destian/dtp/GameOnlineOverlay.java')
+    overlay = read('dtp/src/com/destian/dtp/GameOnlineOverlay.java')
+    assert 'removeLegacyButtons(root)' in overlay and 'addMailEntry' not in overlay
 
 
 def test_admin_no_longer_has_second_supabase_login_or_direct_wallet_action():
@@ -81,9 +82,9 @@ def test_admin_realtime_broadcast_plus_poll_fallback_refreshes_player_and_mail_t
 def test_version_and_package_are_bumped_for_v17_14_2():
     yml = read('kingdom-in-chaos-decompiled/apktool.yml')
     build = read('build_dtp.py')
-    assert 'versionCode: 15' in yml
-    assert 'versionName: 17.14.6' in yml
-    assert 'KingdomInChaosDTP-v17.14.6-wallet-crashfix.apk' in build
+    assert 'versionCode: 16' in yml
+    assert 'versionName: 17.14.8' in yml
+    assert 'KingdomInChaosDTP-v17.14.8-price-barter-crashfix.apk' in build
 
 
 def test_claimed_mail_rewards_are_journaled_and_applied_to_native_wallet_and_life():

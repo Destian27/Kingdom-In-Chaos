@@ -37,8 +37,15 @@ def test_packed_price_config_has_no_cash_values_and_has_barter_prices():
     # saat game dibuka, jadi sekarang node harus punya isi "0" (bukan uang nyata).
     assert cn is not None and cn.get("sign") == "Rp"
     assert all(child.text == "0" and not child.attrib for child in list(cn))
-    barter = root.find("barter")
-    assert barter is not None and barter.get("currency_exchange_rate") == "50_coin_per_dm"
+    # v17.14.8: blok <barter> dipindah ke JSON karena PriceManager::loadGameValue
+    # memanggil GetText() pada semua elemen setelah <dollar> (NULL -> SIGSEGV).
+    assert root.find("barter") is None
+    import json
+    barter = json.loads(read_text("kingdom-in-chaos-decompiled/assets/dtp_barter_prices.json"))
+    assert barter["currency_exchange_rate"] == "50_coin_per_dm"
+    for child in list(root):
+        if child.tag != "dollar":
+            assert len(child) == 0 and (child.text or "").strip(), child.tag
     expected = {
         "vip30Days": ("coin", "30000"),
         "luckSpree": ("coin", "3500"),
@@ -53,10 +60,10 @@ def test_packed_price_config_has_no_cash_values_and_has_barter_prices():
         "seasonalB": ("dm", "1499"),
     }
     for name, (currency, cost) in expected.items():
-        entry = barter.find(name)
+        entry = barter.get(name)
         assert entry is not None
-        assert entry.get("currency") == currency
-        assert entry.get("cost") == cost
+        assert entry["currency"] == currency
+        assert entry["cost"] == cost
 
 
 def test_native_bridge_deducts_balance_before_original_game_reward():
@@ -101,7 +108,7 @@ def test_build_script_patches_both_abis_and_compiles_thumb_bridge():
     assert "patch_native_barter()" in build
     assert "patch_barter_native.py" in build
     assert '"-mthumb"' in build
-    assert '"KingdomInChaosDTP-v17.14.6-wallet-crashfix.apk"' in build
+    assert '"KingdomInChaosDTP-v17.14.8-price-barter-crashfix.apk"' in build
     assert '"armeabi", "armeabi-v7a"' in patcher
 
 

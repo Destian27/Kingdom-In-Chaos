@@ -21,11 +21,13 @@ def test_semua_config_tanpa_elemen_atau_atribut_kosong():
         assert not re.findall(r"\s\w+=\"\"", t), f.name + " punya atribut kosong"
 
 
-def test_patch_price_idempotent_dan_barter_tetap_ada():
+def test_patch_price_idempotent_dan_barter_pindah_ke_json():
     before = (CONFIG / "price.xml").read_bytes()
     subprocess.check_call([sys.executable, str(ROOT / "tools/patch_price_dollar_fix.py")])
     assert (CONFIG / "price.xml").read_bytes() == before
-    assert "<barter " in baca("price.xml")
+    # v17.14.8: <barter> tidak boleh ada di price.xml (GetText() NULL -> SIGSEGV).
+    assert "<barter" not in baca("price.xml")
+    assert (ROOT / "kingdom-in-chaos-decompiled/assets/dtp_barter_prices.json").is_file()
     assert "<lifeRecoveryInterval>300</lifeRecoveryInterval>" in baca("price.xml")
 
 

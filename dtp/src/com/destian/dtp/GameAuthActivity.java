@@ -43,6 +43,8 @@ public final class GameAuthActivity extends Activity {
             authenticate(backend.getSavedAccountName());
         } else {
             status.setText("Login memakai akun Google. Email harus sudah diverifikasi oleh Google.");
+            // v17.14.8: pemilih akun Google langsung muncul, pemain tinggal memilih akun.
+            if (state == null) chooseGoogleAccount();
         }
     }
 

@@ -1,0 +1,77 @@
+{
+  "currency_exchange_rate": "50_coin_per_dm",
+  "coinPack0": {
+    "currency": "dm",
+    "cost": "200",
+    "reward": "10000"
+  },
+  "coinPack1": {
+    "currency": "dm",
+    "cost": "700",
+    "reward": "35000"
+  },
+  "coinPack2": {
+    "currency": "dm",
+    "cost": "2400",
+    "reward": "120000"
+  },
+  "dmPack0": {
+    "currency": "coin",
+    "cost": "10000",
+    "reward": "200"
+  },
+  "dmPack1": {
+    "currency": "coin",
+    "cost": "35000",
+    "reward": "700"
+  },
+  "dmPack2": {
+    "currency": "coin",
+    "cost": "120000",
+    "reward": "2400"
+  },
+  "vip30Days": {
+    "currency": "coin",
+    "cost": "30000"
+  },
+  "luckSpree": {
+    "currency": "coin",
+    "cost": "3500"
+  },
+  "newbieValue": {
+    "currency": "dm",
+    "cost": "299"
+  },
+  "newbieRich": {
+    "currency": "dm",
+    "cost": "999"
+  },
+  "equipmentItem": {
+    "currency": "dm",
+    "cost": "499"
+  },
+  "heroBundle": {
+    "currency": "dm",
+    "cost": "560"
+  },
+  "gearBundle": {
+    "currency": "dm",
+    "cost": "420"
+  },
+  "weeklyBundle": {
+    "currency": "dm",
+    "cost": "599"
+  },
+  "pvpTicket": {
+    "currency": "dm",
+    "cost": "99"
+  },
+  "seasonalA": {
+    "currency": "dm",
+    "cost": "499"
+  },
+  "seasonalB": {
+    "currency": "dm",
+    "cost": "1499"
+  }
+}
