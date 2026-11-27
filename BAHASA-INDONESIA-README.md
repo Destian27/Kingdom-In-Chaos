@@ -25,6 +25,10 @@ Sebanyak **2.254 entri teks** di dalam konfigurasi diproses. Pemeriksaan otomati
 
 Untuk build lokal dibutuhkan JDK 17+, Android SDK beserta build-tools/platform yang sesuai, serta `tools/apktool.jar`. Jalankan `python3 build_dtp.py` dari root source. Berkas APK belum dibangun oleh sesi penyuntingan ini karena Android SDK dan `apktool.jar` tidak tersedia di lingkungan kerja ini.
 
+## Perapihan dialog cerita
+
+Dialog cerita berbahasa Indonesia memakai pemisah baris eksplisit pada batas kata (maksimal sekitar 44 karakter per baris). Nama pembicara tetap di baris tersendiri. Tujuannya agar kalimat panjang—termasuk “Raja Michael? Kalian seharusnya mengkhawatirkan diri sendiri!”—ditampilkan dalam beberapa baris, bukan melewati sisi kotak dialog. Kata dan tanda baca tidak dihapus.
+
 ## Batasan yang perlu diketahui
 
 - Native game yang tersedia hanya memiliki **lima slot bahasa**. Tidak ada source C++ native yang memungkinkan menambahkan slot keenam dengan aman pada pekerjaan ini. Karena itu, label **Deutsch** dan data runtime `de.xml` dialihkan untuk Bahasa Indonesia. Bahasa Jerman tidak lagi tersedia pada build ini.

@@ -24,6 +24,7 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
 
     private final Handler h = new Handler(Looper.getMainLooper());
     private volatile Activity game;
+    private volatile Activity foregroundActivity;
     private boolean busy;
     private boolean kicking;
     private boolean again;
@@ -69,7 +70,18 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
     @Override
     public void onCreate() {
         super.onCreate();
-        CrashReporter.onAppStart(this);
+        CrashReporter.onAppStart(this, new CrashReporter.ReportListener() {
+            @Override public void onReportReady() {
+                final Activity active = foregroundActivity;
+                if (active != null && !active.isFinishing()) {
+                    active.runOnUiThread(new Runnable() {
+                        @Override public void run() {
+                            GameOnlineOverlay.refreshCrashReportUi(active);
+                        }
+                    });
+                }
+            }
+        });
         registerActivityLifecycleCallbacks(this);
     }
 
@@ -137,8 +149,18 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
 
     @Override
     public void onActivityResumed(Activity a) {
+        foregroundActivity = a;
+        if (!GAME.equals(a.getClass().getName())) {
+            // The launcher/maintenance screen is the first screen after relaunch. Show a
+            // previous-session report here too, even before the player enters the game.
+            if (a instanceof MaintenanceActivity) {
+                GameOnlineOverlay.showPendingCrashReport(a);
+            }
+            return;
+        }
         if (GAME.equals(a.getClass().getName())) {
-            CrashReporter.mark(this, "game resumed");
+            CrashReporter.mark(this, "game resumed; activity=" + a.getClass().getName()
+                    + "; pid=" + android.os.Process.myPid());
             try {
                 onGameResumed(a);
             } catch (Throwable error) {
@@ -452,8 +474,12 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
     @Override
     public void onActivityPaused(Activity a) {
         if (GAME.equals(a.getClass().getName())) {
-            CrashReporter.clearMarker(this);
+            // A pause is not proof of a clean exit. Keep the marker so process death while
+            // backgrounded is still diagnosed on the next launch.
+            CrashReporter.mark(this, "game paused; changingConfigurations="
+                    + a.isChangingConfigurations());
         }
+        if (a == foregroundActivity) foregroundActivity = null;
         if (a == game) {
             game = null;
             h.removeCallbacks(poll);
@@ -470,5 +496,12 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
     @Override public void onActivityStarted(Activity a) { }
     @Override public void onActivityStopped(Activity a) { }
     @Override public void onActivitySaveInstanceState(Activity a, Bundle b) { }
-    @Override public void onActivityDestroyed(Activity a) { }
+    @Override public void onActivityDestroyed(Activity a) {
+        if (GAME.equals(a.getClass().getName()) && a.isFinishing()
+                && !a.isChangingConfigurations()) {
+            // Explicitly finishing the game is a normal exit, unlike an unexpected process death.
+            CrashReporter.clearMarker(this);
+        }
+        if (a == foregroundActivity) foregroundActivity = null;
+    }
 }

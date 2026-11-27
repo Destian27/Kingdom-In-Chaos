@@ -1,8 +1,19 @@
-# Kingdom In Chaos DTP (v1.0.5) — Crystal Shop / No Top Up (Android 7+)
+# Kingdom In Chaos DTP (v17.9) — Crystal Shop / No Top Up (Android 7+)
 
 Compatibility port and offline patch for **Kingdom in Chaos** (`com.droidhang.zhanshen` / 战神传说), originally released by Droidhang in 2013. This DTP build keeps its maintenance-screen / Supabase integration and adds the r6 Crystal Shop conversion.
 
 The game originally crashes immediately on Android 6.0 and newer versions due to deprecated APIs, `DT_TEXTREL` dynamic relocations, dead telemetry services, and uninitialized graphics contexts. This repository contains the decompiled source, binary patches for `libgame.so`, and an automated build script to produce a working APK for modern Android devices.
+
+
+## v17.9 — Automatic full crash report
+
+- A crash/session marker is retained across ordinary Activity pauses so a process death while the game is backgrounded can still be diagnosed. It is cleared only for explicit normal game finishing or the intentional maintenance kick.
+- A previous-session marker is rotated at startup and preserved until the report is written successfully.
+- The app now captures uncaught Java exceptions before chaining to Android's original crash handler.
+- On relaunch, the full report is automatically shown on the maintenance/launcher screen; the small warning icon in the game can reopen it.
+- The report includes device/build/app version, session breadcrumbs, Java stack trace when available, Android 11+ process-exit reasons and available trace/tombstone text, plus relevant logcat entries. Secrets/tokens are redacted.
+- Reports remain in private app storage until the player deletes them. Android may restrict some logcat/tombstone data, so completeness depends on OS access.
+- Android package version is `17.9` (versionCode `7`).
 
 ---
 
@@ -64,7 +75,7 @@ Build the DTP edition from the checked-in source (including the Crystal Shop cha
 python3 build_dtp.py
 ```
 
-This creates `KingdomInChaosDTP.apk`. A local build requires JDK 17+, Android SDK build-tools, an Android platform `android.jar`, and `tools/apktool.jar`. The GitHub Actions workflow downloads apktool automatically. Do **not** use the legacy `build_apk.py` script for this DTP source tree.
+This creates `KingdomInChaosDTP-v17.9.apk`. A local build requires JDK 17+, Android SDK build-tools, an Android platform `android.jar`, and `tools/apktool.jar`. The GitHub Actions workflow downloads apktool automatically. Do **not** use the legacy `build_apk.py` script for this DTP source tree.
 
 
 ---
@@ -94,7 +105,7 @@ Setup database: jalankan `supabase/maintenance.sql` sekali di SQL Editor. Nyalak
 
 Opsi di `MaintenanceActivity.java`: `BLOCK_WHEN_OFFLINE` (default `false`, artinya kalau tidak ada internet game tetap bisa dibuka).
 
-**Build.** Push ke GitHub lalu jalankan workflow `Build Kingdom In Chaos DTP APK`, hasilnya artifact `KingdomInChaosDTP.apk`. Build lokal: `python3 build_dtp.py` (butuh JDK 17+, Android SDK, dan `tools/apktool.jar`). Jangan jalankan `build_apk.py` lama, itu untuk port sebelumnya.
+**Build.** Push ke GitHub lalu jalankan workflow `Build Kingdom In Chaos DTP APK`, hasilnya artifact `KingdomInChaosDTP-v17.9.apk`. Build lokal: `python3 build_dtp.py` (butuh JDK 17+, Android SDK, dan `tools/apktool.jar`). Jangan jalankan `build_apk.py` lama, itu untuk port sebelumnya.
 
 Agar update APK bisa menimpa versi lama, simpan keystore sebagai secret `KEYSTORE_BASE64` (plus `KEYSTORE_PASS` dan `KEYSTORE_ALIAS`). Tanpa itu tiap build memakai keystore baru.
 

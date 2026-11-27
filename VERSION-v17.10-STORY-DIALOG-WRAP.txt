@@ -1,0 +1,5 @@
+Kingdom in Chaos DTP — v17.10
+Perapihan baris dialog Bahasa Indonesia
+- Dialog cerita diberi line break pada batas kata agar teks panjang tidak melewati sisi kotak.
+- Isi kata dan tanda baca dipertahankan.
+- APK belum dibangun dan belum diuji langsung di perangkat.

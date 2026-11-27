@@ -2,7 +2,11 @@ package com.destian.dtp;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Process;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -14,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,66 +27,139 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Kotak hitam ringan untuk kasus "game keluar sendiri".
+ * Persistent crash black box for unexpected game exits.
  *
- * Cara kerja: saat GameActivity tampil ditulis penanda sesi; saat GameActivity pause secara
- * normal penanda dihapus. Jika proses berikutnya menemukan penanda yang masih ada, berarti sesi
- * sebelumnya berakhir tidak wajar (crash Java/native, dimatikan sistem). Saat itu disusun laporan
- * teks (jejak sesi, alasan keluar dari Android 11+, dan log relevan) yang bisa dibuka dan disalin
- * dari tombol LAPORAN CRASH di overlay game. Semua metode aman dipanggil kapan saja: tidak ada
- * exception yang keluar ke pemanggil.
+ * A session marker is kept while GameActivity is active, including ordinary pauses. On the next
+ * process start it is rotated to a pending marker, then a full report is written on a worker
+ * thread. The pending marker is deleted only after the report is safely written. Java uncaught
+ * exceptions are synchronously saved before Android's original crash handler is called.
  */
 final class CrashReporter {
     private static final String MARKER = "kic_session_marker.txt";
+    private static final String PREVIOUS_MARKER = "kic_previous_session_marker.txt";
+    private static final String JAVA_CRASH = "kic_last_java_crash.txt";
     private static final String REPORT = "kic_last_report.txt";
-    private static final int MAX_MARKER_CHARS = 4096;
-    private static final int MAX_LOG_LINES = 220;
-    private static final int MAX_LOG_CHARS = 14000;
-    private static final int MAX_REPORT_CHARS = 26000;
+    private static final int MAX_MARKER_CHARS = 8192;
+    private static final int MAX_JAVA_CRASH_CHARS = 36000;
+    private static final int MAX_LOG_LINES = 1100;
+    private static final int MAX_LOG_CHARS = 62000;
+    private static final int MAX_REPORT_CHARS = 110000;
     private static final Object LOCK = new Object();
+    private static volatile boolean handlerInstalled;
+
+    interface ReportListener {
+        void onReportReady();
+    }
 
     private CrashReporter() { }
 
-    /** Dipanggil dari Application.onCreate. Hanya bekerja di proses utama (bukan proses :kick). */
-    static void onAppStart(final Context context) {
+    /** Called from Application.onCreate. Runs only in the main application process. */
+    static void onAppStart(final Context context, final ReportListener listener) {
         try {
             if (!isMainProcess(context)) return;
-            final File marker = new File(context.getFilesDir(), MARKER);
-            final String breadcrumbs;
-            synchronized (LOCK) {
-                if (!marker.exists()) return;
-                breadcrumbs = readText(marker, MAX_MARKER_CHARS);
-                marker.delete();
-            }
             final Context app = context.getApplicationContext() != null
                     ? context.getApplicationContext() : context;
+            installUncaughtExceptionHandler(app);
+
+            final String breadcrumbs;
+            final String javaCrash;
+            final boolean needsReport;
+            synchronized (LOCK) {
+                File marker = new File(app.getFilesDir(), MARKER);
+                File previous = new File(app.getFilesDir(), PREVIOUS_MARKER);
+                File javaFile = new File(app.getFilesDir(), JAVA_CRASH);
+                if (marker.isFile()) {
+                    String current = readText(marker, MAX_MARKER_CHARS);
+                    String older = readText(previous, MAX_MARKER_CHARS);
+                    writeText(previous, trimTail(older + current, MAX_MARKER_CHARS * 2));
+                    marker.delete();
+                }
+                breadcrumbs = readText(previous, MAX_MARKER_CHARS * 2);
+                javaCrash = readText(javaFile, MAX_JAVA_CRASH_CHARS);
+                needsReport = previous.isFile() || javaFile.isFile();
+            }
+
+            if (!needsReport) return;
             Thread worker = new Thread(new Runnable() {
                 @Override public void run() {
-                    buildReport(app, breadcrumbs);
+                    boolean saved = buildReport(app, breadcrumbs, javaCrash);
+                    if (saved) {
+                        synchronized (LOCK) {
+                            new File(app.getFilesDir(), PREVIOUS_MARKER).delete();
+                            new File(app.getFilesDir(), JAVA_CRASH).delete();
+                        }
+                        if (listener != null) {
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override public void run() {
+                                    try { listener.onReportReady(); } catch (Throwable ignored) { }
+                                }
+                            });
+                        }
+                    }
                 }
             }, "kic-crash-report");
             worker.setDaemon(true);
             worker.start();
         } catch (Throwable ignored) {
-            // Perekam tidak boleh mengganggu game.
+            // Diagnostics must never prevent the original game from starting.
         }
     }
 
-    /** Tambah satu baris jejak ke penanda sesi (dibuat jika belum ada). */
+    /** Persist Java fatal details before delegating to Android's existing crash handler. */
+    private static void installUncaughtExceptionHandler(final Context context) {
+        if (handlerInstalled) return;
+        synchronized (LOCK) {
+            if (handlerInstalled) return;
+            final Thread.UncaughtExceptionHandler previous = Thread.getDefaultUncaughtExceptionHandler();
+            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override public void uncaughtException(Thread thread, Throwable error) {
+                    saveJavaCrash(context, thread, error);
+                    if (previous != null) {
+                        previous.uncaughtException(thread, error);
+                    } else {
+                        Process.killProcess(Process.myPid());
+                        System.exit(10);
+                    }
+                }
+            });
+            handlerInstalled = true;
+        }
+    }
+
+    private static void saveJavaCrash(Context context, Thread thread, Throwable error) {
+        try {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            pw.println("JAVA UNCAUGHT EXCEPTION");
+            pw.println("Waktu: " + stamp());
+            pw.println("Thread: " + (thread == null ? "unknown" : thread.getName())
+                    + " | id=" + (thread == null ? -1 : thread.getId()));
+            if (error != null) error.printStackTrace(pw);
+            pw.flush();
+            String text = sw.toString();
+            if (text.length() > MAX_JAVA_CRASH_CHARS) {
+                text = text.substring(0, MAX_JAVA_CRASH_CHARS);
+            }
+            synchronized (LOCK) {
+                writeText(new File(context.getFilesDir(), JAVA_CRASH), text);
+            }
+        } catch (Throwable ignored) {
+            // Last-resort crash path: never interfere with the system crash handler.
+        }
+    }
+
+    /** Add a timestamped breadcrumb to the current game session. */
     static void mark(Context context, String event) {
         try {
             synchronized (LOCK) {
                 File file = new File(context.getFilesDir(), MARKER);
                 String text = readText(file, MAX_MARKER_CHARS) + stamp() + " " + event + "\n";
-                if (text.length() > MAX_MARKER_CHARS) {
-                    text = text.substring(text.length() - MAX_MARKER_CHARS);
-                }
-                writeText(file, text);
+                writeText(file, trimTail(text, MAX_MARKER_CHARS));
             }
         } catch (Throwable ignored) { }
     }
 
-    /** Sesi berakhir wajar (pause / kick maintenance): hapus penanda supaya tidak dianggap crash. */
+    /** Clear only for an explicitly normal game exit or the intentional maintenance kick. */
     static void clearMarker(Context context) {
         try {
             synchronized (LOCK) {
@@ -89,7 +168,7 @@ final class CrashReporter {
         } catch (Throwable ignored) { }
     }
 
-    /** Isi laporan terakhir, atau null jika tidak ada. */
+    /** Read the saved report; it is retained until the player explicitly deletes it. */
     static String peekReport(Context context) {
         try {
             File file = new File(context.getFilesDir(), REPORT);
@@ -107,8 +186,6 @@ final class CrashReporter {
         } catch (Throwable ignored) { }
     }
 
-    // ---------------------------------------------------------------------------------------
-
     private static boolean isMainProcess(Context context) {
         BufferedReader reader = null;
         try {
@@ -125,47 +202,92 @@ final class CrashReporter {
         }
     }
 
-    private static void buildReport(Context context, String breadcrumbs) {
+    private static boolean buildReport(Context context, String breadcrumbs, String javaCrash) {
         StringBuilder sb = new StringBuilder();
         try {
-            sb.append("LAPORAN SESI TIDAK WAJAR - Kingdom In Chaos DTP v17.7\n");
+            sb.append("LAPORAN LENGKAP GAME KELUAR SENDIRI - Kingdom In Chaos DTP v17.9\n");
             sb.append("Waktu laporan: ").append(stamp()).append('\n');
+            sb.append("Package: ").append(context.getPackageName()).append('\n');
+            sb.append("PID saat laporan: ").append(Process.myPid()).append('\n');
             sb.append("Perangkat: ").append(Build.MANUFACTURER).append(' ').append(Build.MODEL)
-                    .append(" | Android ").append(Build.VERSION.RELEASE)
-                    .append(" (API ").append(Build.VERSION.SDK_INT).append(")\n");
+                    .append(" | device=").append(Build.DEVICE)
+                    .append(" | hardware=").append(Build.HARDWARE).append('\n');
+            sb.append("Android: ").append(Build.VERSION.RELEASE)
+                    .append(" | API ").append(Build.VERSION.SDK_INT)
+                    .append(" | build=").append(Build.DISPLAY).append('\n');
+            sb.append("Build fingerprint: ").append(Build.FINGERPRINT).append('\n');
+            sb.append("Aplikasi: ").append(appVersion(context)).append('\n');
             sb.append("ABI: ");
             String[] abis = Build.SUPPORTED_ABIS;
             for (int i = 0; abis != null && i < abis.length; i++) {
                 if (i > 0) sb.append(',');
                 sb.append(abis[i]);
             }
-            sb.append("\n\n== Jejak sesi sebelumnya (waktu, kejadian) ==\n").append(breadcrumbs);
-            if (Build.VERSION.SDK_INT >= 30) {
-                sb.append("\n== Alasan proses berakhir menurut Android ==\n");
-                sb.append(ExitInfo.describe(context));
+            sb.append("\n\n== JEJAK SESI SEBELUMNYA ==\n");
+            sb.append(breadcrumbs.length() == 0 ? "(penanda sesi tidak tersedia; detail exit Android tetap diperiksa)\n" : redact(breadcrumbs));
+
+            if (javaCrash.length() > 0) {
+                sb.append("\n== JAVA CRASH: EXCEPTION DAN STACK TRACE ==\n");
+                sb.append(redact(javaCrash)).append('\n');
+            } else {
+                sb.append("\n== JAVA CRASH ==\n(tidak ada uncaught exception Java yang tersimpan)\n");
             }
-            sb.append("\n== Log relevan (logcat) ==\n");
+
+            if (Build.VERSION.SDK_INT >= 30) {
+                sb.append("\n== RIWAYAT ALASAN PROSES MENURUT ANDROID ==\n");
+                sb.append(ExitInfo.describe(context));
+            } else {
+                sb.append("\n== RIWAYAT ALASAN PROSES ANDROID ==\n");
+                sb.append("ApplicationExitInfo memerlukan Android 11 (API 30) atau lebih baru.\n");
+            }
+
+            sb.append("\n== LOG SISTEM YANG RELEVAN (LOGCAT) ==\n");
             sb.append(collectLog());
+            sb.append("\n== CATATAN AKSES LOG ==\n");
+            sb.append("Android dapat membatasi akses aplikasi ke log sistem. Jika logcat kosong/ditolak, "
+                    + "bagian Java exception dan ApplicationExitInfo tetap dicoba secara terpisah.\n");
+            sb.append("Laporan ini tidak mengirim data ke server. File disimpan lokal di penyimpanan privat aplikasi.\n");
         } catch (Throwable error) {
-            sb.append("\n[Sebagian laporan gagal disusun: ").append(error).append("]\n");
+            sb.append("\n[ sebagian laporan gagal disusun: ").append(error).append(" ]\n");
         }
+
         String text = sb.toString();
         if (text.length() > MAX_REPORT_CHARS) {
-            text = text.substring(0, 8000) + "\n...[dipotong]...\n"
-                    + text.substring(text.length() - (MAX_REPORT_CHARS - 8000));
+            text = text.substring(0, 12000) + "\n...[bagian tengah dipotong karena batas penyimpanan laporan]...\n"
+                    + text.substring(text.length() - (MAX_REPORT_CHARS - 12000));
         }
         try {
             synchronized (LOCK) {
-                writeText(new File(context.getFilesDir(), REPORT), text);
+                File report = new File(context.getFilesDir(), REPORT);
+                File temp = new File(context.getFilesDir(), REPORT + ".tmp");
+                writeText(temp, text);
+                if (report.exists() && !report.delete()) return false;
+                if (!temp.renameTo(report)) {
+                    copyFile(temp, report);
+                    temp.delete();
+                }
+                return report.isFile() && report.length() > 0;
             }
-        } catch (Throwable ignored) { }
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    private static String appVersion(Context context) {
+        try {
+            PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            long code = Build.VERSION.SDK_INT >= 28 ? info.getLongVersionCode() : info.versionCode;
+            return String.valueOf(info.versionName) + " (versionCode=" + code + ")";
+        } catch (Throwable error) {
+            return "tidak tersedia: " + error;
+        }
     }
 
     private static String collectLog() {
-        Process process = null;
+        java.lang.Process process = null;
         BufferedReader reader = null;
         try {
-            ProcessBuilder builder = new ProcessBuilder("logcat", "-d", "-v", "threadtime", "-t", "3000");
+            ProcessBuilder builder = new ProcessBuilder("logcat", "-d", "-v", "threadtime", "-t", "5000");
             builder.redirectErrorStream(true);
             process = builder.start();
             reader = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
@@ -173,18 +295,15 @@ final class CrashReporter {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (interesting(line)) {
-                    keep.add(line.length() > 400 ? line.substring(0, 400) : line);
+                    keep.add(redact(line.length() > 700 ? line.substring(0, 700) : line));
                 }
             }
+            process.waitFor();
             int from = Math.max(0, keep.size() - MAX_LOG_LINES);
             StringBuilder out = new StringBuilder();
-            for (int i = from; i < keep.size(); i++) {
-                out.append(keep.get(i)).append('\n');
-            }
-            if (out.length() == 0) return "(tidak ada baris log relevan yang bisa dibaca)\n";
-            if (out.length() > MAX_LOG_CHARS) {
-                return out.substring(out.length() - MAX_LOG_CHARS);
-            }
+            for (int i = from; i < keep.size(); i++) out.append(keep.get(i)).append('\n');
+            if (out.length() == 0) return "(tidak ada baris relevan yang bisa dibaca; akses logcat mungkin dibatasi Android)\n";
+            if (out.length() > MAX_LOG_CHARS) return out.substring(out.length() - MAX_LOG_CHARS);
             return out.toString();
         } catch (Throwable error) {
             return "(logcat tidak bisa dibaca: " + error + ")\n";
@@ -196,39 +315,43 @@ final class CrashReporter {
         }
     }
 
-    private static boolean interesting(String l) {
+    private static boolean interesting(String line) {
+        String l = line == null ? "" : line;
         return l.contains("FATAL") || l.contains("Fatal signal") || l.contains("AndroidRuntime")
                 || l.contains("backtrace") || l.contains("libgame") || l.contains("JNI DETECTED")
                 || l.contains("Aborting") || l.contains("SIGSEGV") || l.contains("SIGABRT")
                 || l.contains("DEBUG") || l.contains("Exception") || l.contains("Error")
-                || l.contains("KIC") || l.contains("CrossPromotion") || l.contains("ocos2d")
-                || l.contains(" E ") || l.contains(" F ")
-                || (l.contains(" be ") && l.indexOf(':') > 0)
-                || (l.contains(" dh ") && l.indexOf(':') > 0);
+                || l.contains("ANR") || l.contains("KIC") || l.contains("CrossPromotion")
+                || l.contains("cocos2d") || l.contains("NetworkOnMainThreadException")
+                || l.contains("com.destian.kingdominchaosdtp")
+                || l.contains(" E ") || l.contains(" F ");
     }
 
-    /** Dipisah ke kelas sendiri supaya kelas ApplicationExitInfo (API 30) hanya dimuat di Android 11+. */
+    /** Kept nested so ApplicationExitInfo is only resolved on Android 11+ devices. */
     private static final class ExitInfo {
         static String describe(Context context) {
             StringBuilder sb = new StringBuilder();
             try {
                 ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
                 if (am == null) return "ActivityManager tidak tersedia\n";
-                List<android.app.ApplicationExitInfo> list = am.getHistoricalProcessExitReasons(null, 0, 4);
-                if (list == null || list.isEmpty()) return "(tidak ada data)\n";
+                List<android.app.ApplicationExitInfo> list =
+                        am.getHistoricalProcessExitReasons(context.getPackageName(), 0, 8);
+                if (list == null || list.isEmpty()) return "(Android tidak menyediakan riwayat exit)\n";
                 for (android.app.ApplicationExitInfo info : list) {
                     sb.append(stampMs(info.getTimestamp()))
+                            .append(" pid=").append(info.getPid())
                             .append(" proses=").append(info.getProcessName())
                             .append(" alasan=").append(reasonName(info.getReason()))
                             .append('(').append(info.getReason()).append(')')
                             .append(" status=").append(info.getStatus())
-                            .append(" importance=").append(info.getImportance());
+                            .append(" importance=").append(info.getImportance())
+                            .append(" pssKB=").append(info.getPss())
+                            .append(" rssKB=").append(info.getRss());
                     String description = info.getDescription();
-                    if (description != null) sb.append(" ket=").append(description);
+                    if (description != null) sb.append(" keterangan=").append(redact(description));
                     sb.append('\n');
-                    if (info.getReason() == 5) { // REASON_CRASH_NATIVE
-                        sb.append(readTrace(info));
-                    }
+                    String trace = readTrace(info);
+                    if (trace.length() > 0) sb.append(trace);
                 }
             } catch (Throwable error) {
                 sb.append("Gagal membaca ApplicationExitInfo: ").append(error).append('\n');
@@ -241,18 +364,16 @@ final class CrashReporter {
             try {
                 in = info.getTraceInputStream();
                 if (in == null) return "";
-                byte[] buf = new byte[8192];
+                byte[] buf = new byte[24576];
                 int total = 0;
                 int n;
-                while (total < buf.length && (n = in.read(buf, total, buf.length - total)) > 0) {
-                    total += n;
-                }
-                StringBuilder out = new StringBuilder("  [tombstone native, teks yang terbaca]\n");
+                while (total < buf.length && (n = in.read(buf, total, buf.length - total)) > 0) total += n;
+                StringBuilder out = new StringBuilder("  [detail trace/tombstone yang dapat dibaca]\n");
                 boolean lastBreak = true;
                 int runStart = out.length();
                 for (int i = 0; i < total; i++) {
                     int b = buf[i] & 0xFF;
-                    if ((b >= 32 && b < 127) || b == '\n') {
+                    if ((b >= 32 && b < 127) || b == '\n' || b == '\t') {
                         out.append((char) b);
                         lastBreak = (b == '\n');
                     } else if (!lastBreak) {
@@ -260,9 +381,9 @@ final class CrashReporter {
                         lastBreak = true;
                     }
                 }
-                return out.toString().length() > runStart ? out.toString() + "\n" : "";
+                return out.length() > runStart ? redact(out.toString()) + "\n" : "";
             } catch (Throwable error) {
-                return "  (tombstone tidak bisa dibaca: " + error + ")\n";
+                return "  (trace/tombstone tidak bisa dibaca: " + error + ")\n";
             } finally {
                 closeQuietly(in);
             }
@@ -288,6 +409,33 @@ final class CrashReporter {
         }
     }
 
+    private static String redact(String input) {
+        if (input == null) return "";
+        return input.replaceAll("(?i)(authorization\\s*[:=]\\s*bearer\\s+)[^\\s,;]+", "$1[REDACTED]")
+                .replaceAll("(?i)((?:access_token|refresh_token|id_token|client_secret|service_role|apikey|api_key|password)\\s*[=:]\\s*)[^\\s,;&]+", "$1[REDACTED]");
+    }
+
+    private static String trimTail(String text, int max) {
+        if (text == null || text.length() <= max) return text == null ? "" : text;
+        return text.substring(text.length() - max);
+    }
+
+    private static void copyFile(File source, File target) throws IOException {
+        FileInputStream in = null;
+        FileOutputStream out = null;
+        try {
+            in = new FileInputStream(source);
+            out = new FileOutputStream(target, false);
+            byte[] buffer = new byte[4096];
+            int count;
+            while ((count = in.read(buffer)) > 0) out.write(buffer, 0, count);
+            out.flush();
+        } finally {
+            closeQuietly(in);
+            closeQuietly(out);
+        }
+    }
+
     private static String stamp() {
         return stampMs(System.currentTimeMillis());
     }
@@ -302,11 +450,9 @@ final class CrashReporter {
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
             StringBuilder sb = new StringBuilder();
-            char[] buf = new char[2048];
+            char[] buf = new char[4096];
             int n;
-            while (sb.length() < maxChars && (n = reader.read(buf)) > 0) {
-                sb.append(buf, 0, n);
-            }
+            while (sb.length() < maxChars && (n = reader.read(buf)) > 0) sb.append(buf, 0, n);
             return sb.toString();
         } finally {
             closeQuietly(reader);
@@ -326,8 +472,6 @@ final class CrashReporter {
 
     private static void closeQuietly(Closeable closeable) {
         if (closeable == null) return;
-        try {
-            closeable.close();
-        } catch (Throwable ignored) { }
+        try { closeable.close(); } catch (Throwable ignored) { }
     }
 }

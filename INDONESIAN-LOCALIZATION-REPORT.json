@@ -47,5 +47,12 @@
   "apk_build": {
     "built": false,
     "reason": "Android SDK android.jar and tools/apktool.jar are not available in this working environment; build_dtp.py is the supported build entry point."
+  },
+  "story_text_wrapping": {
+    "max_characters_per_line": 44,
+    "entries_changed": 175,
+    "additional_line_breaks": 276,
+    "method": "word-boundary line wrapping; text and punctuation preserved",
+    "apk_built_or_device_tested": false
   }
 }

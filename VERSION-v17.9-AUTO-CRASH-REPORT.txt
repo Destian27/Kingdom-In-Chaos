@@ -1,0 +1,7 @@
+Kingdom In Chaos DTP source update: v17.9 Automatic Full Crash Report
+Date: 2026-11-27
+Base: v17.8 Hero Stack Fix
+Scope: persistent crash marker, Java uncaught-exception capture, Android ApplicationExitInfo/tombstone details, relevant logcat, automatic report display after relaunch, small reopen icon, version metadata.
+APK versionName: 17.9
+APK versionCode: 7
+Build output: KingdomInChaosDTP-v17.9.apk

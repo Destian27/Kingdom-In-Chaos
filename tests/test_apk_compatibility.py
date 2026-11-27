@@ -10,7 +10,7 @@ import zlib
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DECOMPILED_DIR = os.path.join(REPO_ROOT, "kingdom-in-chaos-decompiled")
 TOOLS_DIR = os.path.join(REPO_ROOT, "tools")
-OUTPUT_APK = os.path.join(REPO_ROOT, "KingdomInChaosDTP.apk")
+OUTPUT_APK = os.path.join(REPO_ROOT, "KingdomInChaosDTP-v17.9.apk")
 
 
 def find_build_tool(name):
@@ -100,7 +100,7 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
 
     def test_built_and_signed_apk_is_valid_for_android_13_plus(self):
         if not os.path.isfile(OUTPUT_APK):
-            self.skipTest("Build_dtp.py has not produced KingdomInChaosDTP.apk yet")
+            self.skipTest("Build_dtp.py has not produced KingdomInChaosDTP-v17.9.apk yet")
         if not AAPT2_EXE or not APKSIGNER:
             self.skipTest("Android SDK build tools are not configured for this environment")
 

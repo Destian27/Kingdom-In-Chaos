@@ -7,6 +7,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -107,12 +108,47 @@ public final class GameOnlineOverlay {
             }
             addCrashReportEntry(activity, root);
             accountButton.bringToFront();
+            showPendingCrashReport(activity);
         } catch (Throwable ignored) {
             // The original native game keeps working if an optional overlay cannot be added.
         }
     }
 
-    /** Tombol kecil yang hanya muncul jika sesi sebelumnya berakhir tidak wajar. */
+    /** Refresh the small report icon and automatically show a newly saved report. */
+    public static void refreshCrashReportUi(final Activity activity) {
+        if (activity == null || activity.isFinishing()) return;
+        activity.runOnUiThread(new Runnable() {
+            @Override public void run() {
+                try {
+                    View content = activity.findViewById(android.R.id.content);
+                    if (content instanceof FrameLayout) {
+                        addCrashReportEntry(activity, (FrameLayout) content);
+                    }
+                    showPendingCrashReport(activity);
+                } catch (Throwable ignored) { }
+            }
+        });
+    }
+
+    /** Automatically display the saved report once per app process/report. */
+    public static void showPendingCrashReport(final Activity activity) {
+        if (activity == null || activity.isFinishing()) return;
+        try {
+            final String report = CrashReporter.peekReport(activity.getApplicationContext());
+            if (report == null) return;
+            final String key = Integer.toHexString(report.hashCode()) + ":" + report.length();
+            SharedPreferences prefs = activity.getSharedPreferences("kic_crash_reports", Context.MODE_PRIVATE);
+            if (key.equals(prefs.getString("last_auto_shown_signature", ""))) return;
+            prefs.edit().putString("last_auto_shown_signature", key).apply();
+            activity.runOnUiThread(new Runnable() {
+                @Override public void run() {
+                    if (!activity.isFinishing()) showCrashReportDialog(activity);
+                }
+            });
+        } catch (Throwable ignored) { }
+    }
+
+    /** Small warning icon remains available to reopen the full report later. */
     private static void addCrashReportEntry(final Activity activity, FrameLayout root) {
         try {
             View existing = root.findViewWithTag(TAG_CRASH_REPORT_BUTTON);
@@ -127,19 +163,21 @@ public final class GameOnlineOverlay {
             }
             Button button = new Button(activity);
             button.setTag(TAG_CRASH_REPORT_BUTTON);
-            button.setText("LAPORAN CRASH");
-            button.setTextSize(10f);
+            button.setText("!");
+            button.setTextSize(19f);
+            button.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
             button.setAllCaps(false);
             button.setTextColor(Color.WHITE);
+            button.setPadding(0, 0, 0, 0);
             button.setBackground(buttonBackground());
-            button.setContentDescription("Lihat laporan sesi game yang berakhir tidak wajar");
+            button.setContentDescription("Buka laporan lengkap game keluar sendiri");
             button.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View view) {
                     showCrashReportDialog(activity);
                 }
             });
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                    dp(activity, 104), dp(activity, 36), Gravity.TOP | Gravity.LEFT);
+                    dp(activity, 38), dp(activity, 38), Gravity.TOP | Gravity.LEFT);
             params.topMargin = dp(activity, 102);
             params.leftMargin = dp(activity, 8);
             root.addView(button, params);
@@ -154,27 +192,27 @@ public final class GameOnlineOverlay {
             ScrollView scroll = new ScrollView(activity);
             TextView text = new TextView(activity);
             text.setText(report);
-            text.setTextSize(9f);
+            text.setTextSize(10f);
             text.setTypeface(Typeface.MONOSPACE);
             text.setTextIsSelectable(true);
             text.setPadding(dp(activity, 12), dp(activity, 8), dp(activity, 12), dp(activity, 8));
             scroll.addView(text);
             new AlertDialog.Builder(activity)
-                    .setTitle("Laporan sesi tidak wajar")
+                    .setTitle("LAPORAN LENGKAP FORCE CLOSE • v17.9")
                     .setView(scroll)
-                    .setPositiveButton("Salin", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("Salin Semua", new DialogInterface.OnClickListener() {
                         @Override public void onClick(DialogInterface dialog, int which) {
                             try {
                                 ClipboardManager clipboard = (ClipboardManager)
                                         activity.getSystemService(Context.CLIPBOARD_SERVICE);
                                 if (clipboard != null) {
-                                    clipboard.setPrimaryClip(ClipData.newPlainText("Laporan KIC DTP", report));
-                                    Toast.makeText(activity, "Laporan disalin", Toast.LENGTH_SHORT).show();
+                                    clipboard.setPrimaryClip(ClipData.newPlainText("Laporan KIC DTP v17.9", report));
+                                    Toast.makeText(activity, "Laporan lengkap disalin", Toast.LENGTH_SHORT).show();
                                 }
                             } catch (Throwable ignored) { }
                         }
                     })
-                    .setNeutralButton("Hapus", new DialogInterface.OnClickListener() {
+                    .setNeutralButton("Hapus Laporan", new DialogInterface.OnClickListener() {
                         @Override public void onClick(DialogInterface dialog, int which) {
                             try {
                                 CrashReporter.deleteReport(activity.getApplicationContext());
@@ -183,6 +221,7 @@ public final class GameOnlineOverlay {
                                     View entry = ((FrameLayout) content).findViewWithTag(TAG_CRASH_REPORT_BUTTON);
                                     if (entry != null) ((FrameLayout) content).removeView(entry);
                                 }
+                                Toast.makeText(activity, "Laporan dihapus", Toast.LENGTH_SHORT).show();
                             } catch (Throwable ignored) { }
                         }
                     })

@@ -1201,6 +1201,39 @@ def apply_array(section, values, label):
     for node, value in zip(children, values):
         node.text = value
 
+# Native story dialogue does not reliably wrap long Indonesian lines.
+# Insert explicit line breaks at word boundaries so the game does not clip text.
+STORY_WRAP_MAX_CHARS = 44
+
+def wrap_story_text(text: str, max_chars: int = STORY_WRAP_MAX_CHARS) -> str:
+    if not text:
+        return text
+    output = []
+    for line_no, raw_line in enumerate(text.splitlines()):
+        line = raw_line.strip()
+        if not line:
+            output.append('')
+            continue
+        # Keep speaker names ("Eric:", "Daisy:", etc.) on their own line.
+        if line_no == 0 and line.endswith(':'):
+            output.append(line)
+            continue
+        current = []
+        current_len = 0
+        for word in line.split():
+            next_len = current_len + (1 if current else 0) + len(word)
+            if current and next_len > max_chars:
+                output.append(' '.join(current))
+                current = [word]
+                current_len = len(word)
+            else:
+                current.append(word)
+                current_len = next_len
+        if current:
+            output.append(' '.join(current))
+    return '\n'.join(output)
+
+
 def main():
     packed_source = STRING_DIR / 'us.xml'
     source_root = ET.fromstring(read_packed(packed_source))
@@ -1240,7 +1273,7 @@ def main():
             missing=[]
             for node in section:
                 idx=node.attrib.get('index','')
-                if idx in STORY: node.text=STORY[idx]
+                if idx in STORY: node.text=wrap_story_text(STORY[idx])
                 else: missing.append(idx)
             if missing: raise ValueError(f'Storyline belum diterjemahkan: {missing}')
             counts[name]=len(list(section))

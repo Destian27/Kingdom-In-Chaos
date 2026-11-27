@@ -1,5 +1,5 @@
 version: 2.10.0
-apkFileName: kingdom-in-chaos-1-0-5.apk
+apkFileName: kingdom-in-chaos-dtp-v17.9.apk
 isFrameworkApk: false
 usesFramework:
   ids:
@@ -12,8 +12,8 @@ packageInfo:
   forcedPackageId: 127
   renameManifestPackage: null
 versionInfo:
-  versionCode: 6
-  versionName: 1.0.5
+  versionCode: 7
+  versionName: 17.9
 resourcesAreCompressed: false
 sharedLibrary: false
 sparseResources: false
