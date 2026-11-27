@@ -44,7 +44,7 @@ BARTER_JSON = os.path.join(
 )
 
 NILAI_HARGA = "0"      # teks pengisi agar node tidak null
-TANDA_MATA_UANG = "Rp"  # pengganti sign="" (atribut kosong)
+TANDA_MATA_UANG = "DM"  # pengganti sign="" (atribut kosong)
 
 
 def perbaiki(xml: str) -> str:

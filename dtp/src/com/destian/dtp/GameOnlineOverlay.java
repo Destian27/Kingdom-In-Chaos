@@ -105,7 +105,7 @@ public final class GameOnlineOverlay {
             setTag(TAG_HOTSPOTS);
         }
 
-        /** 0 = LOGIN, 1 = Bakat, -1 = di luar area. */
+        /** 0 = LOGIN, 1 = Bakat, 2 = avatar/nama panggilan, -1 = di luar area. */
         private int zoneAt(float x, float y) {
             float h = getHeight(), w = getWidth();
             if (h <= 0 || w <= 0) return -1;
@@ -114,6 +114,9 @@ public final class GameOnlineOverlay {
             // Bakat: 0.058H dari tepi kanan, lebar 0.130H, atas 0.352H, tinggi 0.139H
             float right = w - 0.058f * h;
             if (x >= right - 0.130f * h && x <= right && y >= 0.352f * h && y <= 0.491f * h) return 1;
+            // v17.14.10: kotak avatar + nama panggilan (kiri bawah beranda) -> Google lebih dulu,
+            // lalu layar Daftar (nama saja). Dialog Masuk/Daftar bawaan game tidak lagi terbuka.
+            if (x >= 0.085f * h && x <= 0.68f * h && y >= 0.80f * h && y <= 0.975f * h) return 2;
             return -1;
         }
 
@@ -270,8 +273,8 @@ public final class GameOnlineOverlay {
         addBarterOption(content, activity, 5, "120.000 Koin  →  2.400 DM");
 
         content.addView(sectionTitle(activity, "PAKET DAN KEISTIMEWAAN"));
-        addBarterOption(content, activity, 6, "VIP 30 hari  —  30.000 Koin");
-        addBarterOption(content, activity, 7, "Luck Spree  —  3.500 Koin");
+        addBarterOption(content, activity, 6, "VIP 30 hari  —  600 DM");
+        addBarterOption(content, activity, 7, "Luck Spree  —  70 DM");
         addBarterOption(content, activity, 8, "Newbie Value Pack  —  299 DM");
         addBarterOption(content, activity, 9, "Newbie Rich Pack  —  999 DM");
         addBarterOption(content, activity, 18, "Paket Hero  —  560 DM");

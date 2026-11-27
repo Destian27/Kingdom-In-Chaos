@@ -175,9 +175,10 @@ def patch_native_libraries():
         0x00441F20: b"\x70\x47",  # TestinAgentHelper::callTestinAgentMethod(char const*, char const*, char const*, char const*)
         # 3. BEUtil::nOnWindowFocusChanged crash prevention (Thumb: bx lr)
         0x003DA62C: b"\x70\x47",  # BEUtil::nOnWindowFocusChanged(int)
-        # 4. Unlimited stamina (5/5 clean UI) & zero food cost
-        0x003053A0: bytes.fromhex("002802d005220260002902d000220a607047"),  # BalanceLifeStatus
-        0x003055FC: b"\x01\x20\x70\x47",  # DecreaseLife
+        # 4. v17.14.11: daging NORMAL lagi (regen 1 per 5 menit, biaya stage normal).
+        # Byte asli dari kingdom-in-chaos-1-0-5.apk menggantikan patch "Unlimited stamina" lama.
+        0x003053A0: bytes.fromhex("f0b5474680b484b00f1c061cd9f7acff1b21"),  # BalanceLifeStatus (asli)
+        0x003055FC: bytes.fromhex("30b583b0"),  # DecreaseLife (asli)
         # 5. Normal hero purchase flow (isHeroUnlock / payUnlockHero keep original code)
         0x0038C03C: b"\x70\x47",  # UITeamLayer::showLocks -> bx lr
         # 6. PreloadLayer::init dhlogo null pointer crash prevention (Thumb)

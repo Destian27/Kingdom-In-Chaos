@@ -133,10 +133,35 @@ public final class GooglePlayerBackend {
 
     private String googleAccessToken(String accountName) throws IOException {
         try {
+            return googleAuthUtilToken(accountName);
+        } catch (RecoverableGoogleAuthException e) {
+            throw e;
+        } catch (IOException primary) {
+            // v17.14.13: GoogleAuthUtil yang tertanam di APK adalah versi lama. Bila
+            // pemanggilan lewat refleksi gagal, pakai AccountManager bawaan Android.
+            try {
+                return accountManagerToken(accountName);
+            } catch (RecoverableGoogleAuthException e) {
+                throw e;
+            } catch (IOException fallback) {
+                throw new IOException(primary.getMessage() + " | Cadangan: " + fallback.getMessage(), fallback);
+            }
+        }
+    }
+
+    private String googleAuthUtilToken(String accountName) throws IOException {
+        try {
             Class<?> authUtil = Class.forName("com.google.android.gms.auth.GoogleAuthUtil");
-            Method method = authUtil.getMethod("getToken", Context.class, Account.class, String.class);
-            Account account = new Account(accountName, "com.google");
-            Object result = method.invoke(null, context, account, GOOGLE_SCOPE);
+            Object result;
+            try {
+                // Salinan lama di APK: getToken(Context, String, String)
+                Method byName = authUtil.getMethod("getToken", Context.class, String.class, String.class);
+                result = byName.invoke(null, context, accountName, GOOGLE_SCOPE);
+            } catch (NoSuchMethodException oldSignatureMissing) {
+                // Pustaka baru: getToken(Context, Account, String)
+                Method byAccount = authUtil.getMethod("getToken", Context.class, Account.class, String.class);
+                result = byAccount.invoke(null, context, new Account(accountName, "com.google"), GOOGLE_SCOPE);
+            }
             if (!(result instanceof String) || ((String) result).trim().isEmpty()) {
                 throw new IOException("Google tidak memberikan token akses.");
             }
@@ -155,8 +180,30 @@ public final class GooglePlayerBackend {
             throw new IOException("Google Auth gagal: " + safeMessage(cause), cause);
         } catch (ClassNotFoundException e) {
             throw new IOException("Google Play Services Auth tidak tersedia pada perangkat ini.", e);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
+        } catch (NoSuchMethodException | IllegalAccessException | LinkageError e) {
             throw new IOException("Google Auth tidak kompatibel dengan versi Google Play Services ini.", e);
+        }
+    }
+
+    /** Cadangan tanpa pustaka tertanam: token OAuth lewat AccountManager sistem. */
+    private String accountManagerToken(String accountName) throws IOException {
+        try {
+            android.accounts.AccountManager manager = android.accounts.AccountManager.get(context);
+            Account account = null;
+            for (Account candidate : manager.getAccountsByType("com.google")) {
+                if (candidate.name.equalsIgnoreCase(accountName)) { account = candidate; break; }
+            }
+            if (account == null) throw new IOException("Akun Google tidak ditemukan di perangkat.");
+            android.os.Bundle result = manager.getAuthToken(account, GOOGLE_SCOPE, null, false, null, null).getResult();
+            Intent consent = result.getParcelable(android.accounts.AccountManager.KEY_INTENT);
+            if (consent != null) throw new RecoverableGoogleAuthException(consent);
+            String token = result.getString(android.accounts.AccountManager.KEY_AUTHTOKEN);
+            if (token == null || token.trim().isEmpty()) throw new IOException("Google tidak memberikan token akses.");
+            return token.trim();
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException("AccountManager gagal: " + safeMessage(e), e);
         }
     }
 

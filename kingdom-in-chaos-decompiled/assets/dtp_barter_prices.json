@@ -31,12 +31,12 @@
     "reward": "2400"
   },
   "vip30Days": {
-    "currency": "coin",
-    "cost": "30000"
+    "currency": "dm",
+    "cost": "600"
   },
   "luckSpree": {
-    "currency": "coin",
-    "cost": "3500"
+    "currency": "dm",
+    "cost": "70"
   },
   "newbieValue": {
     "currency": "dm",

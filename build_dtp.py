@@ -92,6 +92,22 @@ def patch_price_dollar_fix():
     run([sys.executable, patcher])
 
 
+def patch_dm_labels():
+    # v17.14.11: label harga layar Penawaran memakai nominal DM (bukan Rp).
+    patcher = os.path.join(TOOLS, "patch_dm_labels.py")
+    if not os.path.isfile(patcher):
+        sys.exit("Script patch label DM tidak ditemukan: " + patcher)
+    run([sys.executable, patcher])
+
+
+def patch_total_recharge():
+    # v17.14.12: ambang Total Recharge 20/50/150/500 -> 40/100/300/1000 DM.
+    patcher = os.path.join(TOOLS, "patch_total_recharge.py")
+    if not os.path.isfile(patcher):
+        sys.exit("Script patch Total Recharge tidak ditemukan: " + patcher)
+    run([sys.executable, patcher])
+
+
 def patch_ui_polish():
     # v17.14.5: rapikan teks Indonesia yang meluap + perbaiki bendera pilihan bahasa.
     patcher = os.path.join(TOOLS, "patch_ui_polish.py")
@@ -168,6 +184,8 @@ def main():
     patch_native_barter()
     patch_lifemax_crash()
     patch_price_dollar_fix()
+    patch_dm_labels()
+    patch_total_recharge()
     patch_ui_polish()
     compile_native_bridge()
     dex = compile_dex()

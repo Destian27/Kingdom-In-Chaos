@@ -7,15 +7,28 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.json.JSONObject;
 
-/** First-run profile completion after a verified Google sign-in. */
+/**
+ * v17.14.10: layar "Daftar" bergaya perkamen game. Setelah Google terverifikasi pemain hanya
+ * mengisi nama panggilan; ID Pemain dibuat server. Tidak ada tombol Masuk, Daftar-ganda, atau kata sandi.
+ */
 public final class GameProfileSetupActivity extends Activity {
+    private static final int PARCHMENT = 0xFFB88A5A;
+    private static final int PARCHMENT_EDGE = 0xFF6B4423;
+    private static final int RIBBON = 0xFFA11F3A;
+    private static final int FIELD = 0xFF8E6840;
+    private static final int GOLD = 0xFFFFD36A;
+    private static final int INK = 0xFF3B2410;
+
     private GooglePlayerBackend backend;
     private EditText nickname;
     private TextView status;
@@ -32,73 +45,132 @@ public final class GameProfileSetupActivity extends Activity {
     }
 
     private void buildUi() {
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setGravity(Gravity.CENTER_HORIZONTAL);
-        root.setPadding(dp(24), dp(24), dp(24), dp(24));
-        GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{0xFFFFF6E4, 0xFFE9F1FF});
-        root.setBackground(bg);
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(0xE6101A14);
 
-        TextView title = new TextView(this); title.setText("Buat Profil Pemain");
-        title.setTextSize(25); title.setTextColor(0xFF52351A); title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        title.setGravity(Gravity.CENTER); root.addView(title, matchWrap());
+        ScrollView scroll = new ScrollView(this);
+        scroll.setFillViewport(true);
+        root.addView(scroll, new FrameLayout.LayoutParams(-1, -1));
+
+        FrameLayout holder = new FrameLayout(this);
+        scroll.addView(holder, new FrameLayout.LayoutParams(-1, -2));
+
+        LinearLayout panel = new LinearLayout(this);
+        panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setGravity(Gravity.CENTER_HORIZONTAL);
+        panel.setPadding(dp(28), dp(44), dp(28), dp(24));
+        GradientDrawable panelBg = new GradientDrawable();
+        panelBg.setColor(PARCHMENT); panelBg.setCornerRadius(dp(10)); panelBg.setStroke(dp(3), PARCHMENT_EDGE);
+        panel.setBackground(panelBg);
+        FrameLayout.LayoutParams pp = new FrameLayout.LayoutParams(dp(380), -2, Gravity.CENTER);
+        pp.topMargin = dp(28); pp.bottomMargin = dp(20);
+        holder.addView(panel, pp);
+
+        TextView ribbon = new TextView(this);
+        ribbon.setText("Daftar"); ribbon.setTextSize(22); ribbon.setTextColor(GOLD);
+        ribbon.setTypeface(Typeface.DEFAULT, Typeface.BOLD); ribbon.setGravity(Gravity.CENTER);
+        GradientDrawable ribbonBg = new GradientDrawable();
+        ribbonBg.setColor(RIBBON); ribbonBg.setCornerRadius(dp(6)); ribbonBg.setStroke(dp(2), 0xFF6E1226);
+        ribbon.setBackground(ribbonBg); ribbon.setPadding(dp(30), dp(6), dp(30), dp(8));
+        FrameLayout.LayoutParams rp = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+        rp.topMargin = dp(12);
+        holder.addView(ribbon, rp);
+
+        TextView close = new TextView(this);
+        close.setText("X"); close.setTextSize(20); close.setTextColor(Color.WHITE);
+        close.setTypeface(Typeface.DEFAULT, Typeface.BOLD); close.setGravity(Gravity.CENTER);
+        GradientDrawable closeBg = new GradientDrawable();
+        closeBg.setShape(GradientDrawable.OVAL); closeBg.setColor(0xFFC4452B); closeBg.setStroke(dp(3), 0xFFB9BEC6);
+        close.setBackground(closeBg);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { finish(); }
+        });
+        FrameLayout.LayoutParams cp = new FrameLayout.LayoutParams(dp(42), dp(42), Gravity.TOP | Gravity.RIGHT);
+        cp.topMargin = dp(18); cp.rightMargin = dp(4);
+        holder.addView(close, cp);
 
         TextView email = new TextView(this);
-        email.setText("Google terverifikasi\n" + getIntent().getStringExtra("email"));
-        email.setTextSize(14); email.setTextColor(0xFF5F6470); email.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams ep = matchWrap(); ep.topMargin = dp(14); root.addView(email, ep);
+        String mail = getIntent().getStringExtra("email");
+        email.setText("Google terverifikasi\n" + (mail == null ? "" : mail));
+        email.setTextSize(13); email.setTextColor(INK); email.setGravity(Gravity.CENTER);
+        panel.addView(email, matchWrap());
 
-        TextView idLabel = new TextView(this); idLabel.setText("ID PEMAIN"); idLabel.setTextSize(13);
-        idLabel.setTextColor(0xFF6F4A20); idLabel.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        LinearLayout.LayoutParams lp = matchWrap(); lp.topMargin = dp(26); root.addView(idLabel, lp);
-        TextView idValue = new TextView(this); idValue.setText(playerId); idValue.setTextSize(20);
-        idValue.setTextColor(0xFF193D78); idValue.setGravity(Gravity.CENTER);
-        idValue.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
-        GradientDrawable idBg = new GradientDrawable(); idBg.setColor(Color.WHITE); idBg.setCornerRadius(dp(10)); idBg.setStroke(dp(1), 0xFFCBD8EC);
-        idValue.setBackground(idBg); idValue.setPadding(dp(14), dp(14), dp(14), dp(14));
-        LinearLayout.LayoutParams ivp = matchWrap(); ivp.topMargin = dp(8); root.addView(idValue, ivp);
+        panel.addView(label("ID Pemain", 18), labelParams(18));
+        TextView idValue = new TextView(this);
+        idValue.setText(playerId); idValue.setTextSize(18); idValue.setTextColor(Color.WHITE);
+        idValue.setTypeface(Typeface.MONOSPACE, Typeface.BOLD); idValue.setGravity(Gravity.CENTER);
+        idValue.setBackground(fieldBg()); idValue.setPadding(dp(12), dp(10), dp(12), dp(10));
+        panel.addView(idValue, labelParams(6));
 
-        TextView nameLabel = new TextView(this); nameLabel.setText("NICKNAME"); nameLabel.setTextSize(13);
-        nameLabel.setTextColor(0xFF6F4A20); nameLabel.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        LinearLayout.LayoutParams nlp = matchWrap(); nlp.topMargin = dp(24); root.addView(nameLabel, nlp);
-        nickname = new EditText(this); nickname.setSingleLine(true); nickname.setHint("Masukkan nama panggilan");
-        nickname.setTextSize(16); nickname.setFilters(new InputFilter[]{new InputFilter.LengthFilter(32)});
-        nickname.setPadding(dp(12), dp(12), dp(12), dp(12));
-        GradientDrawable inputBg = new GradientDrawable(); inputBg.setColor(Color.WHITE); inputBg.setCornerRadius(dp(10)); inputBg.setStroke(dp(1), 0xFFCBD8EC);
-        nickname.setBackground(inputBg);
-        LinearLayout.LayoutParams np = matchWrap(); np.topMargin = dp(8); root.addView(nickname, np);
+        panel.addView(label("Nama Panggilan", 16), labelParams(16));
+        nickname = new EditText(this);
+        nickname.setSingleLine(true); nickname.setHint("masukkan nama panggilan");
+        nickname.setHintTextColor(0xFFE2D2BA); nickname.setTextColor(Color.WHITE); nickname.setTextSize(16);
+        nickname.setFilters(new InputFilter[]{new InputFilter.LengthFilter(32)});
+        nickname.setBackground(fieldBg()); nickname.setPadding(dp(12), dp(10), dp(12), dp(10));
+        panel.addView(nickname, labelParams(6));
 
-        status = new TextView(this); status.setTextColor(0xFF7A2C1A); status.setTextSize(13);
-        status.setGravity(Gravity.CENTER); LinearLayout.LayoutParams sp = matchWrap(); sp.topMargin = dp(14); root.addView(status, sp);
+        status = new TextView(this);
+        status.setTextColor(0xFF6E1226); status.setTextSize(13); status.setGravity(Gravity.CENTER);
+        panel.addView(status, labelParams(12));
 
-        submit = new Button(this); submit.setText("Simpan Profil dan Lanjutkan"); submit.setAllCaps(false);
-        submit.setOnClickListener(v -> saveProfile());
-        LinearLayout.LayoutParams bp = matchWrap(); bp.topMargin = dp(20); root.addView(submit, bp);
+        submit = new Button(this);
+        submit.setText("Daftar"); submit.setAllCaps(false); submit.setTextColor(Color.WHITE);
+        submit.setTextSize(18); submit.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        GradientDrawable btnBg = new GradientDrawable();
+        btnBg.setColor(0xFF2C5C9E); btnBg.setCornerRadius(dp(8)); btnBg.setStroke(dp(2), 0xFF16345E);
+        submit.setBackground(btnBg);
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { saveProfile(); }
+        });
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(dp(170), -2);
+        bp.topMargin = dp(14); bp.gravity = Gravity.CENTER_HORIZONTAL;
+        panel.addView(submit, bp);
         setContentView(root);
+    }
+
+    private TextView label(String text, int topDp) {
+        TextView t = new TextView(this);
+        t.setText(text); t.setTextSize(14); t.setTextColor(INK);
+        t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        return t;
+    }
+
+    private LinearLayout.LayoutParams labelParams(int topDp) {
+        LinearLayout.LayoutParams lp = matchWrap(); lp.topMargin = dp(topDp); return lp;
+    }
+
+    private GradientDrawable fieldBg() {
+        GradientDrawable g = new GradientDrawable();
+        g.setColor(FIELD); g.setCornerRadius(dp(6)); g.setStroke(dp(1), PARCHMENT_EDGE);
+        return g;
     }
 
     private void saveProfile() {
         final String name = nickname.getText().toString().trim();
         if (name.length() < 3 || name.length() > 32) {
-            status.setText("Nickname harus terdiri dari 3–32 karakter."); return;
+            status.setText("Nama panggilan harus terdiri dari 3–32 karakter."); return;
         }
         if (saving) return;
         saving = true; submit.setEnabled(false); status.setText("Menyimpan profil...");
-        Thread worker = new Thread(() -> {
-            JSONObject result = null; Exception failure = null;
-            try { result = backend.completeProfile(name); } catch (Exception e) { failure = e; }
-            final JSONObject data = result; final Exception error = failure;
-            runOnUiThread(() -> {
-                saving = false; submit.setEnabled(true);
-                if (error != null) { status.setText("Tidak dapat menyimpan profil: " + error.getMessage()); return; }
-                JSONObject savedProfile = data == null ? null : data.optJSONObject("profile");
-                String id = savedProfile == null ? playerId : savedProfile.optString("player_id", playerId);
-                status.setText("Profil berhasil dibuat. ID Pemain: " + id);
-                getIntent().putExtra("player_id", id);
-                startActivity(new android.content.Intent(GameProfileSetupActivity.this, GameOnlineHubActivity.class));
-                finish();
-            });
+        Thread worker = new Thread(new Runnable() {
+            @Override public void run() {
+                JSONObject result = null; Exception failure = null;
+                try { result = backend.completeProfile(name); } catch (Exception e) { failure = e; }
+                final JSONObject data = result; final Exception error = failure;
+                runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        saving = false; submit.setEnabled(true);
+                        if (error != null) { status.setText("Tidak dapat menyimpan profil: " + error.getMessage()); return; }
+                        JSONObject savedProfile = data == null ? null : data.optJSONObject("profile");
+                        String id = savedProfile == null ? playerId : savedProfile.optString("player_id", playerId);
+                        status.setText("Berhasil terdaftar. ID Pemain: " + id);
+                        getIntent().putExtra("player_id", id);
+                        startActivity(new android.content.Intent(GameProfileSetupActivity.this, GameOnlineHubActivity.class));
+                        finish();
+                    }
+                });
+            }
         }, "kic-google-profile-setup");
         worker.setDaemon(true); worker.start();
     }

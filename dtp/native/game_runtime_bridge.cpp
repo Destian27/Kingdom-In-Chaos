@@ -268,9 +268,9 @@ bool getOfferCost(int paymentId, OfferCost* out) {
     }
     if (paymentId == 38) { *out = {false, 599}; return true; }      // Weekly pack
     if (paymentId == 39) { *out = {false, 99}; return true; }       // PvP ticket
-    if (paymentId == 40) { *out = {true, 30000}; return true; }     // 30-day VIP
+    if (paymentId == 40) { *out = {false, 600}; return true; }       // 30-day VIP (v17.14.15: dibayar Kristal/DM)
     if (paymentId >= 41 && paymentId <= 48) { *out = {false, 499}; return true; } // Equipment ($4.99 equivalent)
-    if (paymentId == 49) { *out = {true, 3500}; return true; }      // Luck Spree ($1 coin equivalent)
+    if (paymentId == 49) { *out = {false, 70}; return true; }        // Luck Spree (v17.14.15: dibayar Kristal/DM)
     if (paymentId == 50) { *out = {false, 560}; return true; }      // Hero bundle
     if (paymentId == 51) { *out = {false, 420}; return true; }      // Gear bundle
     if (paymentId == 52) { *out = {false, 499}; return true; }      // Seasonal offer

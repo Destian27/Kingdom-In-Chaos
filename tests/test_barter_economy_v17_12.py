@@ -35,8 +35,10 @@ def test_packed_price_config_has_no_cash_values_and_has_barter_prices():
     cn = root.find("./dollar/cn")
     # v17.14.4: elemen kosong / sign kosong menyebabkan SIGSEGV DHValue::getValue
     # saat game dibuka, jadi sekarang node harus punya isi "0" (bukan uang nyata).
-    assert cn is not None and cn.get("sign") == "Rp"
-    assert all(child.text == "0" and not child.attrib for child in list(cn))
+    assert cn is not None and cn.get("sign") == "DM"
+    # v17.14.11: label harga = nominal barter (DM/Koin), bukan nilai uang nyata.
+    assert all(child.text.isdigit() and int(child.text) > 0 and not child.attrib for child in list(cn))
+    assert cn.findtext("rookieGifts00") == "299" and cn.findtext("rookieGifts10") == "999"
     # v17.14.8: blok <barter> dipindah ke JSON karena PriceManager::loadGameValue
     # memanggil GetText() pada semua elemen setelah <dollar> (NULL -> SIGSEGV).
     assert root.find("barter") is None
@@ -47,8 +49,8 @@ def test_packed_price_config_has_no_cash_values_and_has_barter_prices():
         if child.tag != "dollar":
             assert len(child) == 0 and (child.text or "").strip(), child.tag
     expected = {
-        "vip30Days": ("coin", "30000"),
-        "luckSpree": ("coin", "3500"),
+        "vip30Days": ("dm", "600"),
+        "luckSpree": ("dm", "70"),
         "newbieValue": ("dm", "299"),
         "newbieRich": ("dm", "999"),
         "equipmentItem": ("dm", "499"),
@@ -88,8 +90,8 @@ def test_overlay_shows_dm_progress_and_only_barter_price_labels():
     overlay = read_text("dtp/src/com/destian/dtp/GameOnlineOverlay.java")
     assert "Total DM terkumpul" in overlay
     assert "2000L, 5000L, 15000L, 50000L" in overlay
-    assert "VIP 30 hari  —  30.000 Koin" in overlay
-    assert "Luck Spree  —  3.500 Koin" in overlay
+    assert "VIP 30 hari  —  600 DM" in overlay
+    assert "Luck Spree  —  70 DM" in overlay
     assert "Perlengkapan " in overlay and "499 DM" in overlay
     assert "Saldo akan dipotong sebelum hadiah diberikan" in overlay
 

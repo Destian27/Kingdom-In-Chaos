@@ -1,8 +1,11 @@
 package com.destian.dtp;
 
+import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -27,6 +30,7 @@ public final class GameAuthActivity extends Activity {
     private static final int MUTED = 0xFFD5DDF0;
     private static final int REQUEST_GOOGLE_ACCOUNT = 5101;
     private static final int REQUEST_GOOGLE_RECOVERY = 5102;
+    private static final int REQUEST_ACCOUNTS_PERMISSION = 5103;
 
     private GooglePlayerBackend backend;
     private TextView status;
@@ -36,6 +40,7 @@ public final class GameAuthActivity extends Activity {
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
+        ImmersiveHelper.apply(this);
         backend = new GooglePlayerBackend(getApplicationContext());
         buildUi();
         if (backend.hasAccount()) {
@@ -48,15 +53,20 @@ public final class GameAuthActivity extends Activity {
         }
     }
 
+    @Override public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) ImmersiveHelper.apply(this);
+    }
+
     private void buildUi() {
         FrameLayout root = new FrameLayout(this);
         root.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
                 new int[]{BG_TOP, BG_BOTTOM}));
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
-        content.setGravity(Gravity.CENTER_HORIZONTAL);
-        content.setPadding(dp(26), dp(24), dp(26), dp(24));
+        content.setGravity(Gravity.CENTER);
         root.addView(content, new FrameLayout.LayoutParams(-1, -1));
+        ImmersiveHelper.padForInsets(content, dp(26), dp(24), dp(26), dp(24));
 
         ImageView logo = new ImageView(this);
         int iconId = getResources().getIdentifier("icon", "drawable", getPackageName());
@@ -108,6 +118,39 @@ public final class GameAuthActivity extends Activity {
 
     private void chooseGoogleAccount() {
         if (busy) return;
+        if (Build.VERSION.SDK_INT >= 23
+                && checkSelfPermission(Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
+            try {
+                status.setText("Izinkan akses akun agar daftar akun Google dapat ditampilkan.");
+                requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS}, REQUEST_ACCOUNTS_PERMISSION);
+                return;
+            } catch (Exception e) {
+                openSystemAccountChooser();
+                return;
+            }
+        }
+        openAccountPicker();
+    }
+
+    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode != REQUEST_ACCOUNTS_PERMISSION) return;
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) openAccountPicker();
+        else openSystemAccountChooser();
+    }
+
+    /** Pemilih akun layar penuh milik game. */
+    private void openAccountPicker() {
+        try {
+            startActivityForResult(new Intent(this, GoogleAccountPickerActivity.class), REQUEST_GOOGLE_ACCOUNT);
+            status.setText("Pilih akun Google yang akan digunakan.");
+        } catch (Exception e) {
+            openSystemAccountChooser();
+        }
+    }
+
+    /** Cadangan: dialog pilih akun bawaan Android (juga untuk "Gunakan akun lain"). */
+    private void openSystemAccountChooser() {
         try {
             Intent chooser = AccountManager.newChooseAccountIntent(
                     null, null, new String[]{"com.google"}, true,
@@ -121,6 +164,10 @@ public final class GameAuthActivity extends Activity {
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_GOOGLE_ACCOUNT && resultCode == RESULT_FIRST_USER) {
+            openSystemAccountChooser();
+            return;
+        }
         if (resultCode != RESULT_OK || data == null) {
             if (requestCode == REQUEST_GOOGLE_ACCOUNT) status.setText("Pemilihan akun dibatalkan.");
             return;

@@ -234,9 +234,9 @@ class TestKingdomInChaosAndroid13Port(unittest.TestCase):
                     f"Patch mismatch at 0x{off:08X} in {abi}/libgame.so",
                 )
 
-    def test_fix6_stamina_system_unlimited_and_clean_ui(self):
-        balance_patch = bytes.fromhex("002802d005220260002902d000220a607047")
-        decrease_patch = b"\x01\x20\x70\x47"
+    def test_fix6_stamina_restored_to_original_regen(self):
+        balance_patch = bytes.fromhex("f0b5474680b484b00f1c061cd9f7acff1b21")  # v17.14.11: asli
+        decrease_patch = bytes.fromhex("30b583b0")  # v17.14.11: asli
 
         for abi in ["armeabi", "armeabi-v7a"]:
             so_path = os.path.join(DECOMPILED_DIR, "lib", abi, "libgame.so")

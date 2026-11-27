@@ -353,6 +353,8 @@
     .line 59
     invoke-super {p0, p1}, Lorg/cocos2dx/lib/Cocos2dxActivity;->onCreate(Landroid/os/Bundle;)V
 
+    invoke-static {p0}, Lcom/destian/dtp/ImmersiveHelper;->apply(Landroid/app/Activity;)V
+
     .line 60
     sput-object p0, Lcom/droidhang/ph/GameActivity;->STATIC_REF:Landroid/content/Context;
 
@@ -637,6 +639,8 @@
 
     .line 110
     invoke-static {}, Lcom/hz/game/be/util/BEUtil;->hideToolbar()V
+
+    invoke-static {p0}, Lcom/destian/dtp/ImmersiveHelper;->apply(Landroid/app/Activity;)V
 
     .line 112
     :cond_0
