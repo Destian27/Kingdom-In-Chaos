@@ -1,0 +1,5 @@
+Kingdom In Chaos DTP v17.14.6
+versionCode=15
+Fix: game keluar sendiri (SIGSEGV DHValue::getValue) saat GameActivity dibuka setelah cek maintenance lolos.
+Build output: KingdomInChaosDTP-v17.14.6-wallet-crashfix.apk
+Status: source package; APK belum dibuild/diuji di perangkat.

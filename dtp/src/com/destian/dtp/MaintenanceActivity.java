@@ -60,6 +60,7 @@ public class MaintenanceActivity extends Activity {
         long startMs;
         long endMs;
         long serverNow;
+        String error;
     }
 
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -447,7 +448,8 @@ public class MaintenanceActivity extends Activity {
         if (!r.ok) {
             if (BLOCK_WHEN_OFFLINE) {
                 showError();
-                noteView.setText("Pemeriksaan server gagal. Akses tetap ditahan; game tidak akan dibuka tanpa status server yang valid.");
+                String detail = r.error != null && r.error.length() > 0 ? "\nDetail: " + r.error : "";
+                noteView.setText("Pemeriksaan server gagal. Akses tetap ditahan; game tidak akan dibuka tanpa status server yang valid." + detail);
             } else {
                 launchGame();
             }
@@ -514,6 +516,9 @@ public class MaintenanceActivity extends Activity {
             r.ok = true;
         } catch (Exception e) {
             r.ok = false;
+            String msg = String.valueOf(e.getMessage());
+            if (msg.length() > 90) msg = msg.substring(0, 90);
+            r.error = e.getClass().getSimpleName() + ": " + msg;
         } finally {
             if (c != null) {
                 c.disconnect();

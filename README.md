@@ -1,3 +1,7 @@
+## v17.14.6 — Wallet crash fix (27 November 2026)
+
+Game keluar sendiri tepat setelah layar maintenance lolos (tekan **Cek Lagi** atau buka dengan data seluler) karena `SIGSEGV` di `DHValue::getValue()`. Penyebab: pembacaan saldo native di thread UI saat game baru dibuka, sebelum data `LevelManager` dimuat. Lihat `CHANGELOG-V17.14.6-WALLET-CRASHFIX.md`.
+
 ## v17.14.3 — Google OAuth Client ID (27 November 2026)
 
 - Web OAuth Client ID diberikan dan dikonfigurasi di `supabase/functions/google-player/index.ts` sebagai `GOOGLE_WEB_OAUTH_CLIENT_ID`.

@@ -48,5 +48,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: KingdomInChaosDTP-v17.14.5-ui-polish-apk
-          path: KingdomInChaosDTP-v17.14.5-ui-polish.apk
+          name: KingdomInChaosDTP-v17.14.6-wallet-crashfix-apk
+          path: KingdomInChaosDTP-v17.14.6-wallet-crashfix.apk

@@ -41,7 +41,9 @@ public final class NativeGameRuntimeBridge {
         try {
             String state = installEconomyHooksNative();
             if (state != null && state.startsWith("OK|")) {
-                seedLifetimeDmFromCurrentWallet();
+                // v17.14.6: JANGAN membaca saldo di sini. Dipanggil di thread UI tepat saat
+                // GameActivity resume, ketika data LevelManager di libgame.so belum dimuat
+                // (SIGSEGV DHValue::getValue). Seed DM dilakukan malas di getWallet().
                 DtpApp app = DtpApp.getInstance();
                 if (app != null) GameOnlineOverlay.refreshBarterStatus();
             }
@@ -79,7 +81,10 @@ public final class NativeGameRuntimeBridge {
     public static String getWallet() {
         if (!ensureLoaded()) return "BRIDGE_NOT_LOADED|" + loadFailure;
         try {
-            return getWalletNative();
+            String wallet = getWalletNative();
+            // Saldo berhasil dibaca = game sudah siap: mulai meter DM dari saldo saat ini (sekali).
+            seedLifetimeDmFromWallet(wallet);
+            return wallet;
         } catch (Throwable error) {
             return "BRIDGE_CALL_FAILED|" + error.getClass().getSimpleName() + ": " + String.valueOf(error.getMessage());
         }
@@ -87,13 +92,19 @@ public final class NativeGameRuntimeBridge {
 
     /** Starts the cumulative-DM meter from the existing balance once per installation. */
     private static void seedLifetimeDmFromCurrentWallet() {
+        try {
+            seedLifetimeDmFromWallet(getWalletNative());
+        } catch (Throwable ignored) { }
+    }
+
+    /** Seeds from an already-read "coins=..;dm=.." string; ignores errors/not-ready replies. */
+    private static void seedLifetimeDmFromWallet(String wallet) {
         DtpApp app = DtpApp.getInstance();
-        if (app == null) return;
+        if (app == null || wallet == null || !wallet.startsWith("coins=")) return;
         SharedPreferences prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         if (prefs.contains(KEY_DM_EARNED)) return;
         try {
-            String wallet = getWalletNative();
-            int marker = wallet == null ? -1 : wallet.indexOf("dm=");
+            int marker = wallet.indexOf("dm=");
             if (marker < 0) return;
             String raw = wallet.substring(marker + 3).trim().split("[;|]", 2)[0].trim();
             long balance = Long.parseLong(raw);
@@ -109,6 +120,14 @@ public final class NativeGameRuntimeBridge {
         if (app == null) return;
         synchronized (NativeGameRuntimeBridge.class) {
             SharedPreferences prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            if (!prefs.contains(KEY_DM_EARNED)) {
+                // Hook berjalan setelah saldo bertambah: saldo sekarang sudah termasuk `amount`.
+                seedLifetimeDmFromCurrentWallet();
+                if (prefs.contains(KEY_DM_EARNED)) {
+                    GameOnlineOverlay.refreshBarterStatus();
+                    return;
+                }
+            }
             long current = prefs.getLong(KEY_DM_EARNED, 0L);
             long next = current > Long.MAX_VALUE - amount ? Long.MAX_VALUE : current + amount;
             prefs.edit().putLong(KEY_DM_EARNED, next).apply();

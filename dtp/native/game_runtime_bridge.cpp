@@ -1,6 +1,8 @@
 #include <jni.h>
 #include <dlfcn.h>
 #include <limits.h>
+#include <setjmp.h>
+#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -51,6 +53,109 @@ jstring result(JNIEnv* env, const char* value) {
 
 void* symbol(void* handle, const char* name) {
     return handle ? dlsym(handle, name) : nullptr;
+}
+
+// v17.14.6: pelindung SIGSEGV untuk membaca saldo dari libgame.so.
+// LevelManager::getInstance() sudah mengembalikan pointer saat GameActivity baru dibuat,
+// tetapi data di dalamnya (DHInt) belum dimuat. LevelManager::getCoin() lalu membaca
+// anggota dari pointer NULL (fault addr 0x18, DHValue::getValue) dan mematikan proses.
+// Pembacaan dibungkus sigsetjmp/siglongjmp: jika game belum siap, fungsi native
+// mengembalikan GAME_STATE_NOT_READY dan game tetap hidup. Fault di luar blok terlindung
+// diteruskan ke handler sebelumnya (perilaku crash normal tidak berubah).
+__thread sigjmp_buf* t_guardJump = nullptr;
+struct sigaction g_guardPrevious;
+volatile int g_guardInstalled = 0;
+
+void guardSegvHandler(int sig, siginfo_t* info, void* context) {
+    if (t_guardJump) siglongjmp(*t_guardJump, 1);
+    if (g_guardPrevious.sa_flags & SA_SIGINFO) {
+        if (g_guardPrevious.sa_sigaction) {
+            g_guardPrevious.sa_sigaction(sig, info, context);
+            return;
+        }
+    } else if (g_guardPrevious.sa_handler != SIG_DFL && g_guardPrevious.sa_handler != SIG_IGN) {
+        g_guardPrevious.sa_handler(sig);
+        return;
+    }
+    // Tidak ada handler lain: kembalikan ke default agar fault diulang dan crash apa adanya.
+    signal(sig, SIG_DFL);
+}
+
+void installGuardHandler() {
+    if (g_guardInstalled) return;
+    struct sigaction action;
+    memset(&action, 0, sizeof(action));
+    sigemptyset(&action.sa_mask);
+    action.sa_sigaction = guardSegvHandler;
+    action.sa_flags = SA_SIGINFO | SA_ONSTACK;
+    if (sigaction(SIGSEGV, &action, &g_guardPrevious) == 0) g_guardInstalled = 1;
+}
+
+// Menjalankan body(arg); mengembalikan false bila body menyebabkan SIGSEGV.
+bool runGuarded(void (*body)(void*), void* arg) {
+    installGuardHandler();
+    if (!g_guardInstalled) {
+        body(arg);  // handler tidak dapat dipasang: perilaku lama
+        return true;
+    }
+    sigjmp_buf jump;
+    sigjmp_buf* volatile previous = t_guardJump;
+    if (sigsetjmp(jump, 1) == 0) {
+        t_guardJump = &jump;
+        body(arg);
+        t_guardJump = previous;
+        return true;
+    }
+    t_guardJump = previous;
+    return false;
+}
+
+struct WalletRead {
+    void* manager;
+    GetIntValue getCoins;
+    GetIntValue getCrystals;
+    GetIntValue getGoblin;
+    BalanceLifeStatus balanceLife;
+    GetLifeMax getLifeMax;
+    int coins;
+    int crystals;
+    int goblin;
+    int life;
+    int secondsToNextLife;
+    int lifeMax;
+};
+
+void readWalletBody(void* raw) {
+    WalletRead* w = static_cast<WalletRead*>(raw);
+    w->coins = w->getCoins(w->manager);
+    w->crystals = w->getCrystals(w->manager);
+    w->goblin = w->getGoblin(w->manager);
+    w->life = 0;
+    w->secondsToNextLife = 0;
+    w->balanceLife(&w->life, &w->secondsToNextLife);
+    w->lifeMax = w->getLifeMax();
+}
+
+// false = game belum siap (SIGSEGV ditangkap); saldo tidak boleh dipakai.
+bool readWalletGuarded(WalletRead* w) {
+    return runGuarded(readWalletBody, w);
+}
+
+struct EconomyRead {
+    void* manager;
+    GetIntValue getCoins;
+    GetIntValue getCrystals;
+    GetIntValue getGoblin;
+    int coins;
+    int crystals;
+    int goblin;
+};
+
+void readEconomyBody(void* raw) {
+    EconomyRead* e = static_cast<EconomyRead*>(raw);
+    e->coins = e->getCoins ? e->getCoins(e->manager) : -1;
+    e->crystals = e->getCrystals ? e->getCrystals(e->manager) : -1;
+    e->goblin = e->getGoblin ? e->getGoblin(e->manager) : -1;
 }
 
 bool protectCode(void* address, size_t length, int protection) {
@@ -320,9 +425,13 @@ Java_com_destian_dtp_NativeGameRuntimeBridge_applyEconomyNative(
     void* manager = needLevelManager ? getManager() : nullptr;
     if (needLevelManager && !manager) return result(env, "GAME_STATE_NOT_READY");
 
-    const int beforeCoins = targetCoins >= 0 ? getCoins(manager) : -1;
-    const int beforeCrystals = targetCrystals >= 0 ? getCrystals(manager) : -1;
-    const int beforeGoblin = targetGoblinCoins >= 0 ? getGoblinCoins(manager) : -1;
+    EconomyRead econBefore = {manager, getCoins, getCrystals, getGoblinCoins, -1, -1, -1};
+    if (needLevelManager && !runGuarded(readEconomyBody, &econBefore)) {
+        return result(env, "GAME_STATE_NOT_READY|economy_read_faulted");
+    }
+    const int beforeCoins = targetCoins >= 0 ? econBefore.coins : -1;
+    const int beforeCrystals = targetCrystals >= 0 ? econBefore.crystals : -1;
+    const int beforeGoblin = targetGoblinCoins >= 0 ? econBefore.goblin : -1;
     void* userDataManager = targetEventEyes >= 0 ? getUserDataManager() : nullptr;
     if (targetEventEyes >= 0 && !userDataManager) return result(env, "USER_DATA_MANAGER_NOT_READY");
     const int beforeEventEyes = targetEventEyes >= 0 ? getGlobalInfo(userDataManager, 0x85) : -1;
@@ -350,9 +459,11 @@ Java_com_destian_dtp_NativeGameRuntimeBridge_applyEconomyNative(
         setGlobalInfo(userDataManager, 0x85, wantedEventEyes);
     }
 
-    const int afterCoins = targetCoins >= 0 ? getCoins(manager) : -1;
-    const int afterCrystals = targetCrystals >= 0 ? getCrystals(manager) : -1;
-    const int afterGoblin = targetGoblinCoins >= 0 ? getGoblinCoins(manager) : -1;
+    EconomyRead econAfter = {manager, getCoins, getCrystals, getGoblinCoins, -1, -1, -1};
+    if (needLevelManager) runGuarded(readEconomyBody, &econAfter);
+    const int afterCoins = targetCoins >= 0 ? econAfter.coins : -1;
+    const int afterCrystals = targetCrystals >= 0 ? econAfter.crystals : -1;
+    const int afterGoblin = targetGoblinCoins >= 0 ? econAfter.goblin : -1;
     const int afterEventEyes = targetEventEyes >= 0 ? getGlobalInfo(userDataManager, 0x85) : -1;
     const bool verified = coinsOk && crystalsOk && goblinOk &&
             (targetCoins < 0 || afterCoins == wantedCoins) &&
@@ -470,13 +581,14 @@ Java_com_destian_dtp_NativeGameRuntimeBridge_applyWalletTargetsNative(
     void* manager = getManager();
     if (!manager) return result(env, "GAME_STATE_NOT_READY");
 
-    const int beforeCoins = getCoins(manager);
-    const int beforeCrystals = getCrystals(manager);
-    const int beforeGoblin = getGoblin(manager);
-    int beforeLife = 0;
-    int secondsToNextLife = 0;
-    balanceLife(&beforeLife, &secondsToNextLife);
-    const int lifeMax = getLifeMax();
+    WalletRead before = {manager, getCoins, getCrystals, getGoblin, balanceLife, getLifeMax,
+                         0, 0, 0, 0, 0, 0};
+    if (!readWalletGuarded(&before)) return result(env, "GAME_STATE_NOT_READY|wallet_read_faulted");
+    const int beforeCoins = before.coins;
+    const int beforeCrystals = before.crystals;
+    const int beforeGoblin = before.goblin;
+    const int beforeLife = before.life;
+    const int lifeMax = before.lifeMax;
     if (beforeCoins < 0 || beforeCrystals < 0 || beforeGoblin < 0 ||
         beforeLife < 0 || lifeMax <= 0 || lifeMax > 24) {
         return result(env, "INVALID_NATIVE_BALANCE|mail_reward");
@@ -490,13 +602,14 @@ Java_com_destian_dtp_NativeGameRuntimeBridge_applyWalletTargetsNative(
     const int safeLifeTarget = targetLife > lifeMax ? lifeMax : targetLife;
     if (beforeLife < safeLifeTarget) increaseLife(safeLifeTarget - beforeLife, true);
 
-    const int afterCoins = getCoins(manager);
-    const int afterCrystals = getCrystals(manager);
-    const int afterGoblin = getGoblin(manager);
-    int afterLife = 0;
-    int afterLifeRegenSeconds = 0;
-    balanceLife(&afterLife, &afterLifeRegenSeconds);
-    const int afterLifeMax = getLifeMax();
+    WalletRead after = {manager, getCoins, getCrystals, getGoblin, balanceLife, getLifeMax,
+                        0, 0, 0, 0, 0, 0};
+    if (!readWalletGuarded(&after)) return result(env, "APPLY_MISMATCH|wallet_reread_faulted");
+    const int afterCoins = after.coins;
+    const int afterCrystals = after.crystals;
+    const int afterGoblin = after.goblin;
+    const int afterLife = after.life;
+    const int afterLifeMax = after.lifeMax;
     const bool ok = afterCoins >= targetCoins && afterCrystals >= targetCrystals &&
         afterGoblin >= targetGoblinCoins && afterLife >= safeLifeTarget &&
         afterLife <= afterLifeMax && afterLifeMax > 0 && afterLifeMax <= 24;
@@ -520,12 +633,13 @@ Java_com_destian_dtp_NativeGameRuntimeBridge_getWalletNative(JNIEnv* env, jclass
         return result(env, "GAME_SYMBOL_MISSING");
     void* manager = getManager();
     if (!manager) return result(env, "GAME_STATE_NOT_READY");
-    int life = 0;
-    int secondsToNextLife = 0;
-    balanceLife(&life, &secondsToNextLife);
-    const int lifeMax = getLifeMax();
+    // v17.14.6: data LevelManager belum dimuat saat game baru dibuka -> getCoin() menyentuh
+    // pointer NULL. Baca lewat pelindung SIGSEGV agar game tidak crash.
+    WalletRead w = {manager, getCoins, getCrystals, getGoblin, balanceLife, getLifeMax,
+                    0, 0, 0, 0, 0, 0};
+    if (!readWalletGuarded(&w)) return result(env, "GAME_STATE_NOT_READY|wallet_read_faulted");
     char text[200];
     snprintf(text, sizeof(text), "coins=%d;dm=%d;goblin=%d;life=%d;life_max=%d",
-             getCoins(manager), getCrystals(manager), getGoblin(manager), life, lifeMax);
+             w.coins, w.crystals, w.goblin, w.life, w.lifeMax);
     return result(env, text);
 }

@@ -81,9 +81,9 @@ def test_admin_realtime_broadcast_plus_poll_fallback_refreshes_player_and_mail_t
 def test_version_and_package_are_bumped_for_v17_14_2():
     yml = read('kingdom-in-chaos-decompiled/apktool.yml')
     build = read('build_dtp.py')
-    assert 'versionCode: 14' in yml
-    assert 'versionName: 17.14.5' in yml
-    assert 'KingdomInChaosDTP-v17.14.5-ui-polish.apk' in build
+    assert 'versionCode: 15' in yml
+    assert 'versionName: 17.14.6' in yml
+    assert 'KingdomInChaosDTP-v17.14.6-wallet-crashfix.apk' in build
 
 
 def test_claimed_mail_rewards_are_journaled_and_applied_to_native_wallet_and_life():
@@ -100,7 +100,9 @@ def test_claimed_mail_rewards_are_journaled_and_applied_to_native_wallet_and_lif
     assert 'applyWalletTargetsNative' in native
     assert '_Z12IncreaseLifeib' in native
     assert '_Z7LifeMaxv' in native
-    assert 'balanceLife(&beforeLife, &secondsToNextLife)' in native
+    # v17.14.6: pembacaan saldo/nyawa lewat pelindung SIGSEGV (WalletRead).
+    assert 'w->balanceLife(&w->life, &w->secondsToNextLife)' in native
+    assert 'readWalletGuarded(&before)' in native
     assert 'NativeGameRuntimeSync.reconcileClaimedMail(a)' in app
     assert 'NativeGameRuntimeSync.queueClaimedMail' in mail
 
@@ -109,11 +111,12 @@ def test_native_lifemax_guard_still_returns_24_for_achievement_reward_flow():
     patch = read('tools/patch_lifemax_crash.py')
     assert 'movs r0,#24; bx lr' in patch
     native = read('dtp/native/game_runtime_bridge.cpp')
-    assert 'const int lifeMax = getLifeMax();' in native
-    assert 'const int afterLifeMax = getLifeMax();' in native
+    # v17.14.6: LifeMax tetap dibaca lewat getLifeMax(), kini di dalam pembacaan terlindung.
+    assert 'w->lifeMax = w->getLifeMax();' in native
+    assert 'const int lifeMax = before.lifeMax;' in native
+    assert 'const int afterLifeMax = after.lifeMax;' in native
     # The second BalanceLifeStatus out parameter is regen time, not maximum life.
-    assert 'balanceLife(&beforeLife, &secondsToNextLife)' in native
-    assert 'balanceLife(&life, &secondsToNextLife)' in native
+    assert 'w->balanceLife(&w->life, &w->secondsToNextLife)' in native
 
 
 def test_admin_reads_native_wallet_snapshot_from_google_players_without_edit_endpoint():
