@@ -68,7 +68,8 @@ def test_v17_event_store_admin_and_wib_schedule_are_present():
     assert "'Asia/Jakarta'" in sql
     assert "v_cfg.recurrence = 'daily'" in sql and "'weekly'" in sql
     assert "refresh_at" in sql
-    assert 'id="btnSaveEventEyes"' in admin and 'id="caveBossAdminCard"' in admin
+    assert 'id="caveBossAdminCard"' in admin
+    assert 'id="btnSaveEventEyes"' not in admin
     assert '"get_event_store_admin"' in edge and '"save_event_store"' in edge
 
 
@@ -76,6 +77,7 @@ def test_v17_event_eyes_database_value_is_limited_to_native_int32():
     sql = read("supabase/migrations/202611260006_event_store_v17.sql")
     html = read("admin.html")
     assert "event_eyes between 0 and 2147483647" in sql
-    assert "Number(value) > 2147483647" in html
+    assert "ecoEventEyes" not in html
+    assert "btnSaveEconomy" not in html
     assert "create or replace function public.get_my_game_runtime_state()" in sql
     assert "event_eyes_admin_revision" in sql

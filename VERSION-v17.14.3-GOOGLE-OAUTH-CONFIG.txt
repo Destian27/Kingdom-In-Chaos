@@ -1,0 +1,6 @@
+Kingdom In Chaos DTP — Backend/Google Auth configuration update
+Backend config version: 17.14.3
+Android APK version remains: 17.14.2 (versionCode 12)
+Web OAuth Client ID verification added to google-player Edge Function.
+Client Secret is not embedded in source or APK.
+APK rebuild not performed for this TS-only backend update.

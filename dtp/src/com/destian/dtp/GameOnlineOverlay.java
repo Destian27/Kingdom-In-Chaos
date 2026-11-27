@@ -16,18 +16,26 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONObject;
 
-/** Game account entry overlay. It opens Supabase Google login before online account tools. */
+import java.lang.ref.WeakReference;
+import java.text.NumberFormat;
+import java.util.Locale;
+
+/** Game account entry overlay. It opens direct Google sign-in before online account tools. */
 public final class GameOnlineOverlay {
     private static final String TAG_ACCOUNT_BUTTON = "com.destian.dtp.GAME_ACCOUNT_BUTTON";
+    private static final String TAG_MAIL_BUTTON = "com.destian.dtp.GAME_MAIL_BUTTON";
     private static final String TAG_CAVE_BOSS_STATUS = "com.destian.dtp.CAVE_BOSS_STATUS";
     private static final String TAG_EVENT_STORE_BUTTON = "com.destian.dtp.EVENT_STORE_BUTTON";
     private static final String TAG_CRASH_REPORT_BUTTON = "com.destian.dtp.CRASH_REPORT_BUTTON";
+    private static final String TAG_BARTER_BUTTON = "com.destian.dtp.BARTER_BUTTON";
+    private static volatile WeakReference<Activity> activeActivity = new WeakReference<>(null);
 
     private GameOnlineOverlay() { }
 
@@ -37,6 +45,7 @@ public final class GameOnlineOverlay {
             View content = activity.findViewById(android.R.id.content);
             if (!(content instanceof FrameLayout)) return;
             final FrameLayout root = (FrameLayout) content;
+            activeActivity = new WeakReference<>(activity);
 
             Button accountButton = (Button) root.findViewWithTag(TAG_ACCOUNT_BUTTON);
             if (accountButton == null) {
@@ -51,19 +60,19 @@ public final class GameOnlineOverlay {
                 accountButton.setCompoundDrawablePadding(dp(activity, 5));
                 accountButton.setBackground(buttonBackground());
                 accountButton.setContentDescription("Login ke Kingdom In Chaos DTP");
-                int iconId = activity.getResources().getIdentifier("icon", "drawable",
+                int iconId = activity.getResources().getIdentifier("google_logo", "drawable",
                         activity.getPackageName());
                 if (iconId != 0) {
                     Drawable icon = activity.getResources().getDrawable(iconId).mutate();
-                    icon.setBounds(0, 0, dp(activity, 24), dp(activity, 24));
+                    icon.setBounds(0, 0, dp(activity, 22), dp(activity, 22));
                     accountButton.setCompoundDrawables(icon, null, null, null);
                 }
                 accountButton.setOnClickListener(new View.OnClickListener() {
                     @Override public void onClick(View view) {
                         try {
-                            SupabaseGameBackend backend =
-                                    new SupabaseGameBackend(activity.getApplicationContext());
-                            Intent target = new Intent(activity, backend.hasSession()
+                            GooglePlayerBackend backend =
+                                    new GooglePlayerBackend(activity.getApplicationContext());
+                            Intent target = new Intent(activity, backend.hasAccount()
                                     ? GameOnlineHubActivity.class : GameAuthActivity.class);
                             activity.startActivity(target);
                         } catch (RuntimeException ignored) { }
@@ -76,10 +85,11 @@ public final class GameOnlineOverlay {
                 root.addView(accountButton, accountParams);
             }
 
-            SupabaseGameBackend sessionBackend =
-                    new SupabaseGameBackend(activity.getApplicationContext());
-            accountButton.setText(sessionBackend.hasSession() ? "AKUN" : "LOGIN");
+            GooglePlayerBackend sessionBackend =
+                    new GooglePlayerBackend(activity.getApplicationContext());
+            accountButton.setText(sessionBackend.hasAccount() ? "AKUN" : "GOOGLE");
             accountButton.bringToFront();
+            addMailEntry(activity, root);
 
             Button eventButton = (Button) root.findViewWithTag(TAG_EVENT_STORE_BUTTON);
             if (eventButton == null) {
@@ -107,11 +117,280 @@ public final class GameOnlineOverlay {
                 eventButton.bringToFront();
             }
             addCrashReportEntry(activity, root);
+            addBarterEntry(activity, root);
+            installEconomyHooksLater(activity, root, 0);
             accountButton.bringToFront();
             showPendingCrashReport(activity);
         } catch (Throwable ignored) {
             // The original native game keeps working if an optional overlay cannot be added.
         }
+    }
+
+
+    private static void addMailEntry(final Activity activity, FrameLayout root) {
+        Button button = (Button) root.findViewWithTag(TAG_MAIL_BUTTON);
+        if (button == null) {
+            button = new Button(activity);
+            button.setTag(TAG_MAIL_BUTTON);
+            button.setText("SURAT");
+            button.setTextSize(10f);
+            button.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            button.setAllCaps(false);
+            button.setTextColor(Color.WHITE);
+            button.setPadding(dp(activity, 8), dp(activity, 2), dp(activity, 8), dp(activity, 2));
+            button.setBackground(buttonBackground());
+            button.setContentDescription("Buka kotak Surat hadiah pemain");
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View view) {
+                    GooglePlayerBackend player = new GooglePlayerBackend(activity.getApplicationContext());
+                    Intent target = new Intent(activity, player.hasAccount() ? GameMailActivity.class : GameAuthActivity.class);
+                    activity.startActivity(target);
+                }
+            });
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    dp(activity, 104), dp(activity, 38), Gravity.TOP | Gravity.LEFT);
+            params.topMargin = dp(activity, 100);
+            params.leftMargin = dp(activity, 8);
+            root.addView(button, params);
+        }
+        button.bringToFront();
+    }
+
+
+    private static void installEconomyHooksLater(final Activity activity, final View root, final int attempt) {
+        if (activity == null || activity.isFinishing()) return;
+        String state = NativeGameRuntimeBridge.installEconomyHooks();
+        if (state != null && state.startsWith("OK|")) return;
+        if (attempt >= 10) {
+            CrashReporter.mark(activity, "barter native hook not ready: " + state);
+            return;
+        }
+        root.postDelayed(new Runnable() {
+            @Override public void run() {
+                installEconomyHooksLater(activity, root, attempt + 1);
+            }
+        }, 1200L);
+    }
+
+    private static void addBarterEntry(final Activity activity, FrameLayout root) {
+        Button button = (Button) root.findViewWithTag(TAG_BARTER_BUTTON);
+        if (button == null) {
+            button = new Button(activity);
+            button.setTag(TAG_BARTER_BUTTON);
+            button.setText("BARTER");
+            button.setTextSize(11f);
+            button.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            button.setAllCaps(false);
+            button.setTextColor(Color.WHITE);
+            button.setPadding(dp(activity, 8), dp(activity, 2), dp(activity, 8), dp(activity, 2));
+            button.setBackground(buttonBackground());
+            button.setContentDescription("Buka menu barter Koin dan DM");
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View view) {
+                    String state = NativeGameRuntimeBridge.installEconomyHooks();
+                    if (state == null || !state.startsWith("OK|")) {
+                        Toast.makeText(activity, "Sistem barter belum siap: " + state,
+                                Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    showBarterDialog(activity);
+                }
+            });
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    dp(activity, 112), dp(activity, 40), Gravity.TOP | Gravity.RIGHT);
+            params.topMargin = dp(activity, 54);
+            params.rightMargin = dp(activity, 8);
+            root.addView(button, params);
+        }
+        button.bringToFront();
+    }
+
+    public static void refreshBarterStatus(final Activity activity) {
+        if (activity == null || activity.isFinishing()) return;
+        activity.runOnUiThread(new Runnable() {
+            @Override public void run() {
+                try {
+                    View content = activity.findViewById(android.R.id.content);
+                    if (!(content instanceof FrameLayout)) return;
+                    View button = ((FrameLayout) content).findViewWithTag(TAG_BARTER_BUTTON);
+                    if (button != null) {
+                        long earned = NativeGameRuntimeBridge.getLifetimeDmEarned(activity);
+                        button.setContentDescription("Buka barter. Total DM terkumpul: " + formatNumber(earned));
+                    }
+                } catch (Throwable ignored) { }
+            }
+        });
+    }
+
+    public static void notifyBarterResult(final int offerId, final int status) {
+        WeakReference<Activity> reference = activeActivity;
+        final Activity activity = reference == null ? null : reference.get();
+        if (activity == null || activity.isFinishing()) return;
+        activity.runOnUiThread(new Runnable() {
+            @Override public void run() {
+                String message;
+                switch (status) {
+                    case 0: message = "Barter berhasil. Hadiah diproses oleh game."; break;
+                    case 1: message = "Koin tidak cukup."; break;
+                    case 2: message = "DM tidak cukup."; break;
+                    case 3: message = "Hadiah ini sudah pernah diklaim."; break;
+                    case 5: message = "Sistem barter belum siap. Masuk ulang ke game."; break;
+                    default: message = "Top up uang asli dinonaktifkan. Gunakan menu BARTER."; break;
+                }
+                Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private static void showBarterDialog(final Activity activity) {
+        String wallet = NativeGameRuntimeBridge.getWallet();
+        if (wallet == null || !wallet.startsWith("coins=")) {
+            Toast.makeText(activity, "Saldo game belum bisa dibaca: " + wallet, Toast.LENGTH_LONG).show();
+            return;
+        }
+        long coins = parseWalletValue(wallet, "coins=");
+        long dm = parseWalletValue(wallet, "dm=");
+        long earned = NativeGameRuntimeBridge.getLifetimeDmEarned(activity);
+
+        LinearLayout content = new LinearLayout(activity);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setPadding(dp(activity, 14), dp(activity, 8), dp(activity, 14), dp(activity, 8));
+        TextView summary = new TextView(activity);
+        summary.setTextColor(Color.WHITE);
+        summary.setTextSize(13f);
+        summary.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        summary.setText("SALDO SAAT INI\nKoin: " + formatNumber(coins)
+                + "   •   DM: " + formatNumber(dm)
+                + "\nTotal DM terkumpul: " + formatNumber(earned));
+        summary.setPadding(0, 0, 0, dp(activity, 6));
+        content.addView(summary);
+
+        long[] milestones = {2000L, 5000L, 15000L, 50000L};
+        long nextMilestone = milestones[milestones.length - 1];
+        long previousMilestone = 0L;
+        for (long milestone : milestones) {
+            if (earned < milestone) { nextMilestone = milestone; break; }
+            previousMilestone = milestone;
+        }
+        android.widget.ProgressBar dmProgress = new android.widget.ProgressBar(
+                activity, null, android.R.attr.progressBarStyleHorizontal);
+        dmProgress.setMax(1000);
+        long span = Math.max(1L, nextMilestone - previousMilestone);
+        int progress = (int) Math.max(0L, Math.min(1000L,
+                ((earned - previousMilestone) * 1000L) / span));
+        dmProgress.setProgress(progress);
+        content.addView(dmProgress, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(activity, 8)));
+        TextView progressLabel = new TextView(activity);
+        progressLabel.setTextColor(0xFFFFD36A);
+        progressLabel.setTextSize(11f);
+        progressLabel.setText(earned >= milestones[milestones.length - 1]
+                ? "Progres DM: semua ambang tercapai (50.000 DM)"
+                : "Progres DM: " + formatNumber(earned) + " / " + formatNumber(nextMilestone)
+                    + " DM  •  Ambang: 2.000 / 5.000 / 15.000 / 50.000 DM");
+        progressLabel.setPadding(0, dp(activity, 4), 0, dp(activity, 10));
+        content.addView(progressLabel);
+
+        TextView exchangeTitle = sectionTitle(activity, "TUKAR MATA UANG");
+        content.addView(exchangeTitle);
+        addBarterOption(content, activity, 0, "200 DM  →  10.000 Koin");
+        addBarterOption(content, activity, 1, "700 DM  →  35.000 Koin");
+        addBarterOption(content, activity, 2, "2.400 DM  →  120.000 Koin");
+        addBarterOption(content, activity, 3, "10.000 Koin  →  200 DM");
+        addBarterOption(content, activity, 4, "35.000 Koin  →  700 DM");
+        addBarterOption(content, activity, 5, "120.000 Koin  →  2.400 DM");
+
+        content.addView(sectionTitle(activity, "PAKET DAN KEISTIMEWAAN"));
+        addBarterOption(content, activity, 6, "VIP 30 hari  —  30.000 Koin");
+        addBarterOption(content, activity, 7, "Luck Spree  —  3.500 Koin");
+        addBarterOption(content, activity, 8, "Newbie Value Pack  —  299 DM");
+        addBarterOption(content, activity, 9, "Newbie Rich Pack  —  999 DM");
+        addBarterOption(content, activity, 18, "Paket Hero  —  560 DM");
+        addBarterOption(content, activity, 19, "Paket Perlengkapan  —  420 DM");
+        addBarterOption(content, activity, 20, "Paket Mingguan  —  599 DM");
+        addBarterOption(content, activity, 21, "Tiket PvP  —  99 DM");
+        addBarterOption(content, activity, 22, "Paket Musiman A  —  499 DM");
+        addBarterOption(content, activity, 23, "Paket Musiman B  —  1.499 DM");
+
+        content.addView(sectionTitle(activity, "PERLENGKAPAN INDIVIDUAL"));
+        for (int i = 0; i < 8; i++) {
+            addBarterOption(content, activity, 10 + i,
+                    "Perlengkapan " + (i + 1) + "  —  499 DM");
+        }
+
+        ScrollView scroll = new ScrollView(activity);
+        scroll.addView(content);
+        new AlertDialog.Builder(activity)
+                .setTitle("SISTEM BARTER DTP")
+                .setView(scroll)
+                .setNegativeButton("Tutup", null)
+                .show();
+    }
+
+    private static TextView sectionTitle(Activity activity, String value) {
+        TextView title = new TextView(activity);
+        title.setText(value);
+        title.setTextColor(0xFFFFD36A);
+        title.setTextSize(12f);
+        title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        title.setPadding(0, dp(activity, 10), 0, dp(activity, 4));
+        return title;
+    }
+
+    private static void addBarterOption(LinearLayout parent, final Activity activity,
+                                        final int offerId, final String label) {
+        Button option = new Button(activity);
+        option.setText(label);
+        option.setAllCaps(false);
+        option.setTextSize(12f);
+        option.setTextColor(Color.WHITE);
+        option.setBackground(buttonBackground());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(activity, 42));
+        params.bottomMargin = dp(activity, 5);
+        parent.addView(option, params);
+        option.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) {
+                new AlertDialog.Builder(activity)
+                        .setTitle("Konfirmasi barter")
+                        .setMessage("Lanjutkan " + label + "? Saldo akan dipotong sebelum hadiah diberikan.")
+                        .setPositiveButton("Tukar sekarang", new DialogInterface.OnClickListener() {
+                            @Override public void onClick(DialogInterface dialog, int which) {
+                                String result = NativeGameRuntimeBridge.performBarter(offerId);
+                                String message;
+                                if (result != null && result.startsWith("OK|")) {
+                                    message = "Barter berhasil.";
+                                } else if ("INSUFFICIENT_COINS".equals(result)) {
+                                    message = "Koin tidak cukup.";
+                                } else if ("INSUFFICIENT_DM".equals(result)) {
+                                    message = "DM tidak cukup.";
+                                } else if ("ALREADY_CLAIMED".equals(result)) {
+                                    message = "Hadiah ini sudah pernah diklaim.";
+                                } else {
+                                    message = "Barter gagal: " + result;
+                                }
+                                Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+                            }
+                        })
+                        .setNegativeButton("Batal", null)
+                        .show();
+            }
+        });
+    }
+
+    private static long parseWalletValue(String wallet, String prefix) {
+        try {
+            int start = wallet.indexOf(prefix);
+            if (start < 0) return 0L;
+            start += prefix.length();
+            int end = wallet.indexOf(';', start);
+            if (end < 0) end = wallet.length();
+            return Long.parseLong(wallet.substring(start, end).trim());
+        } catch (RuntimeException ignored) { return 0L; }
+    }
+
+    private static String formatNumber(long value) {
+        return NumberFormat.getIntegerInstance(new Locale("id", "ID")).format(value);
     }
 
     /** Refresh the small report icon and automatically show a newly saved report. */
@@ -198,7 +477,7 @@ public final class GameOnlineOverlay {
             text.setPadding(dp(activity, 12), dp(activity, 8), dp(activity, 12), dp(activity, 8));
             scroll.addView(text);
             new AlertDialog.Builder(activity)
-                    .setTitle("LAPORAN LENGKAP FORCE CLOSE • v17.11")
+                    .setTitle("LAPORAN LENGKAP FORCE CLOSE • v17.12")
                     .setView(scroll)
                     .setPositiveButton("Salin Semua", new DialogInterface.OnClickListener() {
                         @Override public void onClick(DialogInterface dialog, int which) {
@@ -206,7 +485,7 @@ public final class GameOnlineOverlay {
                                 ClipboardManager clipboard = (ClipboardManager)
                                         activity.getSystemService(Context.CLIPBOARD_SERVICE);
                                 if (clipboard != null) {
-                                    clipboard.setPrimaryClip(ClipData.newPlainText("Laporan KIC DTP v17.11", report));
+                                    clipboard.setPrimaryClip(ClipData.newPlainText("Laporan KIC DTP v17.12", report));
                                     Toast.makeText(activity, "Laporan lengkap disalin", Toast.LENGTH_SHORT).show();
                                 }
                             } catch (Throwable ignored) { }

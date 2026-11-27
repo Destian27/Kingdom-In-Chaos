@@ -23,13 +23,14 @@ def test_backend_uses_same_public_supabase_project_key_as_maintenance():
 def test_java_adapter_covers_requested_authenticated_functions():
     j = JAVA.read_text()
     for marker in (
-        "signUp(", "signInWithPassword(", "getMyProfile(", "updateProfile(",
-        "findPlayers(", "sendFriendRequest(", "getFriends(", "getFriendRequests(",
-        "getRankings(", "getActiveWorldBossCycles(", "getWorldBossRankings(",
+        "getMyProfile(", "updateProfile(", "findPlayers(", "sendFriendRequest(",
+        "getFriends(", "getFriendRequests(", "getRankings(",
+        "getActiveWorldBossCycles(", "getWorldBossRankings(",
         "submitWorldBossScoreClaim(", "joinPvpQueue(", "getPvpHistory(",
         "saveGame(", "heartbeat(",
     ):
         assert marker in j, marker
+    assert "signUp(" not in j and "signInWithPassword(" not in j
 
 
 def test_sql_has_rls_rpc_and_server_only_competitive_result_writes():
@@ -73,11 +74,7 @@ def test_java_online_hub_is_registered_and_reachable_from_game():
     assert 'android:exported="false"' in manifest.split('android:name="com.destian.dtp.GameOnlineHubActivity"')[0][-250:]
     assert "GameOnlineOverlay.install(a)" in app
     assert "GameOnlineHubActivity.class" in overlay
-    for method in (
-        "signUp(", "signInWithPassword(", "getMyProfile(", "updateProfile(",
-        "findPlayers(", "sendFriendRequest(", "getFriends(", "getFriendRequests(",
-        "getRankings(", "joinPvpQueue(", "getPvpHistory(",
-        "getActiveWorldBossCycles(", "getWorldBossRankings(", "submitWorldBossScoreClaim("
-    ):
-        assert method in hub, method
+    assert "GooglePlayerBackend" in hub
+    assert "Lanjutkan dengan Google" in hub
+    assert "signUp(" not in hub and "signInWithPassword(" not in hub
     assert "native" in hub.lower() and "not" in hub.lower()

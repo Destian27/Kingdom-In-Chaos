@@ -85,6 +85,7 @@
     <public type="drawable" name="offerwall_download_b" id="0x7f02002e" />
     <public type="drawable" name="offerwall_icon" id="0x7f02002f" />
     <public type="drawable" name="self" id="0x7f020032" />
+    <public type="drawable" name="google_logo" id="0x7f020033" />
     <public type="layout" name="app_download_notification" id="0x7f030000" />
     <public type="layout" name="cp_dialog" id="0x7f030001" />
     <public type="layout" name="cp_fullscreen" id="0x7f030002" />

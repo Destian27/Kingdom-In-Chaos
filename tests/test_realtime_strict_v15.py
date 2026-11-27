@@ -22,12 +22,12 @@ def test_authenticated_player_realtime_tables():
     c = read("dtp/src/com/destian/dtp/RealtimeClient.java")
     assert "buildJoinMessage(String liveToken)" in c and 'change.put("filter", filter)' in c
 
-def test_runtime_snapshot_method_and_hub_button():
-    b = read("dtp/src/com/destian/dtp/SupabaseGameBackend.java")
+def test_google_profile_snapshot_button_replaces_old_supabase_snapshot_button():
+    b = read("dtp/src/com/destian/dtp/GooglePlayerBackend.java")
     h = read("dtp/src/com/destian/dtp/GameOnlineHubActivity.java")
-    assert "getMyRuntimeState()" in b
-    assert "getAccessTokenForRealtime()" in b
-    assert "Muat Snapshot Real-time" in h
+    assert "getState()" in b
+    assert "Lihat Profil, ID Pemain, dan Saldo" in h
+    assert "Supabase Auth tidak digunakan untuk login pemain" in h
 
 
 def test_sql_enforces_maintenance_server_side():

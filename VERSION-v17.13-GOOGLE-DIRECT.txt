@@ -1,0 +1,14 @@
+Kingdom In Chaos DTP - v17.13 Google Direct Auth + Reward Codes + Meat
+Tanggal: 27 November 2026
+Basis: v17.12 Barter Economy
+APK versionName: 17.13
+APK versionCode: 10
+Build output: KingdomInChaosDTP-v17.13-google-auth.apk
+
+Pemain login memakai Google secara langsung (Google Play Services account picker + Google access token). Supabase Auth tidak dipakai untuk autentikasi pemain; Supabase tetap menjadi database/Edge Functions dan login admin. Email wajib terverifikasi Google. Tidak ada password atau konfirmasi password pemain.
+
+Pemain baru masuk ke Tahap 2 untuk memilih nickname 3-32 karakter. Server mengeluarkan player_id unik. Admin melihat daftar pemain Google otomatis beserta email, avatar, ID, nickname, Koin, DM, daging, dan status verifikasi.
+
+Kode hadiah dapat dibuat sendiri dari Admin, diatur isi/kuota/masa berlaku, dan disalin. Tiap akun hanya dapat mengeklaim kode yang sama satu kali. Daging server regenerasi 1 unit per 5 menit sampai kapasitas 24; dapat dibeli dengan DM.
+
+Batas yang belum terhubung: tombol MULAI native belum di-hook untuk memblokir stage saat daging 0, dan wallet DM/Koin native dari libgame.so belum disinkronkan ke wallet server Google. Layar Daging menguji operasi server terpisah. Build APK dan uji perangkat belum dilakukan di lingkungan ini.

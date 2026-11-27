@@ -21,8 +21,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * A Java online hub accessible from the DTP in-game ONLINE button. It uses the
- * Supabase adapter, but does not replace or claim to restore native C++ gameplay.
+ * A Java online hub for direct Google player identity and DTP account utilities.
+ * Legacy Supabase Auth gameplay modules remain hidden and are not presented as active.
  */
 public final class GameOnlineHubActivity extends Activity {
     private SupabaseGameBackend backend;
@@ -32,12 +32,7 @@ public final class GameOnlineHubActivity extends Activity {
     private RealtimeClient runtimeRealtime;
     private boolean runtimeRealtimeStarting;
 
-    private EditText email;
-    private EditText password;
-    private EditText username;
-    private EditText nickname;
-    private EditText avatarId;
-    private EditText region;
+    private GooglePlayerBackend googleBackend;
     private EditText playerQuery;
     private EditText targetUserId;
     private EditText friendRequestId;
@@ -53,11 +48,12 @@ public final class GameOnlineHubActivity extends Activity {
         super.onCreate(state);
         setTitle("Kingdom In Chaos — Online");
         backend = new SupabaseGameBackend(this);
+        googleBackend = new GooglePlayerBackend(this);
         executor = Executors.newSingleThreadExecutor();
         buildUi();
-        output.setText(backend.hasSession()
-                ? "Sesi Supabase tersimpan. Realtime akan memuat perubahan Admin pada profil, cloud save, dan ekonomi."
-                : "Belum login. Login/daftar dulu untuk memakai fitur online.");
+        output.setText(googleBackend.hasAccount()
+                ? "Akun Google tersambung. Database game menyimpan profil dan saldo pemain; Supabase Auth tidak digunakan untuk login pemain."
+                : "Belum login. Gunakan akun Google untuk membuat profil pemain.");
         if (backend.hasSession()) ensureRuntimeRealtimeSubscription();
     }
 
@@ -78,161 +74,159 @@ public final class GameOnlineHubActivity extends Activity {
         title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         page.addView(title, matchWrap());
         TextView note = new TextView(this);
-        note.setText("Login, profil/avatar, teman, ranking, antrean PvP, dan World Boss. Realtime memperbarui snapshot server. Coins, Crystals, dan Goblin Coins yang diubah admin diterapkan ke wallet native game melalui JNI; PvP/World Boss dan statistik lain belum menjalankan gameplay native.");
+        note.setText("Akun pemain memakai Google langsung. Gunakan Surat untuk hadiah admin, Kode Hadiah untuk kode promo, dan Daging untuk energi misi. Dashboard admin hanya memantau profil Google serta snapshot wallet native; admin tidak mengedit saldo atau profil pemain secara langsung. Data realtime memerlukan koneksi internet.");
         note.setTextSize(13);
         page.addView(note, matchWrap());
 
-        heading(page, "1. Akun");
-        addButton(page, "Login ke Kingdom In Chaos DTP (Google)", new Runnable() {
+        heading(page, "Akun Google");
+        addButton(page, "Lanjutkan dengan Google", new Runnable() {
             @Override public void run() {
                 startActivity(new Intent(GameOnlineHubActivity.this, GameAuthActivity.class));
             }
         });
+        addButton(page, "Lihat Profil, ID Pemain, dan Saldo", new Runnable() {
+            @Override public void run() {
+                runGoogleBackend("Profil dan saldo Google", "get_state", new JSONObject());
+            }
+        });
+        addButton(page, "Kode Hadiah", new Runnable() {
+            @Override public void run() {
+                startActivity(new Intent(GameOnlineHubActivity.this, GameGiftCodeActivity.class));
+            }
+        });
+        addButton(page, "Surat / Kotak Surat", new Runnable() {
+            @Override public void run() {
+                if (!googleBackend.hasAccount()) {
+                    startActivity(new Intent(GameOnlineHubActivity.this, GameAuthActivity.class));
+                } else {
+                    startActivity(new Intent(GameOnlineHubActivity.this, GameMailActivity.class));
+                }
+            }
+        });
+        addButton(page, "Daging / Energi Misi", new Runnable() {
+            @Override public void run() {
+                startActivity(new Intent(GameOnlineHubActivity.this, GameMeatActivity.class));
+            }
+        });
+        addButton(page, "Logout Google", new Runnable() {
+            @Override public void run() {
+                googleBackend.clearAccount();
+                output.setText("Akun Google dilepas dari perangkat ini.");
+            }
+        });
         TextView authHint = new TextView(this);
-        authHint.setText("Login Google adalah cara utama. Login email/password lama tetap tersedia sebagai alternatif.");
+        authHint.setText("Login pemain hanya memakai Google. Tidak ada password atau konfirmasi password game. Email harus terverifikasi oleh Google. Foto profil Google disegarkan saat sinkronisasi akun; avatar karakter native game tetap mengikuti data game lokal.");
         authHint.setTextSize(12);
         page.addView(authHint, matchWrap());
 
-        heading(page, "Login email lama (alternatif)");
-        email = addInput(page, "Email", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        password = addInput(page, "Password", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        username = addInput(page, "Username (untuk daftar)", InputType.TYPE_CLASS_TEXT);
-        nickname = addInput(page, "Nickname", InputType.TYPE_CLASS_TEXT);
-        addButton(page, "Daftar", new Runnable() { @Override public void run() {
-            final String vEmail = value(email), vPassword = value(password), vUsername = value(username), vNickname = value(nickname);
-            runBackend("Daftar", new BackendTask() { @Override public String execute() throws Exception {
-                return backend.signUp(vEmail, vPassword, vUsername, vNickname).toString();
-            }});
-        }});
-        addButton(page, "Login", new Runnable() { @Override public void run() {
-            final String vEmail = value(email), vPassword = value(password);
-            runBackend("Login", new BackendTask() { @Override public String execute() throws Exception {
-                return backend.signInWithPassword(vEmail, vPassword).toString();
-            }});
-        }});
-        addButton(page, "Muat Profil", new Runnable() { @Override public void run() {
-            runBackend("Profil", new BackendTask() { @Override public String execute() throws Exception {
-                return backend.getMyProfile().toString();
-            }});
-        }});
-        addButton(page, "Muat Snapshot Real-time (Coins / XP / Save)", new Runnable() { @Override public void run() {
-            runBackend("Snapshot server terbaru", new BackendTask() { @Override public String execute() throws Exception {
-                return backend.getMyRuntimeState().toString();
-            }});
-        }});
-        avatarId = addInput(page, "Avatar ID (ID aset avatar lama)", InputType.TYPE_CLASS_NUMBER);
-        region = addInput(page, "Region (contoh: ID)", InputType.TYPE_CLASS_TEXT);
-        addButton(page, "Simpan Nickname / Avatar / Region", new Runnable() { @Override public void run() {
-            final String vNickname = value(nickname), vAvatar = value(avatarId), vRegion = value(region);
-            runBackend("Perbarui profil", new BackendTask() { @Override public String execute() throws Exception {
-                int id = Integer.parseInt(vAvatar);
-                return backend.updateProfile(vNickname, id, vRegion).toString();
-            }});
-        }});
-        addButton(page, "Logout", new Runnable() { @Override public void run() {
-            runBackend("Logout", new BackendTask() { @Override public String execute() throws Exception {
-                backend.signOut(); return "Logout berhasil; token lokal dihapus.";
-            }});
-        }});
+        LinearLayout legacyGroup = new LinearLayout(this);
+        legacyGroup.setOrientation(LinearLayout.VERTICAL);
+        legacyGroup.setVisibility(View.GONE); // Old modules still require Supabase Auth and are intentionally hidden.
+        page.addView(legacyGroup, matchWrap());
+        heading(legacyGroup, "Fitur akun online lama");
+        TextView legacyHint = new TextView(this);
+        legacyHint.setText("Teman, PvP, ranking, dan beberapa snapshot lama masih memakai integrasi Supabase Auth versi sebelumnya. Modul tersebut belum otomatis berpindah ke identitas Google langsung.");
+        legacyHint.setTextSize(12);
+        legacyGroup.addView(legacyHint, matchWrap());
 
-        heading(page, "2. Teman");
-        playerQuery = addInput(page, "Cari username/nickname (min. 2 karakter)", InputType.TYPE_CLASS_TEXT);
-        addButton(page, "Cari Pemain", new Runnable() { @Override public void run() {
+        heading(legacyGroup, "2. Teman");
+        playerQuery = addInput(legacyGroup, "Cari username/nickname (min. 2 karakter)", InputType.TYPE_CLASS_TEXT);
+        addButton(legacyGroup, "Cari Pemain", new Runnable() { @Override public void run() {
             final String query = value(playerQuery);
             runBackend("Hasil pencarian pemain", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.findPlayers(query, 25).toString();
             }});
         }});
-        targetUserId = addInput(page, "UUID user tujuan", InputType.TYPE_CLASS_TEXT);
-        addButton(page, "Kirim Permintaan Teman", new Runnable() { @Override public void run() {
+        targetUserId = addInput(legacyGroup, "UUID user tujuan", InputType.TYPE_CLASS_TEXT);
+        addButton(legacyGroup, "Kirim Permintaan Teman", new Runnable() { @Override public void run() {
             final String id = value(targetUserId);
             runBackend("Permintaan teman", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.sendFriendRequest(id).toString();
             }});
         }});
-        addButton(page, "Muat Teman", new Runnable() { @Override public void run() {
+        addButton(legacyGroup, "Muat Teman", new Runnable() { @Override public void run() {
             runBackend("Daftar teman", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.getFriends().toString();
             }});
         }});
-        addButton(page, "Muat Permintaan Teman", new Runnable() { @Override public void run() {
+        addButton(legacyGroup, "Muat Permintaan Teman", new Runnable() { @Override public void run() {
             runBackend("Permintaan masuk", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.getFriendRequests().toString();
             }});
         }});
-        friendRequestId = addInput(page, "ID permintaan teman (lihat hasil di bawah)", InputType.TYPE_CLASS_TEXT);
-        addButton(page, "Terima Permintaan", new Runnable() { @Override public void run() {
+        friendRequestId = addInput(legacyGroup, "ID permintaan teman (lihat hasil di bawah)", InputType.TYPE_CLASS_TEXT);
+        addButton(legacyGroup, "Terima Permintaan", new Runnable() { @Override public void run() {
             friendResponse(true);
         }});
-        addButton(page, "Tolak Permintaan", new Runnable() { @Override public void run() {
+        addButton(legacyGroup, "Tolak Permintaan", new Runnable() { @Override public void run() {
             friendResponse(false);
         }});
 
-        heading(page, "3. Ranking dan kehadiran");
-        addButton(page, "Muat Ranking", new Runnable() { @Override public void run() {
+        heading(legacyGroup, "3. Ranking dan kehadiran");
+        addButton(legacyGroup, "Muat Ranking", new Runnable() { @Override public void run() {
             runBackend("Ranking", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.getRankings(100).toString();
             }});
         }});
-        roomCode = addInput(page, "Room code (boleh kosong)", InputType.TYPE_CLASS_TEXT);
-        addButton(page, "Heartbeat / Online", new Runnable() { @Override public void run() {
+        roomCode = addInput(legacyGroup, "Room code (boleh kosong)", InputType.TYPE_CLASS_TEXT);
+        addButton(legacyGroup, "Heartbeat / Online", new Runnable() { @Override public void run() {
             final String room = value(roomCode);
             runBackend("Status online", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.heartbeat(room).toString();
             }});
         }});
-        addButton(page, "Tandai Offline", new Runnable() { @Override public void run() {
+        addButton(legacyGroup, "Tandai Offline", new Runnable() { @Override public void run() {
             runBackend("Status offline", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.markOffline().toString();
             }});
         }});
 
-        heading(page, "4. PvP (antrean/state server; belum menjalankan battle native)");
-        addButton(page, "Masuk / Periksa Antrean PvP", new Runnable() { @Override public void run() {
+        heading(legacyGroup, "4. PvP (antrean/state server; belum menjalankan battle native)");
+        addButton(legacyGroup, "Masuk / Periksa Antrean PvP", new Runnable() { @Override public void run() {
             runBackend("Antrean PvP", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.joinPvpQueue().toString();
             }});
         }});
-        addButton(page, "Batalkan Antrean PvP", new Runnable() { @Override public void run() {
+        addButton(legacyGroup, "Batalkan Antrean PvP", new Runnable() { @Override public void run() {
             runBackend("Batalkan PvP", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.cancelPvpQueue().toString();
             }});
         }});
-        addButton(page, "Riwayat PvP", new Runnable() { @Override public void run() {
+        addButton(legacyGroup, "Riwayat PvP", new Runnable() { @Override public void run() {
             runBackend("Riwayat PvP", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.getPvpHistory(50).toString();
             }});
         }});
-        pvpMatchId = addInput(page, "Match UUID (salin dari hasil antrean)", InputType.TYPE_CLASS_TEXT);
-        addButton(page, "Periksa Status Match PvP", new Runnable() { @Override public void run() {
+        pvpMatchId = addInput(legacyGroup, "Match UUID (salin dari hasil antrean)", InputType.TYPE_CLASS_TEXT);
+        addButton(legacyGroup, "Periksa Status Match PvP", new Runnable() { @Override public void run() {
             final String id = value(pvpMatchId);
             runBackend("Status match PvP", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.getPvpMatchState(id).toString();
             }});
         }});
 
-        heading(page, "5. World Boss (skor menunggu verifikasi)");
-        addButton(page, "Muat Siklus World Boss Aktif", new Runnable() { @Override public void run() {
+        heading(legacyGroup, "5. World Boss (skor menunggu verifikasi)");
+        addButton(legacyGroup, "Muat Siklus World Boss Aktif", new Runnable() { @Override public void run() {
             runBackend("Siklus World Boss", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.getActiveWorldBossCycles().toString();
             }});
         }});
-        cycleId = addInput(page, "Cycle ID (salin dari hasil siklus)", InputType.TYPE_CLASS_TEXT);
-        bossScore = addInput(page, "Skor yang diajukan", InputType.TYPE_CLASS_NUMBER);
-        addButton(page, "Ranking World Boss", new Runnable() { @Override public void run() {
+        cycleId = addInput(legacyGroup, "Cycle ID (salin dari hasil siklus)", InputType.TYPE_CLASS_TEXT);
+        bossScore = addInput(legacyGroup, "Skor yang diajukan", InputType.TYPE_CLASS_NUMBER);
+        addButton(legacyGroup, "Ranking World Boss", new Runnable() { @Override public void run() {
             final String cycle = value(cycleId);
             runBackend("Ranking World Boss", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.getWorldBossRankings(cycle, 100).toString();
             }});
         }});
-        addButton(page, "Ajukan Skor World Boss", new Runnable() { @Override public void run() {
+        addButton(legacyGroup, "Ajukan Skor World Boss", new Runnable() { @Override public void run() {
             final String cycle = value(cycleId), score = value(bossScore);
             runBackend("Pengajuan skor World Boss", new BackendTask() { @Override public String execute() throws Exception {
                 long number = Long.parseLong(score);
                 return backend.submitWorldBossScoreClaim(cycle, number, new JSONObject()).toString();
             }});
         }});
-        addButton(page, "Lihat Pengajuan Skor Saya", new Runnable() { @Override public void run() {
+        addButton(legacyGroup, "Lihat Pengajuan Skor Saya", new Runnable() { @Override public void run() {
             final String cycle = value(cycleId);
             runBackend("Pengajuan skor saya", new BackendTask() { @Override public String execute() throws Exception {
                 return backend.getMyWorldBossClaims(cycle).toString();
@@ -321,6 +315,26 @@ public final class GameOnlineHubActivity extends Activity {
         runBackend(accept ? "Terima teman" : "Tolak teman", new BackendTask() {
             @Override public String execute() throws Exception {
                 return backend.respondFriendRequest(id, accept).toString();
+            }
+        });
+    }
+
+
+    private void runGoogleBackend(final String title, final String action, final JSONObject payload) {
+        output.setText(title + ": memuat...");
+        executor.execute(new Runnable() {
+            @Override public void run() {
+                String result;
+                try {
+                    JSONObject data;
+                    if ("get_state".equals(action)) data = googleBackend.getState();
+                    else data = new JSONObject();
+                    result = data.toString(2);
+                } catch (Exception e) {
+                    result = "Gagal: " + (e.getMessage() == null ? "Periksa login Google dan koneksi." : e.getMessage());
+                }
+                final String text = result;
+                main.post(new Runnable() { @Override public void run() { output.setText(title + "\n" + text); } });
             }
         });
     }

@@ -2,31 +2,56 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+def read(path): return (ROOT / path).read_text(encoding="utf-8")
 
-def test_google_oauth_pkce_and_encrypted_supabase_session():
-    backend = (ROOT / "dtp/src/com/destian/dtp/SupabaseGameBackend.java").read_text()
-    assert 'GOOGLE_REDIRECT_URI = "kingdominchaosdtp://auth"' in backend
-    assert 'appendQueryParameter("provider", "google")' in backend
-    assert 'appendQueryParameter("code_challenge_method", "s256")' in backend
-    assert '"/auth/v1/token?grant_type=pkce"' in backend
-    assert 'storeSession(result)' in backend
-    assert "writeSecret(" in backend and "AndroidKeyStore" in backend
+def test_player_login_uses_direct_google_not_supabase_auth():
+    auth = read("dtp/src/com/destian/dtp/GameAuthActivity.java")
+    backend = read("dtp/src/com/destian/dtp/GooglePlayerBackend.java")
+    assert "AccountManager.newChooseAccountIntent" in auth
+    assert "loginWithGoogleAccount" in auth
+    assert "GoogleAuthUtil" in backend
+    assert "userinfo" in backend or "openidconnect.googleapis.com" in read("supabase/functions/google-player/index.ts")
+    assert "email_verified" in read("supabase/functions/google-player/index.ts")
+    assert "auth/v1/authorize" not in auth
+    assert "auth/v1/token" not in auth
+    assert "password" not in auth.lower() or "password game" in auth.lower()
+
+def test_google_player_phase_two_has_nickname_and_server_player_id():
+    activity = read("dtp/src/com/destian/dtp/GameProfileSetupActivity.java")
+    edge = read("supabase/functions/google-player/index.ts")
+    sql = read("supabase/migrations/202611270001_google_players_rewards_meat.sql")
+    assert "Buat Profil Pemain" in activity
+    assert "NICKNAME" in activity
+    assert "player_id" in activity
+    assert "complete_profile" in edge
+    assert "profile_completed" in edge
+    assert "player_id bigint generated always as identity" in sql
 
 
-def test_auth_activity_and_deep_link_registered():
-    manifest = (ROOT / "kingdom-in-chaos-decompiled/AndroidManifest.xml").read_text()
-    auth = (ROOT / "dtp/src/com/destian/dtp/GameAuthActivity.java").read_text()
-    assert 'android:name="com.destian.dtp.GameAuthActivity"' in manifest
-    assert 'android:scheme="kingdominchaosdtp" android:host="auth"' in manifest
-    assert "Login ke Kingdom In Chaos DTP" in auth
-    assert 'getIdentifier("icon", "drawable"' in auth
-    assert "completeGoogleOAuth(code, returnedState)" in auth
+def test_admin_google_directory_and_reward_code_controls_exist():
+    html = read("admin.html")
+    edge = read("supabase/functions/game-admin/index.ts")
+    assert "Semua Pemain — Google Auth" in html
+    assert "googlePlayerRows" in html
+    assert "Email Google" in html and "Avatar" in html
+    assert "btnCreateRewardCode" in html and "Salin kode" in html
+    assert 'action === "list_google_players"' in edge
+    assert 'action === "create_reward_code"' in edge
+    assert 'action === "set_reward_code_enabled"' in edge
 
 
-def test_game_overlay_has_login_entry_and_hub_gates_online_actions():
-    overlay = (ROOT / "dtp/src/com/destian/dtp/GameOnlineOverlay.java").read_text()
-    hub = (ROOT / "dtp/src/com/destian/dtp/GameOnlineHubActivity.java").read_text()
-    assert "GameAuthActivity.class" in overlay
-    assert "GameOnlineHubActivity.class" in overlay
-    assert "backend.hasSession()" in hub
-    assert "Login diperlukan untuk fitur ini" in hub
+def test_meat_regenerates_five_minutes_and_can_be_bought_with_dm():
+    sql = read("supabase/migrations/202611270001_google_players_rewards_meat.sql")
+    activity = read("dtp/src/com/destian/dtp/GameMeatActivity.java")
+    edge = read("supabase/functions/google-player/index.ts")
+    assert "regen_seconds integer not null default 300" in sql
+    assert "dm_per_meat integer not null default 1" in sql
+    assert "game_google_buy_meat" in sql and "game_google_consume_meat" in sql
+    assert "buyMeat(1)" in activity and "consumeMeat()" in activity
+    assert 'action === "buy_meat"' in edge and 'action === "consume_meat"' in edge
+
+
+def test_legacy_supabase_player_session_is_cleared_on_app_start():
+    app = read("dtp/src/com/destian/dtp/DtpApp.java")
+    assert 'getSharedPreferences("kic_supabase_session_v1"' in app
+    assert 'getSharedPreferences("kic_google_oauth_pending_v1"' in app

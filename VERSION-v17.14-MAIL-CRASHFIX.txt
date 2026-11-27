@@ -1,0 +1,8 @@
+Kingdom In Chaos DTP v17.14 — Mail + Native Crash Fix
+- Admin rewards now use in-game Surat, not email delivery.
+- One-time claim atomically credits the Google cloud wallet; native wallet bridge applies Koin, DM, Goblin, and Life on Cocos GL thread.
+- Native wallet snapshots are sent read-only to admin dashboard every 10 seconds while game is foreground; dashboard also uses Realtime Broadcast + 15-second fallback refresh.
+- Admin uses the existing maintenance-admin session; separate Supabase Auth login panel removed.
+- Manual player balance editing route removed; rewards are sent through Surat.
+- Exact-byte LifeMax guard returns the game's configured 24-life cap to avoid the reported UIAchieveLayer::onAward SIGSEGV path.
+- APK is not built/validated in this environment; require ARM device testing before release.

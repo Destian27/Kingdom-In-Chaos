@@ -14,7 +14,7 @@ APKTOOL_JAR = os.environ.get("APKTOOL_JAR", os.path.join(TOOLS, "apktool.jar"))
 KEYSTORE = os.environ.get("KEYSTORE_PATH", os.path.join(TOOLS, "release.keystore"))
 KS_PASS = os.environ.get("KEYSTORE_PASS", "android123")
 KS_ALIAS = os.environ.get("KEYSTORE_ALIAS", "kingdomchaosdtp")
-OUTPUT_APK = os.path.join(ROOT, "KingdomInChaosDTP-v17.11.apk")
+OUTPUT_APK = os.path.join(ROOT, "KingdomInChaosDTP-v17.14.2-google-mail-crashfix.apk")
 MIN_API = "24"
 NDK_VERSION = os.environ.get("ANDROID_NDK_VERSION", "27.2.12479018")
 IS_WIN = os.name == "nt"
@@ -69,6 +69,20 @@ def ndk_root():
     sys.exit("Android NDK tidak ditemukan. Install NDK " + NDK_VERSION + " atau set ANDROID_NDK_HOME")
 
 
+def patch_native_barter():
+    patcher = os.path.join(TOOLS, "patch_barter_native.py")
+    if not os.path.isfile(patcher):
+        sys.exit("Script patch barter native tidak ditemukan: " + patcher)
+    run([sys.executable, patcher])
+
+
+def patch_lifemax_crash():
+    patcher = os.path.join(TOOLS, "patch_lifemax_crash.py")
+    if not os.path.isfile(patcher):
+        sys.exit("Script crash guard LifeMax tidak ditemukan: " + patcher)
+    run([sys.executable, patcher])
+
+
 def compile_native_bridge():
     ndk = ndk_root()
     host = "windows-x86_64" if IS_WIN else ("darwin-arm64" if sys.platform == "darwin" and os.uname().machine == "arm64" else "darwin-x86_64" if sys.platform == "darwin" else "linux-x86_64")
@@ -82,7 +96,7 @@ def compile_native_bridge():
     output = os.path.join(target_dir, "libkicgamebridge.so")
     cmd = [compiler, "--target=armv7a-linux-androideabi" + MIN_API,
            "--sysroot=" + os.path.join(prebuilt, "sysroot"),
-           "-shared", "-fPIC", "-std=c++17", "-O2", "-nostdlib++",
+           "-shared", "-fPIC", "-mthumb", "-std=c++17", "-O2", "-nostdlib++",
            "-Wl,--no-undefined", "-Wl,-soname,libkicgamebridge.so",
            "-o", output, source, "-ldl"]
     run(cmd)
@@ -134,6 +148,8 @@ def add_dex(apk_in, apk_out, dex_path):
 def main():
     if not os.path.exists(APKTOOL_JAR):
         sys.exit("apktool.jar tidak ada: " + APKTOOL_JAR)
+    patch_native_barter()
+    patch_lifemax_crash()
     compile_native_bridge()
     dex = compile_dex()
 

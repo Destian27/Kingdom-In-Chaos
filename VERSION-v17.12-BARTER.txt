@@ -1,0 +1,12 @@
+Kingdom In Chaos DTP - v17.12 Barter Economy
+Tanggal: 27 November 2026
+Basis: v17.11 Money Button Crash Fix
+APK versionName: 17.12
+APK versionCode: 9
+Build output: KingdomInChaosDTP-v17.12-barter.apk
+
+Real-money purchase entry points are disabled. Original cash-priced coin/crystal packs are routed to the in-game Koin/DM exchange on ARMv7. VIP, Luck Spree, newbie packs, heroes, equipment, and other offers deduct Koin/DM before the original native reward function is called.
+
+The BARTER menu shows the native wallet, exchange tiers, purchase confirmations, and locally tracked cumulative DM. The old server-based Total Recharge reward claims have not been ported; the visible DM progress meter is a local lifetime counter.
+
+Build and runtime verification are incomplete in this environment: source tests pass, but Android SDK/NDK/apktool and an Android device/emulator were unavailable. Build the APK with GitHub Actions or a configured Android SDK/NDK toolchain before installation.

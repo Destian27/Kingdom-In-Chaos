@@ -1,0 +1,8 @@
+Kingdom In Chaos DTP v17.14.2
+versionCode=12
+
+Includes: direct Google player sign-in; nickname and generated player ID profile step; in-game Surat rewards; single-use server-side mail claims; native wallet application bridge; food regen configuration; read-only admin player dashboard with Realtime/polling refresh; ARMv7 LifeMax crash guard.
+
+Build output: KingdomInChaosDTP-v17.14.2-google-mail-crashfix.apk
+
+Status: source package only. APK not built or device-tested in this environment.

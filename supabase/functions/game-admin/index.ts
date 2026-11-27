@@ -3,14 +3,6 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-const MAX_INT64 = 9223372036854775807n;
-const BIGINT_FIELDS = new Set([
-  "coins", "crystals", "goblin_coins", "event_eyes", "hero_xp", "player_xp", "energy",
-  "stamina", "honor_points", "arena_tokens", "skill_points",
-]);
-const LEVEL_FIELDS = new Set(["hero_level", "player_level"]);
-const ALLOWED_ECONOMY_FIELDS = new Set([...BIGINT_FIELDS, ...LEVEL_FIELDS, "extra_stats"]);
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
@@ -41,25 +33,6 @@ function uuid(value: unknown, name = "User ID"): string {
   return v;
 }
 type AdminAuthUser = { id: string; [key: string]: unknown };
-
-function safeAuthUser(user: Record<string, unknown>) {
-  // Never return password hashes, login tokens, confirmation tokens, or raw auth records.
-  return {
-    id: user.id,
-    email: user.email ?? null,
-    email_confirmed_at: user.email_confirmed_at ?? null,
-    phone: user.phone ?? null,
-    phone_confirmed_at: user.phone_confirmed_at ?? null,
-    created_at: user.created_at ?? null,
-    updated_at: user.updated_at ?? null,
-    last_sign_in_at: user.last_sign_in_at ?? null,
-    banned_until: user.banned_until ?? null,
-    confirmed_at: user.confirmed_at ?? null,
-    is_anonymous: user.is_anonymous ?? false,
-    user_metadata: user.user_metadata ?? {},
-    app_metadata: user.app_metadata ?? {},
-  };
-}
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error("Missing one or more Supabase function environment variables.");
@@ -105,26 +78,60 @@ async function notifyPlayerStateChanged(targetId: string, resource: string) {
   });
 }
 
-async function requireAdmin(request: Request) {
+async function sha256(value: string): Promise<Uint8Array> {
+  return new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)));
+}
+function constantTimeEqual(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+  return diff === 0;
+}
+async function verifyMaintenanceCredentials(value: unknown): Promise<boolean> {
+  if (!isObject(value)) return false;
+  const configuredName = Deno.env.get("MAINTENANCE_ADMIN_NAME") ?? "";
+  const configuredPassword = Deno.env.get("MAINTENANCE_ADMIN_PASSWORD") ?? "";
+  const suppliedName = typeof value.name === "string" ? value.name : "";
+  const suppliedPassword = typeof value.password === "string" ? value.password : "";
+  if (!configuredName || !configuredPassword || !suppliedName || !suppliedPassword) return false;
+  const [a, b, c, d] = await Promise.all([
+    sha256(configuredName), sha256(suppliedName),
+    sha256(configuredPassword), sha256(suppliedPassword),
+  ]);
+  return constantTimeEqual(a, b) && constantTimeEqual(c, d);
+}
+
+async function requireAdmin(request: Request, body: Record<string, unknown>) {
+  // Preferred: reuse the already authenticated first maintenance-admin session.
+  if (await verifyMaintenanceCredentials(body.admin_credentials)) {
+    let query = service.from("game_admin_users")
+      .select("user_id, role, active")
+      .eq("active", true);
+    const pinnedId = Deno.env.get("MAINTENANCE_ADMIN_USER_ID") ?? "";
+    if (pinnedId) query = query.eq("user_id", pinnedId);
+    else query = query.eq("role", "super_admin");
+    const { data: adminRow, error: adminError } = await query.limit(1).maybeSingle();
+    if (adminError) throw Object.assign(new Error("Pemeriksaan hak admin gagal. Jalankan SQL v17.14 dan pastikan admin aktif."), { status: 503 });
+    if (!adminRow) throw Object.assign(new Error("Belum ada super_admin aktif yang terhubung. Atur MAINTENANCE_ADMIN_USER_ID atau bootstrap admin di database."), { status: 403 });
+    const { data: authData, error: authError } = await service.auth.admin.getUserById(adminRow.user_id);
+    if (authError || !authData.user) throw Object.assign(new Error("Identitas admin database tidak ditemukan."), { status: 403 });
+    return { user: authData.user as AdminAuthUser, admin: adminRow };
+  }
+
+  // Compatibility path for previously configured Supabase Auth admins.
   const header = request.headers.get("Authorization") ?? "";
   const match = header.match(/^Bearer\s+(.+)$/i);
-  if (!match) throw Object.assign(new Error("Login Supabase diperlukan."), { status: 401 });
+  if (!match) throw Object.assign(new Error("Sesi admin utama tidak valid. Silakan login kembali."), { status: 401 });
   const token = match[1];
   const authClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
   const { data: authData, error: authError } = await authClient.auth.getUser(token);
-  if (authError || !authData.user) {
-    throw Object.assign(new Error("Sesi login tidak valid atau sudah kedaluwarsa."), { status: 401 });
-  }
-  const { data: adminRow, error: adminError } = await service
-    .from("game_admin_users")
-    .select("user_id, role, active")
-    .eq("user_id", authData.user.id)
-    .eq("active", true)
-    .maybeSingle();
-  if (adminError) throw Object.assign(new Error("Pemeriksaan hak admin gagal. Pastikan migrasi SQL sudah dijalankan."), { status: 503 });
-  if (!adminRow) throw Object.assign(new Error("Akun ini belum diberi akses admin. Tambahkan akun melalui SQL bootstrap admin."), { status: 403 });
+  if (authError || !authData.user) throw Object.assign(new Error("Sesi admin tidak valid atau kedaluwarsa."), { status: 401 });
+  const { data: adminRow, error: adminError } = await service.from("game_admin_users")
+    .select("user_id, role, active").eq("user_id", authData.user.id).eq("active", true).maybeSingle();
+  if (adminError) throw Object.assign(new Error("Pemeriksaan hak admin gagal."), { status: 503 });
+  if (!adminRow) throw Object.assign(new Error("Akun ini belum diberi akses admin."), { status: 403 });
   return { user: authData.user, admin: adminRow };
 }
 
@@ -136,182 +143,6 @@ async function requireData<T = unknown>(query: PromiseLike<{ data: T | null; err
   }
   return data as T;
 }
-
-async function getRows(table: string, columns: string, ids: string[]) {
-  if (!ids.length) return [];
-  return await requireData<any[]>(service.from(table).select(columns).in("user_id", ids));
-}
-
-async function audit(adminId: string, targetId: string, action: string, reason: string,
-  beforeData: Record<string, unknown>, afterData: Record<string, unknown>) {
-  await requireData(service.from("game_admin_audit").insert({
-    admin_user_id: adminId,
-    target_user_id: targetId,
-    action,
-    reason,
-    before_data: beforeData,
-    after_data: afterData,
-  }).select("audit_id").single());
-}
-
-async function listUsers(body: Record<string, unknown>) {
-  const page = Math.max(1, Math.min(10000, Number.isInteger(body.page) ? Number(body.page) : 1));
-  const perPage = 30;
-  const q = typeof body.q === "string" ? body.q.trim().toLowerCase().slice(0, 100) : "";
-  const { data, error } = await service.auth.admin.listUsers({ page, perPage });
-  if (error) throw Object.assign(new Error("Tidak bisa mengambil daftar akun."), { status: 500 });
-  const users: AdminAuthUser[] = (data.users ?? []) as AdminAuthUser[];
-  const ids = users.map((u: AdminAuthUser) => u.id);
-  const [profiles, presences, rankings, economies, saves] = await Promise.all([
-    getRows("game_profiles", "user_id, legacy_uid, username, nickname, avatar_id, region, created_at, updated_at", ids),
-    getRows("game_presence", "user_id, is_online, room_code, last_seen", ids),
-    getRows("game_rankings", "user_id, level, total_score, pvp_wins, honor_points, updated_at", ids),
-    getRows("game_admin_player_economy", "user_id, coins, crystals, goblin_coins, event_eyes, hero_xp, hero_level, player_xp, player_level, energy, stamina, honor_points, arena_tokens, skill_points, extra_stats, updated_at", ids),
-    getRows("game_player_saves", "user_id, save_version, updated_at", ids),
-  ]);
-  const index = (rows: any[]) => new Map(rows.map((r) => [r.user_id, r]));
-  const pMap = index(profiles), oMap = index(presences), rMap = index(rankings), eMap = index(economies), sMap = index(saves);
-  type ListedUser = { auth_user: ReturnType<typeof safeAuthUser>; profile: any; presence: any; ranking: any; economy: any; save: any };
-  let out: ListedUser[] = users.map((u: AdminAuthUser): ListedUser => ({
-    auth_user: safeAuthUser(u as unknown as Record<string, unknown>),
-    profile: pMap.get(u.id) ?? null,
-    presence: oMap.get(u.id) ?? null,
-    ranking: rMap.get(u.id) ?? null,
-    economy: eMap.get(u.id) ?? null,
-    save: sMap.get(u.id) ?? null,
-  }));
-  if (q) {
-    out = out.filter((x: ListedUser) => [
-      x.auth_user.email, x.auth_user.id, x.profile?.username, x.profile?.nickname,
-    ].some((v) => String(v ?? "").toLowerCase().includes(q)));
-  }
-  return { users: out, page, per_page: perPage, has_more: (data.users?.length ?? 0) === perPage };
-}
-
-async function getUserDetail(targetId: string) {
-  const [{ data: authResult, error: authError }, profile, presence, ranking, economy, save, history, audits] = await Promise.all([
-    service.auth.admin.getUserById(targetId),
-    requireData<any>(service.from("game_profiles").select("*").eq("user_id", targetId).maybeSingle()),
-    requireData<any>(service.from("game_presence").select("*").eq("user_id", targetId).maybeSingle()),
-    requireData<any>(service.from("game_rankings").select("*").eq("user_id", targetId).maybeSingle()),
-    requireData<any>(service.from("game_admin_player_economy").select("*").eq("user_id", targetId).maybeSingle()),
-    requireData<any>(service.from("game_player_saves").select("user_id, save_version, save_data, updated_at").eq("user_id", targetId).maybeSingle()),
-    service.from("game_player_save_history").select("history_id, save_version, archived_at").eq("user_id", targetId).order("archived_at", { ascending: false }).limit(20),
-    service.from("game_admin_audit").select("audit_id, admin_user_id, target_user_id, action, reason, before_data, after_data, created_at").eq("target_user_id", targetId).order("created_at", { ascending: false }).limit(50),
-  ]);
-  if (authError || !authResult.user) throw Object.assign(new Error("Akun tidak ditemukan."), { status: 404 });
-  if (history.error && !history.error.message.includes("does not exist")) console.error("save history read failed", history.error.message);
-  if (audits.error) console.error("audit read failed", audits.error.message);
-  return {
-    auth_user: safeAuthUser(authResult.user as unknown as Record<string, unknown>),
-    profile, presence, ranking, economy, save,
-    save_history: history.error ? [] : (history.data ?? []),
-    audit: audits.error ? [] : (audits.data ?? []),
-  };
-}
-
-function validateEconomyFields(raw: unknown): Record<string, unknown> {
-  if (!isObject(raw)) throw new Error("Data statistik tidak valid.");
-  const keys = Object.keys(raw);
-  if (!keys.length) throw new Error("Pilih setidaknya satu nilai untuk diubah.");
-  const fields: Record<string, unknown> = {};
-  for (const key of keys) {
-    if (!ALLOWED_ECONOMY_FIELDS.has(key)) throw new Error(`Field tidak diizinkan: ${key}`);
-    const value = raw[key];
-    if (BIGINT_FIELDS.has(key)) {
-      const text = String(value ?? "").trim();
-      if (!/^\d{1,19}$/.test(text) || BigInt(text) > MAX_INT64) throw new Error(`${key} harus bilangan bulat 0 sampai ${MAX_INT64}.`);
-      fields[key] = text; // send decimal text; Postgres converts it to BIGINT without JS precision loss
-    } else if (LEVEL_FIELDS.has(key)) {
-      const n = Number(value);
-      if (!Number.isInteger(n) || n < 1 || n > 1_000_000) throw new Error(`${key} harus bilangan bulat 1 sampai 1.000.000.`);
-      fields[key] = n;
-    } else {
-      let obj = value;
-      if (typeof value === "string") {
-        try { obj = JSON.parse(value); } catch { throw new Error("extra_stats harus JSON yang valid."); }
-      }
-      if (!isObject(obj)) throw new Error("extra_stats harus berupa objek JSON.");
-      if (JSON.stringify(obj).length > 16000) throw new Error("extra_stats maksimal 16 KB.");
-      fields.extra_stats = obj;
-    }
-  }
-  return fields;
-}
-
-async function updateEconomy(adminId: string, body: Record<string, unknown>) {
-  const targetId = uuid(body.target_user_id);
-  const reason = cleanText(body.reason, 4, 500, "Alasan perubahan");
-  const fields = validateEconomyFields(body.fields);
-  // The database RPC applies the economy patch and writes its audit record in one transaction.
-  // Only this server function has the service_role credential; never call the RPC from a client.
-  const after = await requireData<any>(service.rpc("admin_update_player_economy", {
-    p_target_user_id: targetId,
-    p_fields: fields,
-    p_reason: reason,
-    p_admin_user_id: adminId,
-  }));
-  const broadcastSent = await notifyPlayerStateChanged(targetId, "economy");
-  return { economy: after, realtime: { broadcast_sent: broadcastSent, postgres_changes_enabled: true } };
-}
-
-async function updateProfile(adminId: string, body: Record<string, unknown>) {
-  const targetId = uuid(body.target_user_id);
-  const reason = cleanText(body.reason, 4, 500, "Alasan perubahan");
-  if (!isObject(body.fields)) throw new Error("Data profil tidak valid.");
-  const raw = body.fields as Record<string, unknown>;
-  const fields: Record<string, unknown> = {};
-  if (raw.username !== undefined) {
-    const username = cleanText(raw.username, 3, 32, "Username").toLowerCase();
-    if (!/^[a-z0-9_]+$/.test(username)) throw new Error("Username hanya boleh berisi huruf, angka, dan garis bawah.");
-    fields.username = username;
-  }
-  if (raw.nickname !== undefined) fields.nickname = cleanText(raw.nickname, 1, 32, "Nickname");
-  if (raw.avatar_id !== undefined) {
-    const n = Number(raw.avatar_id);
-    if (!Number.isInteger(n) || n < 0 || n > 1000000) throw new Error("Avatar ID tidak valid.");
-    fields.avatar_id = n;
-  }
-  if (raw.region !== undefined) fields.region = cleanText(raw.region, 1, 16, "Region");
-  if (!Object.keys(fields).length) throw new Error("Tidak ada field profil yang diubah.");
-  const before = await requireData<any>(service.from("game_profiles").select("*").eq("user_id", targetId).maybeSingle());
-  if (!before) throw new Error("Profil pemain tidak ditemukan.");
-  const after = await requireData<any>(service.from("game_profiles").update({ ...fields, updated_at: new Date().toISOString() }).eq("user_id", targetId).select("*").single());
-  if (fields.nickname !== undefined || fields.avatar_id !== undefined) {
-    await requireData(service.from("game_rankings").update({
-      ...(fields.nickname !== undefined ? { nickname: fields.nickname } : {}),
-      ...(fields.avatar_id !== undefined ? { avatar_id: fields.avatar_id } : {}),
-      updated_at: new Date().toISOString(),
-    }).eq("user_id", targetId));
-  }
-  await audit(adminId, targetId, "profile_update", reason, before, after);
-  const broadcastSent = await notifyPlayerStateChanged(targetId, "profile");
-  return { profile: after, realtime: { broadcast_sent: broadcastSent, postgres_changes_enabled: true } };
-}
-
-async function updateSave(adminId: string, body: Record<string, unknown>) {
-  const targetId = uuid(body.target_user_id);
-  const reason = cleanText(body.reason, 4, 500, "Alasan perubahan");
-  let saveData: unknown = body.save_data;
-  if (typeof saveData === "string") {
-    try { saveData = JSON.parse(saveData); } catch { throw new Error("Save JSON tidak valid."); }
-  }
-  if (!isObject(saveData)) throw new Error("Save data harus berupa objek JSON.");
-  const encoded = JSON.stringify(saveData);
-  if (encoded.length > 500000) throw new Error("Save JSON maksimal 500 KB.");
-  const before = await requireData<any>(service.from("game_player_saves").select("user_id, save_version, updated_at, save_data").eq("user_id", targetId).maybeSingle());
-  const version = Math.max(1, Number(before?.save_version ?? 0) + 1);
-  const after = await requireData<any>(service.from("game_player_saves").upsert({
-    user_id: targetId, save_version: version, save_data: saveData, updated_at: new Date().toISOString(),
-  }, { onConflict: "user_id" }).select("user_id, save_version, updated_at, save_data").single());
-  // Avoid duplicating potentially large save contents in the audit log.
-  await audit(adminId, targetId, "save_update", reason,
-    { save_version: before?.save_version ?? null, bytes: before ? JSON.stringify(before.save_data).length : 0 },
-    { save_version: after.save_version, bytes: encoded.length });
-  const broadcastSent = await notifyPlayerStateChanged(targetId, "save");
-  return { save: after, realtime: { broadcast_sent: broadcastSent, postgres_changes_enabled: true } };
-}
-
 
 // ---------------- Cave Boss hourly schedule (v16) ----------------
 const BOSS_DIFFICULTIES = new Set(["normal", "hard", "elite", "nightmare", "custom"]);
@@ -487,34 +318,210 @@ async function clearCaveBossOverride(adminId: string, body: Record<string, unkno
   return { override, realtime: { broadcast_sent: broadcastSent, postgres_changes_enabled: true } };
 }
 
+
+// ---------------- Direct-Google player directory (v17.13) ----------------
+async function listGooglePlayers() {
+  const perPage = 1000;
+  const maxRows = 20000;
+  const players: any[] = [];
+  for (let start = 0; start < maxRows; start += perPage) {
+    const batch = await requireData<any[]>(service.from("game_google_players")
+      .select("player_uuid, player_id, google_sub, email, email_verified, google_name, avatar_url, nickname, profile_completed, game_avatar_id, region, created_at, updated_at, last_seen_at")
+      .order("created_at", { ascending: false }).range(start, start + perPage - 1));
+    players.push(...batch);
+    if (batch.length < perPage) break;
+  }
+  // Query wallets in small batches so a large player directory cannot exceed
+  // the PostgREST URL/query-string limit when using .in(...).
+  const walletMap = new Map<string, any>();
+  const nativeWalletMap = new Map<string, any>();
+  for (let i = 0; i < players.length; i += 150) {
+    const ids = players.slice(i, i + 150).map((p: any) => p.player_uuid);
+    if (!ids.length) continue;
+    const [wallets, nativeWallets] = await Promise.all([
+      requireData<any[]>(service.from("game_google_player_economy")
+        .select("player_uuid, coins, crystals, goblin_coins, meat, meat_last_regen_at, energy, stamina, player_level, player_xp, updated_at")
+        .in("player_uuid", ids)),
+      requireData<any[]>(service.from("game_google_player_native_wallets")
+        .select("player_uuid, coins, crystals, goblin_coins, meat, client_observed_at, server_received_at")
+        .in("player_uuid", ids)),
+    ]);
+    for (const wallet of wallets) walletMap.set(wallet.player_uuid, wallet);
+    for (const wallet of nativeWallets) nativeWalletMap.set(wallet.player_uuid, wallet);
+  }
+  return {
+    players: players.map((p: any) => ({
+      ...p,
+      economy: walletMap.get(p.player_uuid) ?? null,
+      native_wallet: nativeWalletMap.get(p.player_uuid) ?? null,
+    })),
+    total: players.length,
+    truncated: players.length >= maxRows,
+  };
+}
+
+function validateRewardConfig(raw: unknown) {
+  if (!isObject(raw)) throw new Error("Reward harus berupa objek JSON.");
+  const allowed = new Set(["coins", "crystals", "goblin_coins", "meat"]);
+  const reward: Record<string, number> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (!allowed.has(key)) throw new Error(`Jenis reward tidak didukung: ${key}`);
+    const n = Number(value);
+    if (!Number.isSafeInteger(n) || n < 0 || n > 2147483647) throw new Error(`${key} harus bilangan bulat 0–2.147.483.647.`);
+    if (key === "meat" && n > 24) throw new Error("Reward daging maksimal 24.");
+    reward[key] = n;
+  }
+  if (!Object.keys(reward).length || Object.values(reward).every((v) => v === 0)) {
+    throw new Error("Isi minimal satu reward dengan jumlah lebih dari 0.");
+  }
+  return reward;
+}
+
+async function listRewardCodes() {
+  return await requireData<any[]>(service.from("game_reward_codes")
+    .select("code_id, code, reward_config, enabled, max_uses, uses_count, starts_at, expires_at, created_at")
+    .order("created_at", { ascending: false }).limit(500));
+}
+
+async function createRewardCode(adminId: string, body: Record<string, unknown>) {
+  const code = cleanText(body.code, 4, 40, "Kode hadiah").toUpperCase();
+  if (!/^[A-Z0-9-]{4,40}$/.test(code)) throw new Error("Kode hanya boleh berisi huruf A-Z, angka, dan tanda hubung.");
+  const rewards = validateRewardConfig(body.reward_config);
+  const maxUses = Number(body.max_uses ?? 1);
+  if (!Number.isInteger(maxUses) || maxUses < 1 || maxUses > 10000000) throw new Error("Batas klaim harus 1–10.000.000.");
+  const reason = cleanText(body.reason, 4, 500, "Alasan pembuatan kode");
+  const startsAt = body.starts_at ? new Date(String(body.starts_at)).toISOString() : null;
+  const expiresAt = body.expires_at ? new Date(String(body.expires_at)).toISOString() : null;
+  if (startsAt && expiresAt && new Date(expiresAt).getTime() <= new Date(startsAt).getTime()) throw new Error("Waktu kedaluwarsa harus setelah waktu mulai.");
+  const row = await requireData<any>(service.from("game_reward_codes").insert({
+    code, reward_config: rewards, max_uses: maxUses, starts_at: startsAt, expires_at: expiresAt,
+    enabled: true, created_by: adminId,
+  }).select("*").single());
+  await requireData(service.from("game_reward_code_admin_log").insert({
+    code_id: row.code_id, admin_user_id: adminId, action: "created", reason,
+    details: { code, reward_config: rewards, max_uses: maxUses, starts_at: startsAt, expires_at: expiresAt },
+  }));
+  await recordAdminActivity(adminId, "Admin", "reward_code_created", null, { code, reward_config: rewards, max_uses: maxUses });
+  return row;
+}
+
+async function setRewardCodeEnabled(adminId: string, body: Record<string, unknown>) {
+  const codeId = uuid(body.code_id, "ID kode hadiah");
+  if (typeof body.enabled !== "boolean") throw new Error("Status kode harus true/false.");
+  const reason = cleanText(body.reason, 4, 500, "Alasan perubahan kode");
+  const before = await requireData<any>(service.from("game_reward_codes").select("*").eq("code_id", codeId).single());
+  const after = await requireData<any>(service.from("game_reward_codes").update({ enabled: body.enabled })
+    .eq("code_id", codeId).select("*").single());
+  await requireData(service.from("game_reward_code_admin_log").insert({
+    code_id: codeId, admin_user_id: adminId, action: body.enabled ? "enabled" : "disabled", reason,
+    details: { before_enabled: before.enabled, after_enabled: after.enabled },
+  }));
+  await recordAdminActivity(adminId, "Admin", body.enabled ? "reward_code_enabled" : "reward_code_disabled", null, { code: after.code });
+  return after;
+}
+
+
+// Unified activity feed for the live admin dashboard.
+async function listGoogleActivity() {
+  const activities = await requireData<any[]>(service.from("game_google_activity")
+    .select("activity_id,actor_type,player_uuid,admin_user_id,actor_email,action,details,created_at")
+    .order("created_at", { ascending: false }).limit(300));
+  const playerIds = [...new Set(activities.map((a: any) => a.player_uuid).filter(Boolean))];
+  const playerMap = new Map<string, any>();
+  for (let i = 0; i < playerIds.length; i += 150) {
+    const batch = playerIds.slice(i, i + 150);
+    if (!batch.length) continue;
+    const players = await requireData<any[]>(service.from("game_google_players")
+      .select("player_uuid,player_id,email,nickname,avatar_url,game_avatar_id").in("player_uuid", batch));
+    for (const player of players) playerMap.set(player.player_uuid, player);
+  }
+  return { activities: activities.map((a: any) => ({ ...a, player: a.player_uuid ? playerMap.get(a.player_uuid) ?? null : null })) };
+}
+
+async function recordAdminActivity(
+  adminId: string, adminEmail: string, action: string,
+  playerUuid: string | null = null, details: Record<string, unknown> = {},
+) {
+  const { error } = await service.from("game_google_activity").insert({
+    actor_type: "admin", player_uuid: playerUuid, admin_user_id: adminId,
+    actor_email: adminEmail, action, details,
+  });
+  if (error) console.warn("Could not persist admin activity:", error.message);
+}
+
+// ---------------- In-game Surat mailbox (v17.14) ----------------
+async function listPlayerMail() {
+  return await requireData<any[]>(service.from("game_google_player_mail")
+    .select("mail_id, player_uuid, recipient_email, subject, message, reward_config, admin_name, reason, created_at, expires_at, claimed_at")
+    .order("created_at", { ascending: false }).limit(300));
+}
+
+async function sendPlayerMail(adminId: string, adminName: string, body: Record<string, unknown>) {
+  const email = cleanText(body.recipient_email, 5, 254, "Email akun Google").toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Email tujuan tidak valid.");
+  const player = await requireData<any>(service.from("game_google_players")
+    .select("player_uuid,email,email_verified,nickname,player_id").eq("email", email).maybeSingle());
+  if (!player) throw new Error("Akun Google dengan email itu belum terdaftar sebagai pemain.");
+  if (!player.email_verified) throw new Error("Email pemain belum terverifikasi Google.");
+  const subject = cleanText(body.subject, 1, 100, "Judul surat");
+  const message = cleanText(body.message, 1, 2000, "Isi surat");
+  let rewards: Record<string, number> = {};
+  if (body.reward_config !== undefined) {
+    if (!isObject(body.reward_config)) throw new Error("Hadiah surat harus berupa objek.");
+    const hasPositiveReward = Object.values(body.reward_config).some((v) => Number(v) > 0);
+    rewards = hasPositiveReward ? validateRewardConfig(body.reward_config) : {};
+  }
+  const reason = cleanText(body.reason, 4, 500, "Alasan pengiriman surat");
+  const expiresAt = body.expires_at ? new Date(String(body.expires_at)).toISOString() : null;
+  if (expiresAt && new Date(expiresAt).getTime() <= Date.now()) throw new Error("Masa berlaku surat harus di masa depan.");
+  const mail = await requireData<any>(service.from("game_google_player_mail").insert({
+    player_uuid: player.player_uuid, recipient_email: email, subject, message,
+    reward_config: rewards, created_by: adminId, admin_name: adminName || "Admin",
+    reason, expires_at: expiresAt,
+  }).select("mail_id,player_uuid,recipient_email,subject,message,reward_config,admin_name,reason,created_at,expires_at,claimed_at").single());
+  await requireData(service.from("game_google_mail_admin_log").insert({
+    mail_id: mail.mail_id, admin_user_id: adminId, action: "sent", reason,
+    details: { player_id: player.player_id, nickname: player.nickname, recipient_email: email, reward_config: rewards },
+  }));
+  await recordAdminActivity(adminId, adminName || "Admin", "mail_sent", player.player_uuid, {
+    mail_id: mail.mail_id, subject, recipient_email: email, reward_config: rewards,
+  });
+  const broadcastSent = await publishRealtimeBroadcast("google-admin-dashboard", "google_player_changed", {
+    player_uuid: player.player_uuid, resource: "mail_sent", updated_at: new Date().toISOString(),
+  });
+  await publishRealtimeBroadcast(`google-player-${player.player_uuid}`, "mail_received", { mail_id: mail.mail_id });
+  return { mail, player: { player_uuid: player.player_uuid, player_id: player.player_id, nickname: player.nickname },
+    wallet_credited: false, realtime: { broadcast_sent: broadcastSent } };
+}
+
 Deno.serve(async (request: Request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (request.method !== "POST") return fail("Gunakan POST.", 405);
   try {
-    const { user, admin } = await requireAdmin(request);
     const body = await request.json().catch(() => null);
     if (!isObject(body)) return fail("Body JSON tidak valid.");
+    const { user, admin } = await requireAdmin(request, body);
     const action = body.action;
     let result: unknown;
-    if (action === "list_users") result = await listUsers(body);
-    else if (action === "get_user") result = await getUserDetail(uuid(body.target_user_id));
-    else if (action === "update_economy") result = await updateEconomy(user.id, body);
-    else if (action === "update_profile") result = await updateProfile(user.id, body);
-    else if (action === "update_save") result = await updateSave(user.id, body);
+    if (action === "list_google_players") result = await listGooglePlayers();
+    else if (action === "list_reward_codes") result = await listRewardCodes();
+    else if (action === "list_player_mail") result = await listPlayerMail();
+    else if (action === "list_google_activity") result = await listGoogleActivity();
+    else if (action === "send_player_mail") result = await sendPlayerMail(user.id, String(user.email ?? "Admin"), body);
+    else if (action === "create_reward_code") result = await createRewardCode(user.id, body);
+    else if (action === "set_reward_code_enabled") result = await setRewardCodeEnabled(user.id, body);
     else if (action === "get_cave_boss_admin") result = await getCaveBossAdmin();
     else if (action === "save_cave_boss_schedule") result = await saveCaveBossSchedule(user.id, body);
     else if (action === "trigger_cave_boss_now") result = await triggerCaveBossNow(user.id, body);
     else if (action === "clear_cave_boss_override") result = await clearCaveBossOverride(user.id, body);
     else if (action === "get_event_store_admin") result = await getEventStoreAdmin();
     else if (action === "save_event_store") result = await saveEventStore(user.id, body);
-    else if (action === "list_audit") {
-      const targetId = body.target_user_id ? uuid(body.target_user_id) : null;
-      let query = service.from("game_admin_audit").select("audit_id, admin_user_id, target_user_id, action, reason, before_data, after_data, created_at").order("created_at", { ascending: false }).limit(100);
-      if (targetId) query = query.eq("target_user_id", targetId);
-      result = { audit: await requireData<any[]>(query) };
-    } else if (action === "whoami") {
+    else if (action === "whoami") {
       result = { admin: { user_id: user.id, email: user.email ?? null, role: admin.role } };
     } else return fail("Aksi admin tidak dikenal.");
+    if (["save_cave_boss_schedule", "trigger_cave_boss_now", "clear_cave_boss_override", "save_event_store"].includes(String(action))) {
+      await recordAdminActivity(user.id, String(user.email ?? "Admin"), `admin_${String(action)}`, null, { completed: true });
+    }
     return json({ ok: true, data: result });
   } catch (error) {
     const status = Number((error as { status?: number }).status ?? 400);

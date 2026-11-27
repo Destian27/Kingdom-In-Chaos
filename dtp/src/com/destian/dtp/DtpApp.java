@@ -19,6 +19,7 @@ import org.json.JSONObject;
 public class DtpApp extends Application implements Application.ActivityLifecycleCallbacks {
 
     private static final String GAME = "com.droidhang.ph.GameActivity";
+    private static volatile DtpApp instance;
     private static final long POLL_MS = 2000;
     private static final long EVENT_STORE_POLL_MS = 1000L;
 
@@ -56,6 +57,15 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
         }
     };
 
+    private final Runnable googleWalletSyncPoll = new Runnable() {
+        @Override public void run() {
+            final Activity active = game;
+            if (active == null || kicking) return;
+            if (foregroundActivity == active) NativeGameRuntimeSync.syncGoogleWallet(active);
+            h.postDelayed(this, 10000L);
+        }
+    };
+
     private final Runnable poll = new Runnable() {
         @Override
         public void run() {
@@ -67,9 +77,18 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
         }
     };
 
+    public static DtpApp getInstance() {
+        return instance;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
+        // v17.13: player login is direct Google Auth. Drop obsolete Supabase
+        // player sessions/PKCE state so the old password/OAuth path cannot resume.
+        getSharedPreferences("kic_supabase_session_v1", MODE_PRIVATE).edit().clear().apply();
+        getSharedPreferences("kic_google_oauth_pending_v1", MODE_PRIVATE).edit().clear().apply();
         CrashReporter.onAppStart(this, new CrashReporter.ReportListener() {
             @Override public void onReportReady() {
                 final Activity active = foregroundActivity;
@@ -133,6 +152,7 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
         kicking = true;
         CrashReporter.clearMarker(this);
         h.removeCallbacks(poll);
+        h.removeCallbacks(googleWalletSyncPoll);
         stopRt();
         stopPlayerStateRealtime();
         stopEventStoreRealtime();
@@ -178,8 +198,11 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
             // Add a Java online entry point over the legacy game UI. The original
             // native online screens are not rewritten by this overlay.
             GameOnlineOverlay.install(a);
+            NativeGameRuntimeSync.reconcileClaimedMail(a);
             h.removeCallbacks(poll);
             h.post(poll);
+            h.removeCallbacks(googleWalletSyncPoll);
+            h.postDelayed(googleWalletSyncPoll, 5000L);
             startRt();
             startPlayerStateRealtime(a);
             startEventStoreRealtime(a);

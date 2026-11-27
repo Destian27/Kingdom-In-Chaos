@@ -19,15 +19,17 @@ def test_event_shop_tables_are_realtime_readable_and_published():
 def test_admin_edge_function_supports_event_shop_and_event_eyes():
     assert 'action === "get_event_store_admin"' in TS
     assert 'action === "save_event_store"' in TS
-    assert '"event_eyes"' in TS
     assert "admin_save_event_store" in TS
-    assert "admin_update_player_economy" in TS
+    assert 'action === "update_economy"' not in TS
+    assert 'action === "update_profile"' not in TS
+    assert 'action === "update_save"' not in TS
 
 
 def test_admin_html_uses_game_admin_edge_function_and_realtime_copy():
     assert '"/functions/v1/game-admin"' in HTML
     assert '"save_event_store"' in HTML
-    assert "Pemain yang online menerima notifikasi Realtime" in HTML
+    assert "Semua Pemain — Google Auth" in HTML
+    assert "Daftar otomatis dari akun Google terverifikasi" in HTML
 
 
 def test_supabase_migration_versions_are_unique():

@@ -1,6 +1,29 @@
-# Kingdom In Chaos DTP (v17.9) — Crystal Shop / No Top Up (Android 7+)
+## v17.14.3 — Google OAuth Client ID (27 November 2026)
 
-Compatibility port and offline patch for **Kingdom in Chaos** (`com.droidhang.zhanshen` / 战神传说), originally released by Droidhang in 2013. This DTP build keeps its maintenance-screen / Supabase integration and adds the r6 Crystal Shop conversion.
+- Web OAuth Client ID diberikan dan dikonfigurasi di `supabase/functions/google-player/index.ts` sebagai `GOOGLE_WEB_OAUTH_CLIENT_ID`.
+- Backend dapat memvalidasi Google ID token dengan audience Web Client ID; access token Android tetap memakai verifikasi userinfo dan, bila diisi, `GOOGLE_ANDROID_OAUTH_CLIENT_ID`.
+- Client Secret tidak dimasukkan ke source, APK, atau repo. Native access-token flow tidak memerlukannya. Secret yang sudah dibagikan perlu dirotasi.
+- Lihat `GOOGLE-AUTH-SETUP-v17.14.3.md`. Perubahan TS ini tidak membangun ulang APK.
+
+# Kingdom In Chaos DTP
+
+## Current source revision — v17.14.2
+
+This source revision combines direct Google player sign-in, the second-stage nickname/player-ID setup, the in-game **Surat** mailbox, one-time server-side mail claims, native wallet application, a 5-minute native food regeneration setting, the read-only Google player dashboard, and the reported `LifeMax()` crash guard.
+
+Admin gifts are sent to a player's in-game **Surat** inbox (the email address is only used to find the Google player). Admin cannot directly edit a player's profile, wallet, or cloud save in this dashboard; players' Google profile picture/identity and observed native wallet values update the dashboard through Realtime broadcasts with periodic polling fallback. This requires a network connection and is near-realtime, not guaranteed during offline periods. The native character avatar remains owned by the original game's local character data; the current bridge does not claim that every in-game avatar selection has been synchronized.
+
+The native crash report supplied for v17.11 points to `UIAchieveLayer::onAward() -> LifeMax()` on ARMv7. `tools/patch_lifemax_crash.py` applies an exact-byte-checked guard to both `armeabi` and `armeabi-v7a`; the patched function returns the configured life cap of 24. The patch has been checked by disassembly, but still requires device testing in a rebuilt APK.
+
+Source tests: **95 passed, 2 skipped** (APK-only checks). An APK has **not** been built or device-tested in this environment. Google OAuth still needs the deployment's own OAuth client/SHA-1 configuration, and the SQL migrations plus Edge Functions must be deployed to the project's Supabase database/function host.
+
+The expected build output is `KingdomInChaosDTP-v17.14.2-google-mail-crashfix.apk`. See `CHANGELOG-V17.14.2-ADMIN-READONLY.md` and `CHANGELOG-V17.14-MAIL-CRASHFIX.md`.
+
+---
+
+ (v17.12) — Barter Economy (Android 7+)
+
+Compatibility port and offline patch for **Kingdom in Chaos** (`com.droidhang.zhanshen` / 战神传说), originally released by Droidhang in 2013. This DTP build keeps its maintenance-screen / Supabase integration and replaces real-money offers with native Koin/DM barter transactions.
 
 The game originally crashes immediately on Android 6.0 and newer versions due to deprecated APIs, `DT_TEXTREL` dynamic relocations, dead telemetry services, and uninitialized graphics contexts. This repository contains the decompiled source, binary patches for `libgame.so`, and an automated build script to produce a working APK for modern Android devices.
 
@@ -17,7 +40,15 @@ The game originally crashes immediately on Android 6.0 and newer versions due to
 
 ---
 
-## Summary of Applied Fixes (r6 Crystal Shop + DTP)
+## v17.12 — Barter Economy
+
+- Cash purchase entry points are disabled; the ARMv7 native hook deducts Koin/DM before the original reward callback grants VIP, hero, equipment, and gift items.
+- A BARTER menu converts Koin and DM in both directions and lists barter prices for store packages. The native wallet is read from the game runtime.
+- The cumulative-DM meter counts crystals actually added to the wallet; spending DM does not reduce the lifetime counter.
+- Legacy cash-payment recording and paid-purchase analytics are disabled.
+- See [CHANGELOG-V17.12-BARTER-ECONOMY.md](CHANGELOG-V17.12-BARTER-ECONOMY.md) for price assumptions and limitations.
+
+## Summary of Applied Fixes (Crystal Shop + DTP)
 
 The patches below resolve crash causes, obsolete APIs, and offline gameplay issues:
 
@@ -60,23 +91,23 @@ The patches below resolve crash causes, obsolete APIs, and offline gameplay issu
 
 ## Testing and Verification
 
-Run the source compatibility and Crystal Shop checks with pytest. APK-only checks are skipped until an APK has been built:
+Run the source compatibility and barter economy checks with pytest. The current source suite reports 79 passed and 2 APK-only checks skipped until a signed APK has been built:
 
 ```powershell
-pytest tests/test_apk_compatibility.py
+pytest
 ```
 
 ---
 
 ## Building the APK
 
-Build the DTP edition from the checked-in source (including the Crystal Shop changes):
+Build the DTP edition from the checked-in source (including the native barter economy changes):
 
 ```bash
 python3 build_dtp.py
 ```
 
-This creates `KingdomInChaosDTP-v17.9.apk`. A local build requires JDK 17+, Android SDK build-tools, an Android platform `android.jar`, and `tools/apktool.jar`. The GitHub Actions workflow downloads apktool automatically. Do **not** use the legacy `build_apk.py` script for this DTP source tree.
+This creates `KingdomInChaosDTP-v17.14.2-google-mail-crashfix.apk`. A local build requires JDK 17+, Android SDK build-tools, an Android platform `android.jar`, and `tools/apktool.jar`. The GitHub Actions workflow downloads apktool automatically. Do **not** use the legacy `build_apk.py` script for this DTP source tree.
 
 
 ---
@@ -125,7 +156,7 @@ The game is still built around a precompiled native `libgame.so`; its original C
 
 ### Feature behavior and security
 
-- Login/register uses Supabase Auth email + password. Whether signup immediately gets a session depends on the Supabase email-confirmation setting.
+- **Diperbarui pada v17.13:** autentikasi pemain memakai Google secara langsung. Google memverifikasi email; tidak ada password atau konfirmasi password game. Supabase Auth hanya dipakai untuk akun admin dashboard.
 - Profile/avatar changes save the original game's numeric `avatar_id` so the selected avatar can be drawn from bundled game assets; this adapter does not upload arbitrary avatar images.
 - Friends/search/requests and presence use authenticated RPCs and RLS.
 - Player save sync is supported, but client-supplied save data is not trusted for competitive scores or premium currency.
@@ -328,3 +359,21 @@ Jika Google Provider belum aktif atau Redirect URL belum diizinkan, proses login
 Tombol akun/login Android ditambahkan sebagai pintu masuk ke autentikasi. Source C++ untuk layar asli game tidak tersedia dalam paket ini, sehingga sentuhan langsung pada tombol avatar/menu online bawaan native belum dapat dialihkan satu per satu ke layar login. Operasi online yang tersedia melalui Java Online Hub sudah meminta sesi terlebih dahulu; ini bukan klaim bahwa seluruh layar online C++ lama sudah tersambung.
 
 Build memakai workflow GitHub Actions atau `python3 build_dtp.py` pada lingkungan yang sudah memiliki JDK, Android SDK, Android NDK dan apktool. ZIP ini berisi source yang diperbarui, bukan APK yang sudah dibangun dan diuji di perangkat.
+
+
+## v17.13 — Google Direct Auth, Kode Hadiah, dan Daging (27 November 2026)
+
+Versi ini mengganti autentikasi pemain dari alur Supabase OAuth lama menjadi login langsung melalui akun Google Android. Lihat `CHANGELOG-V17.13-GOOGLE-DIRECT-REWARDS-MEAT.md` dan `GOOGLE-AUTH-SETUP-v17.13.md` untuk alur, konfigurasi, dan batas integrasi.
+
+- Pemain masuk dengan tombol berikon Google; tidak ada password atau konfirmasi password game. Email harus memiliki klaim `email_verified=true` dari Google.
+- Pemain baru wajib menyelesaikan Tahap 2 dengan memilih nickname 3–32 karakter; server mengeluarkan Player ID unik.
+- `admin.html` otomatis menampilkan daftar akun Google beserta email, avatar, ID pemain, nickname, Koin, DM, Daging, dan status verifikasi.
+- Admin dapat membuat dan menyalin kode hadiah serta mengatur reward, kuota, dan tanggal berlaku.
+- Makanan/Life native: kapasitas bawaan 24; `lifeRecoveryInterval` sudah diubah menjadi 300 detik (+1 setiap 5 menit). Pembelian native bawaan tetap 12 makanan seharga 50. Daging Cloud untuk admin/kode hadiah terpisah dari Life native.
+- SQL baru: `kingdom-in-chaos-dtp-SQL-GABUNGAN-v17.13-GOOGLE-AUTH-KODE-DAGING.sql`; Edge Functions: `google-player` dan `game-admin`.
+
+**Batas integrasi:** stage memakai gate Makanan/Life bawaan `libgame.so`; konfigurasi regen diperbarui tetapi perlu uji runtime APK. Daging Cloud dan wallet DM/Koin cloud masih terpisah dari nilai native. APK belum dibangun/diuji di perangkat. Detail dan langkah deploy ada di changelog v17.13.
+
+## v17.14 — Surat and native wallet monitoring
+
+Admin reward delivery now uses the in-game Surat inbox. The player receives the letter, presses Klaim, and the server credits the cloud reward ledger once. The Android client then applies the reward through the native game wallet APIs on the Cocos GL thread and records a local retry journal. The admin dashboard shows read-only native wallet snapshots uploaded every 10 seconds while the game is foreground, with Realtime Broadcast and 15-second refresh fallback. This is near-realtime, not a guarantee of 100% instant delivery. See `CHANGELOG-V17.14-MAIL-CRASHFIX.md` and `VERSION-v17.14-MAIL-CRASHFIX.txt`.

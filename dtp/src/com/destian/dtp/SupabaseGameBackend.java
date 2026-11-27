@@ -137,43 +137,6 @@ public final class SupabaseGameBackend {
                 .apply();
     }
 
-    /** Creates a Supabase Auth account. Email confirmation may be required by project settings. */
-    public JSONObject signUp(String email, String password, String username, String nickname) throws IOException {
-        requireText(email, "email");
-        requireText(password, "password");
-        requireLength(username, "username", 3, 32);
-        requireLength(nickname, "nickname", 1, 32);
-        JSONObject data = new JSONObject();
-        JSONObject payload = new JSONObject();
-        try {
-            data.put("username", username.trim().toLowerCase(Locale.ROOT));
-            data.put("nickname", nickname.trim());
-            payload.put("email", email.trim());
-            payload.put("password", password);
-            payload.put("data", data);
-        } catch (JSONException e) {
-            throw new IOException("Cannot encode signup request", e);
-        }
-        JSONObject result = request("/auth/v1/signup", "POST", payload, null, false);
-        storeSession(result);
-        return result;
-    }
-
-    public JSONObject signInWithPassword(String email, String password) throws IOException {
-        requireText(email, "email");
-        requireText(password, "password");
-        JSONObject payload = new JSONObject();
-        try {
-            payload.put("email", email.trim());
-            payload.put("password", password);
-        } catch (JSONException e) {
-            throw new IOException("Cannot encode login request", e);
-        }
-        JSONObject result = request("/auth/v1/token?grant_type=password", "POST", payload, null, false);
-        storeSession(result);
-        return result;
-    }
-
     public JSONObject refreshSession() throws IOException {
         String refresh = readSecret(REFRESH);
         if (isBlank(refresh)) throw new IOException("No saved refresh token; please sign in again.");

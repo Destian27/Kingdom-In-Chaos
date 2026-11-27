@@ -6,18 +6,17 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
     <uses-permission android:name="com.android.vending.BILLING"/>
     <application android:name="com.destian.dtp.DtpApp" android:requestLegacyExternalStorage="true" android:usesCleartextTraffic="true" android:allowBackup="true" android:icon="@drawable/icon" android:label="@string/app_name">
         <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:label="@string/app_name" android:launchMode="singleTask" android:name="com.droidhang.ph.GameActivity" android:exported="false" android:screenOrientation="landscape" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
         <activity android:name="com.destian.dtp.GameOnlineHubActivity" android:label="Kingdom In Chaos Online" android:configChanges="keyboardHidden|orientation|screenSize" android:exported="false" android:screenOrientation="portrait" android:theme="@android:style/Theme.Material.Light.NoActionBar"/>
-<activity android:name="com.destian.dtp.GameAuthActivity" android:label="Login ke Kingdom In Chaos DTP" android:configChanges="keyboardHidden|orientation|screenSize" android:exported="true" android:launchMode="singleTask" android:screenOrientation="portrait" android:theme="@android:style/Theme.Material.Light.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="kingdominchaosdtp" android:host="auth"/>
-            </intent-filter>
-        </activity>
+<activity android:name="com.destian.dtp.GameAuthActivity" android:label="Login Google — Kingdom In Chaos DTP" android:configChanges="keyboardHidden|orientation|screenSize" android:exported="false" android:screenOrientation="portrait" android:theme="@android:style/Theme.Material.Light.NoActionBar"/>
+        <activity android:name="com.destian.dtp.GameProfileSetupActivity" android:label="Buat Profil Pemain" android:configChanges="keyboardHidden|orientation|screenSize" android:exported="false" android:screenOrientation="portrait" android:theme="@android:style/Theme.Material.Light.NoActionBar"/>
+        <activity android:name="com.destian.dtp.GameGiftCodeActivity" android:label="Kode Hadiah" android:configChanges="keyboardHidden|orientation|screenSize" android:exported="false" android:screenOrientation="portrait" android:theme="@android:style/Theme.Material.Light.NoActionBar"/>
+        <activity android:name="com.destian.dtp.GameMailActivity" android:label="Surat — Kingdom In Chaos DTP" android:configChanges="keyboardHidden|orientation|screenSize" android:exported="false" android:screenOrientation="portrait" android:theme="@android:style/Theme.Material.Light.NoActionBar"/>
+        <activity android:name="com.destian.dtp.GameMeatActivity" android:label="Daging Misi" android:configChanges="keyboardHidden|orientation|screenSize" android:exported="false" android:screenOrientation="portrait" android:theme="@android:style/Theme.Material.Light.NoActionBar"/>
         <activity android:name="com.destian.dtp.GameEventStoreActivity" android:label="Kingdom In Chaos Event Shop" android:configChanges="keyboardHidden|orientation|screenSize" android:exported="false" android:screenOrientation="landscape" android:theme="@android:style/Theme.Material.Light.NoActionBar"/>
         <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:label="@string/app_name" android:name="com.destian.dtp.MaintenanceActivity" android:exported="true" android:screenOrientation="landscape" android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
             <intent-filter>

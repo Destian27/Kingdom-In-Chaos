@@ -59,12 +59,12 @@ def test_overlay_auto_shows_full_report_and_keeps_small_reopen_icon():
     assert "setPrimaryClip" in source
 
 
-def test_android_package_version_is_v17_11():
+def test_android_package_version_is_v17_14_2_google_mail_crashfix():
     source = read("kingdom-in-chaos-decompiled/apktool.yml")
-    assert "versionCode: 8" in source
-    assert "versionName: 17.11" in source
+    assert "versionCode: 12" in source
+    assert "versionName: 17.14.2" in source
     build = read("build_dtp.py")
-    assert "KingdomInChaosDTP-v17.11.apk" in build
+    assert "KingdomInChaosDTP-v17.14.2-google-mail-crashfix.apk" in build
 
 
 def test_maintenance_gate_and_realtime_fix_remain_intact():
