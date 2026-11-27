@@ -32,8 +32,13 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
+          mkdir -p tools
           if [ -n "$KEYSTORE_BASE64" ]; then
             echo "$KEYSTORE_BASE64" | base64 -d > tools/release.keystore
+            echo "Keystore: dari secret KEYSTORE_BASE64"
+          else
+            cp keystore/dtp-fixed.keystore tools/release.keystore
+            echo "Keystore: tetap dari repo (keystore/dtp-fixed.keystore), tanda tangan sama di setiap build"
           fi
 
       - name: Build APK

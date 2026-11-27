@@ -143,7 +143,7 @@ Opsi di `MaintenanceActivity.java`: `BLOCK_WHEN_OFFLINE` (default `false`, artin
 
 **Build.** Push ke GitHub lalu jalankan workflow `Build Kingdom In Chaos DTP APK`, hasilnya artifact `KingdomInChaosDTP-v17.9.apk`. Build lokal: `python3 build_dtp.py` (butuh JDK 17+, Android SDK, dan `tools/apktool.jar`). Jangan jalankan `build_apk.py` lama, itu untuk port sebelumnya.
 
-Agar update APK bisa menimpa versi lama, simpan keystore sebagai secret `KEYSTORE_BASE64` (plus `KEYSTORE_PASS` dan `KEYSTORE_ALIAS`). Tanpa itu tiap build memakai keystore baru.
+Agar update APK bisa menimpa versi lama, simpan keystore sebagai secret `KEYSTORE_BASE64` (plus `KEYSTORE_PASS` dan `KEYSTORE_ALIAS`). Tanpa secret itu, build memakai keystore tetap `keystore/dtp-fixed.keystore` (alias `kingdomchaosdtp`, password `android123`) sehingga tanda tangan APK selalu sama. Jangan dihapus atau diganti, kalau tidak update akan gagal "Aplikasi tidak terinstal".
 
 ## Supabase online backend (v2 integration adapter)
 
