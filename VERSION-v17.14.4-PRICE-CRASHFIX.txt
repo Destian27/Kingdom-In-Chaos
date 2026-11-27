@@ -1,0 +1,5 @@
+Kingdom In Chaos DTP v17.14.4
+versionCode=13
+Fix: price.xml elemen/atribut dolar kosong -> SIGSEGV DHValue::getValue saat game dibuka.
+Build output: KingdomInChaosDTP-v17.14.4-price-crashfix.apk
+Status: source package; APK belum dibuild/diuji di perangkat.

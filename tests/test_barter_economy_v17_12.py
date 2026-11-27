@@ -33,8 +33,10 @@ def test_cash_payment_routes_are_disabled_in_both_arm_libraries():
 def test_packed_price_config_has_no_cash_values_and_has_barter_prices():
     root = unpack_config("kingdom-in-chaos-decompiled/assets/public/config/price.xml")
     cn = root.find("./dollar/cn")
-    assert cn is not None and cn.get("sign") == ""
-    assert all(not child.text and not child.attrib for child in list(cn))
+    # v17.14.4: elemen kosong / sign kosong menyebabkan SIGSEGV DHValue::getValue
+    # saat game dibuka, jadi sekarang node harus punya isi "0" (bukan uang nyata).
+    assert cn is not None and cn.get("sign") == "Rp"
+    assert all(child.text == "0" and not child.attrib for child in list(cn))
     barter = root.find("barter")
     assert barter is not None and barter.get("currency_exchange_rate") == "50_coin_per_dm"
     expected = {
@@ -99,7 +101,7 @@ def test_build_script_patches_both_abis_and_compiles_thumb_bridge():
     assert "patch_native_barter()" in build
     assert "patch_barter_native.py" in build
     assert '"-mthumb"' in build
-    assert '"KingdomInChaosDTP-v17.14.2-google-mail-crashfix.apk"' in build
+    assert '"KingdomInChaosDTP-v17.14.5-ui-polish.apk"' in build
     assert '"armeabi", "armeabi-v7a"' in patcher
 
 

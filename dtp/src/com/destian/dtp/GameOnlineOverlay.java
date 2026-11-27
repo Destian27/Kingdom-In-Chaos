@@ -205,11 +205,6 @@ public final class GameOnlineOverlay {
         button.bringToFront();
     }
 
-    public static void refreshBarterStatus() {
-        WeakReference<Activity> ref = activeActivity;
-        refreshBarterStatus(ref == null ? null : ref.get());
-    }
-
     public static void refreshBarterStatus(final Activity activity) {
         if (activity == null || activity.isFinishing()) return;
         activity.runOnUiThread(new Runnable() {

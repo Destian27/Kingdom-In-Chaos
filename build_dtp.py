@@ -14,7 +14,7 @@ APKTOOL_JAR = os.environ.get("APKTOOL_JAR", os.path.join(TOOLS, "apktool.jar"))
 KEYSTORE = os.environ.get("KEYSTORE_PATH", os.path.join(TOOLS, "release.keystore"))
 KS_PASS = os.environ.get("KEYSTORE_PASS", "android123")
 KS_ALIAS = os.environ.get("KEYSTORE_ALIAS", "kingdomchaosdtp")
-OUTPUT_APK = os.path.join(ROOT, "KingdomInChaosDTP-v17.14.2-google-mail-crashfix.apk")
+OUTPUT_APK = os.path.join(ROOT, "KingdomInChaosDTP-v17.14.5-ui-polish.apk")
 MIN_API = "24"
 NDK_VERSION = os.environ.get("ANDROID_NDK_VERSION", "27.2.12479018")
 IS_WIN = os.name == "nt"
@@ -80,6 +80,23 @@ def patch_lifemax_crash():
     patcher = os.path.join(TOOLS, "patch_lifemax_crash.py")
     if not os.path.isfile(patcher):
         sys.exit("Script crash guard LifeMax tidak ditemukan: " + patcher)
+    run([sys.executable, patcher])
+
+
+def patch_price_dollar_fix():
+    # v17.14.4: isi elemen harga dolar yang kosong di price.xml (penyebab SIGSEGV
+    # DHValue::getValue saat game dibuka).
+    patcher = os.path.join(TOOLS, "patch_price_dollar_fix.py")
+    if not os.path.isfile(patcher):
+        sys.exit("Script patch price dolar tidak ditemukan: " + patcher)
+    run([sys.executable, patcher])
+
+
+def patch_ui_polish():
+    # v17.14.5: rapikan teks Indonesia yang meluap + perbaiki bendera pilihan bahasa.
+    patcher = os.path.join(TOOLS, "patch_ui_polish.py")
+    if not os.path.isfile(patcher):
+        sys.exit("Script perapihan UI tidak ditemukan: " + patcher)
     run([sys.executable, patcher])
 
 
@@ -150,6 +167,8 @@ def main():
         sys.exit("apktool.jar tidak ada: " + APKTOOL_JAR)
     patch_native_barter()
     patch_lifemax_crash()
+    patch_price_dollar_fix()
+    patch_ui_polish()
     compile_native_bridge()
     dex = compile_dex()
 

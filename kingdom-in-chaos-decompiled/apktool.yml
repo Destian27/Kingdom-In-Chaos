@@ -1,5 +1,5 @@
 version: 2.10.0
-apkFileName: KingdomInChaosDTP-v17.14.2-google-mail-crashfix.apk
+apkFileName: KingdomInChaosDTP-v17.14.5-ui-polish.apk
 isFrameworkApk: false
 usesFramework:
   ids:
@@ -12,8 +12,8 @@ packageInfo:
   forcedPackageId: 127
   renameManifestPackage: null
 versionInfo:
-  versionCode: 12
-  versionName: 17.14.2
+  versionCode: 14
+  versionName: 17.14.5
 resourcesAreCompressed: false
 sharedLibrary: false
 sparseResources: false

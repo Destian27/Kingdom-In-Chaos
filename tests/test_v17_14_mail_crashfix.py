@@ -81,9 +81,9 @@ def test_admin_realtime_broadcast_plus_poll_fallback_refreshes_player_and_mail_t
 def test_version_and_package_are_bumped_for_v17_14_2():
     yml = read('kingdom-in-chaos-decompiled/apktool.yml')
     build = read('build_dtp.py')
-    assert 'versionCode: 12' in yml
-    assert 'versionName: 17.14.2' in yml
-    assert 'KingdomInChaosDTP-v17.14.2-google-mail-crashfix.apk' in build
+    assert 'versionCode: 14' in yml
+    assert 'versionName: 17.14.5' in yml
+    assert 'KingdomInChaosDTP-v17.14.5-ui-polish.apk' in build
 
 
 def test_claimed_mail_rewards_are_journaled_and_applied_to_native_wallet_and_life():

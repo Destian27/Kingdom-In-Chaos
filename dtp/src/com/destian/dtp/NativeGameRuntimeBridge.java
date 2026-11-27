@@ -43,7 +43,7 @@ public final class NativeGameRuntimeBridge {
             if (state != null && state.startsWith("OK|")) {
                 seedLifetimeDmFromCurrentWallet();
                 DtpApp app = DtpApp.getInstance();
-                if (app != null) GameOnlineOverlay.refreshBarterStatus();
+                if (app != null) GameOnlineOverlay.refreshBarterStatus(app);
             }
             return state;
         } catch (Throwable error) {
@@ -113,7 +113,7 @@ public final class NativeGameRuntimeBridge {
             long next = current > Long.MAX_VALUE - amount ? Long.MAX_VALUE : current + amount;
             prefs.edit().putLong(KEY_DM_EARNED, next).apply();
         }
-        GameOnlineOverlay.refreshBarterStatus();
+        GameOnlineOverlay.refreshBarterStatus(app);
     }
 
     /** Called by the native barter hook; the UI callback only displays a result message. */

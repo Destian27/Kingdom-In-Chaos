@@ -1,0 +1,5 @@
+Kingdom In Chaos DTP v17.14.5
+versionCode=14
+Fix: teks Indonesia meluap/terpotong + bendera pilihan bahasa (Indonesia, English).
+Build output: KingdomInChaosDTP-v17.14.5-ui-polish.apk
+Status: source package; APK belum dibuild/diuji di perangkat.

@@ -22,7 +22,8 @@
 
 Periksa kartu SD dan coba lagi nanti.</i>  
         
-        <i key="disabled_learn">Tidak dapat mempelajari bakat ini.</i>
+        <i key="disabled_learn">Tidak dapat mempelajari
+bakat ini.</i>
         
         <i key="fb_invite_title">Undang</i>
         <i key="fb_invite_message">Ayo! Masuki dunia menakjubkan Kingdom in Chaos dan selamatkan kerajaan!</i>
@@ -52,15 +53,18 @@ Periksa kartu SD dan coba lagi nanti.</i>
         <i key="gear_sell">Jual</i>
         <i key="gear_required_level">Level minimum</i>
         <i key="gear_new">BARU</i>
-        <i key="gear_hero_level_low">Perlengkapan ini membutuhkan level hero yang lebih tinggi.</i>
-        <i key="gear_wrong_vocation">Perlengkapan ini tidak cocok untuk hero ini.</i>
+        <i key="gear_hero_level_low">Perlengkapan ini membutuhkan level hero yang
+lebih tinggi.</i>
+        <i key="gear_wrong_vocation">Perlengkapan ini tidak cocok untuk hero
+ini.</i>
         
         <i key="shop_refresh_clock_prefix">Gratis Berikutnya</i>
         <i key="shop_refresh_coin">Segarkan</i>
         <i key="shop_refresh_free">Segarkan
 Gratis</i>
         <i key="shop_refresh_bulksale">Jual Massal</i>
-        <i key="shop_refresh_label">3 peningkat acak membantumu bertarung:</i>
+        <i key="shop_refresh_label">3 peningkat acak membantumu
+bertarung:</i>
         
         <i key="talent_hp_title1">HP</i>
         <i key="talent_attack_title1">Serangan</i>
@@ -72,16 +76,21 @@ Gratis</i>
         <i key="talent_rate_title">Kecepatan Serangan</i>
         <i key="talent_move_title">Kecepatan Gerak</i>
         <i key="talent_cd_title">Kecepatan Merapal</i>
-        <i key="talent_crit_desc">Meningkatkan peluang kritis sebesar %d%%.</i>
-        <i key="talent_rate_desc">Meningkatkan kecepatan serangan sebesar %d%%.</i>
-        <i key="talent_move_desc">Meningkatkan kecepatan gerak sebesar %d%%.</i>
-        <i key="talent_cd_desc">Meningkatkan kecepatan merapal sebesar %d.</i>
+        <i key="talent_crit_desc">Meningkatkan peluang kritis
+sebesar %d%%.</i>
+        <i key="talent_rate_desc">Meningkatkan kecepatan
+serangan sebesar %d%%.</i>
+        <i key="talent_move_desc">Meningkatkan kecepatan gerak
+sebesar %d%%.</i>
+        <i key="talent_cd_desc">Meningkatkan kecepatan
+merapal sebesar %d.</i>
         <i key="talent_upgrade">Pelajari</i>
         
         <i key="awakening_title">Kebangkitan Hero</i>
         <i key="awakening_confirm">Bangkitkan</i>
         <i key="awakening_info_title">Promosi Kebangkitan Hero</i>
-        <i key="awakening_info_content">Dapatkan skill baru GRATIS setelah kebangkitan</i>
+        <i key="awakening_info_content">Dapatkan skill baru GRATIS setelah
+kebangkitan</i>
         
         <i key="store_free">Gratis</i>
         <i key="store_tab_coins">Koin</i>
@@ -91,7 +100,8 @@ Hadiah</i>
         
         <i key="bonus_title">Roda Keberuntungan</i>
         <i key="bonus_get">Klaim</i>
-        <i key="bonus_hint">Goblin menyukai Koin Goblin!</i>
+        <i key="bonus_hint">Goblin menyukai Koin
+Goblin!</i>
         
         <i key="popup_confirm">Oke</i>
         
@@ -105,7 +115,8 @@ Pembelian</i>
         <i key="popup_life_tab_buy">Tukar</i>
         <i key="popup_life_tab_infinity">Tak Terbatas</i>
         <i key="popup_life_text_buy">Tambah makanan?</i>
-        <i key="popup_life_text_infinity">Makanan tak terbatas menjaga
+        <i key="popup_life_text_infinity">Makanan tak terbatas
+menjaga
 tim tetap bersemangat!</i>
         
         <i key="popup_rookie_title">Paket Pemula</i>
@@ -156,15 +167,22 @@ tim tetap bersemangat!</i>
         <i key="popupDescribe_unlockHero">Rekrut hero ini?</i>
         <i key="popupDescribe_backpackFull">Maaf, tas perlengkapanmu penuh!</i>
         <i key="popupDescribe_refresh">Gunakan Koin untuk menyegarkan toko?</i>
-        <i key="popupDescribe_transferHint">Kebangkitan Hero hanya dapat digunakan setelah kamu mempelajari cukup banyak bakat.</i>
+        <i key="popupDescribe_transferHint">Kebangkitan Hero hanya dapat digunakan setelah kamu mempelajari
+cukup banyak bakat.</i>
         <i key="popupDescribe_mission">Tidak ada misi baru</i>
-        <i key="popupDescribe_bank_coin">Emas tidak cukup! Beli %d emas untuk melanjutkan!</i>
-        <i key="popupDescribe_bank_crystal">Kristal tidak cukup! Beli %d kristal untuk melanjutkan!</i>
+        <i key="popupDescribe_bank_coin">Emas tidak cukup! Beli
+%d emas untuk
+melanjutkan!</i>
+        <i key="popupDescribe_bank_crystal">Kristal tidak cukup!
+Beli %d kristal untuk
+melanjutkan!</i>
         <i key="popupDescribe_worldBossOverTime">Waktu habis!</i>
         <i key="popupDescribe_worldBossOverDead">BOS dikalahkan!</i>
         <i key="popupDescribe_worldBossOverKill">Selamat, kamu mengalahkan BOS!</i>
-        <i key="popupDescribe_worldBossRestHint">Gunakan kristal untuk memulihkan hero.</i>
-        <i key="popupDescribe_saveGameRestartHint">Unduhan arsip %d/%02d/%02d/%02d:%02d selesai. Perubahan akan berlaku setelah game dimulai ulang.</i>
+        <i key="popupDescribe_worldBossRestHint">Gunakan kristal untuk memulihkan
+hero.</i>
+        <i key="popupDescribe_saveGameRestartHint">Unduhan arsip %d/%02d/%02d/%02d:%02d selesai. Perubahan akan berlaku
+setelah game dimulai ulang.</i>
         
         <i key="promo_code_title">Masukkan kode promosi</i>
         <i key="promo_code_invalid">Kode promosi tidak valid, kesalahan: </i>
@@ -177,12 +195,14 @@ tim tetap bersemangat!</i>
         <i key="tutorial_story_talent">Pelajari bakat dan mantra lainnya di sini.</i>
         <i key="tutorial_story_team">Atur timmu di sini.</i>
         <i key="tutorial_story_achieve">Lihat pencapaianmu di sini.</i>
-        <i key="tutorial_story_rotary">Ketuk untuk membuka Roda Keberuntungan.</i>
+        <i key="tutorial_story_rotary">Ketuk untuk membuka Roda
+Keberuntungan.</i>
         <i key="tutorial_gear_1">Seret perlengkapan toko untuk memakainya.</i>
         <i key="tutorial_gear_2">Tingkatkan perlengkapan menggunakan Koin.</i>
         <i key="tutorial_shop_1">Kamu bisa membeli dan menjual perlengkapan di sini.</i>
         <i key="tutorial_shop_2">Tunggu untuk menyegarkan isi toko secara gratis.
-Atau gunakan sedikit Emas untuk menyegarkannya sekarang.</i>
+Atau gunakan sedikit Emas untuk menyegarkannya
+sekarang.</i>
         <i key="tutorial_talent_1">Ketuk untuk memilih bakat.</i>
         <i key="tutorial_talent_2">Ketuk di sini untuk mempelajarinya.
 Mempelajari bakat membutuhkan Kristal.</i>
@@ -193,20 +213,25 @@ Mempelajari bakat membutuhkan Kristal.</i>
 (Ketuk di mana saja untuk melanjutkan)</i>
         <i key="tutorial_spell_2">Slot mantra tambahan dapat dibuka.
 (Ketuk di mana saja untuk melanjutkan)</i>
-        <i key="tutorial_team_1">Di sini kamu dapat merekrut hero baru. Coba sekarang!
+        <i key="tutorial_team_1">Di sini kamu dapat merekrut hero baru.
+Coba sekarang!
 Pilih hero.</i>
-        <i key="tutorial_team_2">Ketuk untuk membeli. Gunakan 3 Kristal untuk mendapatkan hero!</i>
+        <i key="tutorial_team_2">Ketuk untuk membeli. Gunakan 3 Kristal untuk
+mendapatkan hero!</i>
         <i key="tutorial_team_3">Ketuk untuk mengonfirmasi.</i>
         <i key="tutorial_team_4">Seret hero dan tempatkan ke dalam tim.</i>
-        <i key="tutorial_team_6">Buka halaman kedua untuk melihat hero lainnya.</i>
+        <i key="tutorial_team_6">Buka halaman kedua untuk melihat
+hero lainnya.</i>
         <i key="tutorial_rotary">Usap layar untuk memutar!
 Setiap putaran membutuhkan 5 Koin Goblin.</i>
         <i key="tutorial_achieve_1">Ketuk di sini untuk mendapatkan bonus!</i>
-        <i key="tutorial_achieve_2">Bagikan pencapaianmu secara daring untuk mendapat lebih banyak hadiah!
+        <i key="tutorial_achieve_2">Bagikan pencapaianmu secara daring untuk
+mendapat lebih banyak hadiah!
 (Ketuk di mana saja untuk melanjutkan)</i>
         <i key="tutorial_back">Ketuk di sini untuk melanjutkan perjalananmu.
 (Ketuk di mana saja untuk melanjutkan)</i>
-        <i key="tutorial_back_force">Ketuk untuk kembali ke Peta.</i>
+        <i key="tutorial_back_force">Ketuk untuk kembali ke
+Peta.</i>
         <i key="tutorial_story_mission">Lihat misi di sini.
 Banyak hadiah menantimu.</i>
         
@@ -226,20 +251,28 @@ Banyak hadiah menantimu.</i>
         
         <i key="world_boss_start">mulai</i>
         <i key="world_boss_title_alchemist">Lostwood sang Alkemis</i>
-        <i key="world_boss_desc_alchemist">Lostwood adalah alkemis terbaik di kerajaan.
-Sepanjang hidupnya, ia mengembangkan ramuan
-untuk membuka seluruh potensi tubuh manusia.
-Sayangnya, ia bereksperimen pada dirinya sendiri
+        <i key="world_boss_desc_alchemist">Lostwood adalah alkemis terbaik di
+kerajaan.
+Sepanjang hidupnya, ia mengembangkan
+ramuan
+untuk membuka seluruh potensi tubuh
+manusia.
+Sayangnya, ia bereksperimen pada dirinya
+sendiri
 dan akhirnya dikuasai kegilaan.</i>
         <i key="world_boss_title_introduction">Pengantar</i>
         <i key="world_boss_desc_introduction">Ada dua acara Tantangan Bos setiap hari.
-Acara berakhir setelah 1 jam atau saat bos dikalahkan.
+Acara berakhir setelah 1 jam atau saat
+bos dikalahkan.
 
-Lawan bos berulang kali; skor dari semua pertarunganmu
+Lawan bos berulang kali; skor dari semua
+pertarunganmu
 akan dijumlahkan di papan peringkat.
 
-Setelah Tantangan Bos berakhir, buka tab “Peringkat”
-untuk melihat posisimu dan mengklaim hadiah!</i>
+Setelah Tantangan Bos berakhir, buka tab
+“Peringkat”
+untuk melihat posisimu dan mengklaim
+hadiah!</i>
         <i key="world_boss_next_battle">pertarungan berikutnya:</i>
         <i key="world_boss_time_left">waktu tersisa:</i>
         <i key="world_boss_rank_title">peringkat</i>
@@ -257,7 +290,8 @@ untuk melihat posisimu dan mengklaim hadiah!</i>
         
         <i key="editBoxAccount_placeHolder">masukkan nama pengguna</i>
         <i key="editBoxPassword_placeHolder">Harus 4–16 karakter</i>
-        <i key="editBoxRepeatPassword_placeHolder">Masukkan ulang kata sandi</i>
+        <i key="editBoxRepeatPassword_placeHolder">Masukkan ulang kata
+sandi</i>
         <i key="editBoxNickname_placeHolder">masukkan nama panggilan</i>
         
         <i key="accountMenu_logIn">Masuk</i>
@@ -275,21 +309,31 @@ untuk melihat posisimu dan mengklaim hadiah!</i>
         <i key="toast_accountHint">Nama pengguna hanya boleh berisi huruf dan angka</i>
         <i key="toast_passwordHint">Kata sandi hanya boleh berisi huruf dan angka
 (4–16 karakter)</i>
-        <i key="toast_niacknameHint">Nama panggilan tidak boleh kosong. Silakan masukkan nama.</i>
+        <i key="toast_niacknameHint">Nama panggilan tidak boleh kosong. Silakan
+masukkan nama.</i>
         <i key="toast_logInSuccess">Berhasil masuk.</i>
-        <i key="toast_accountNoExist">Nama pengguna tidak ditemukan</i>
-        <i key="toast_wrongPassword">ID pengguna atau kata sandi salah</i>
+        <i key="toast_accountNoExist">Nama pengguna tidak
+ditemukan</i>
+        <i key="toast_wrongPassword">ID pengguna atau kata sandi
+salah</i>
         <i key="toast_twoPasswordsNotMatch">Kata sandi tidak cocok</i>
         <i key="toast_signUpSuccess">Pendaftaran berhasil</i>
-        <i key="toast_accountDuplicate">Nama pengguna sudah digunakan. Silakan masukkan nama lain</i>
-        <i key="toast_changePWSuccess">Kata sandi berhasil diubah</i>
-        <i key="toast_worldBossRankIsLock">Tunggu hingga permainan berakhir untuk melihat peringkat</i>
+        <i key="toast_accountDuplicate">Nama pengguna sudah digunakan. Silakan
+masukkan nama lain</i>
+        <i key="toast_changePWSuccess">Kata sandi berhasil
+diubah</i>
+        <i key="toast_worldBossRankIsLock">Tunggu hingga permainan berakhir untuk melihat
+peringkat</i>
         <i key="toast_uploadSuccess">Berhasil diunggah</i>
         
-        <i key="version_lower_title">Perbarui untuk melanjutkan</i>
-        <i key="version_lower_describ">Silakan perbarui ke versi terbaru</i>
-        <i key="pass_level_to_unlock_world_boss">Selesaikan tahap 2-8 untuk membuka Tantangan Bos</i>
-        <i key="pass_level_to_unlock_conquer">Selesaikan tahap 2-2 untuk membuka Ekspedisi!</i>
+        <i key="version_lower_title">Perbarui untuk
+melanjutkan</i>
+        <i key="version_lower_describ">Silakan perbarui ke versi
+terbaru</i>
+        <i key="pass_level_to_unlock_world_boss">Selesaikan tahap 2-8 untuk membuka
+Tantangan Bos</i>
+        <i key="pass_level_to_unlock_conquer">Selesaikan tahap 2-2 untuk membuka
+Ekspedisi!</i>
         
         <i key="heroBuffSlot_0">Serangan +%d%%
 untuk semua
@@ -325,7 +369,8 @@ hero</i>
         <i key="inbox_tab_events">Penawaran</i>
         <i key="inbox_tab_notices">Pesan</i>
         <i key="popupTitle_goblinCoinHint">Koin Goblin tidak cukup!</i>
-        <i key="popupDescribe_goblinCoinHint">Koin Goblin tidak cukup untuk membeli.</i>
+        <i key="popupDescribe_goblinCoinHint">Koin Goblin tidak cukup untuk
+membeli.</i>
         <i key="discount_off">Diskon</i>
         <i key="notices_item_coin">Koin</i>
         <i key="notices_item_crystals">Kristal</i>
@@ -333,12 +378,16 @@ hero</i>
         <i key="notices_item_gear">Perlengkapan</i>
         <i key="notices_item_world_boss_score">Skor Tantangan Bos</i>
         <i key="notices_item_activity_score">Mata Jack-o’-lantern</i>
-        <i key="tutorial_notices">Ada pesan baru. Ketuk di sini untuk melihatnya.</i>
-        <i key="tutorial_buffSlot">Ketuk di sini untuk mendapat tiga bonus acak.
-(Kali ini kamu bisa menyegarkannya gratis)</i>
+        <i key="tutorial_notices">Ada pesan baru. Ketuk di sini untuk
+melihatnya.</i>
+        <i key="tutorial_buffSlot">Ketuk di sini untuk mendapat tiga
+bonus acak.
+(Kali ini kamu bisa menyegarkannya
+gratis)</i>
         <i key="popupButton_get">Dapatkan Sekarang</i>
         <i key="popupTitle_fisrtPurchaseHint">Selamat!</i>
-        <i key="popupDescribe_fisrtPurchaseHint">Kamu mendapatkan kesempatan belanja untuk pembelian pertamamu! Periksa kotak pesan!</i>
+        <i key="popupDescribe_fisrtPurchaseHint">Kamu mendapatkan kesempatan belanja untuk pembelian
+pertamamu! Periksa kotak pesan!</i>
         <i key="events_timeLabel">Waktu Acara</i>
         <i key="popupDescribe_eventsNone">Tidak ada penawaran baru</i>
         <i key="tutorial_world_boss_info">Ketuk di sini untuk membaca pengantar acara.
@@ -355,11 +404,13 @@ hero</i>
         <i key="conquer_info">Info</i>
         <i key="chat_placeHolder">Ketik pesan di sini</i>
         <i key="chat_send">Kirim</i>
-        <i key="hireHero_title">Setiap Peningkatan Menambah</i>
+        <i key="hireHero_title">Setiap Peningkatan
+Menambah</i>
         <i key="hireHero_infoTitle">Promosikan</i>
         <i key="team_infoBtn">Info</i>
         <i key="convert_skillTitle">Ringkasan mantra hero</i>
-        <i key="tutorial_team_5">Ketuk di sini untuk melihat detail hero</i>
+        <i key="tutorial_team_5">Ketuk di sini untuk melihat
+detail hero</i>
         <i key="toast_comingSoon">Segera hadir</i>
         <i key="weekPackTitle">Rekomendasi</i>
         
@@ -367,16 +418,20 @@ hero</i>
         <i key="conquer_reset">Atur Ulang</i>
         <i key="conquer_title">Ekspedisi</i>
         <i key="conquer_info_title">Info</i>
-        <i key="conquer_desc_introduction">1. Semakin jauh kamu melangkah, semakin banyak hadiah!
+        <i key="conquer_desc_introduction">1. Semakin jauh kamu melangkah, semakin banyak
+hadiah!
 
-2. Setiap hari tersedia satu kesempatan reset gratis.
+2. Setiap hari tersedia satu kesempatan reset
+gratis.
 
-3. Semua hero yang telah dibuka dapat mengikuti Ekspedisi.
+3. Semua hero yang telah dibuka dapat mengikuti
+Ekspedisi.
 
 4. Hero yang gugur tidak dapat bertarung lagi.</i>
         <i key="tutorial_conquer1">Mode Ekspedisi terbuka.
 Ketuk untuk mulai.</i>
-        <i key="tutorial_conquer3">Ketuk untuk melihat pengantar
+        <i key="tutorial_conquer3">Ketuk untuk melihat
+pengantar
 Mode Ekspedisi.</i>
         <i key="tutorial_world_boss">Tantangan Bos terbuka.
 Ketuk untuk melihat.</i>
@@ -396,17 +451,20 @@ Ketuk untuk melihat.</i>
         <i key="card_quality_4">Legendaris</i>
         <i key="card_quality_5">Mitik</i>
         <i key="card_generateInfo_0">Selamat, kamu mendapatkan kartu!</i>
-        <i key="card_generateInfo_1">Kamu sudah memiliki kartu ini. Kartu diubah menjadi 10 pecahan untuk memperkuat kartu.</i>
+        <i key="card_generateInfo_1">Kamu sudah memiliki kartu ini. Kartu diubah menjadi 10
+pecahan untuk memperkuat kartu.</i>
         <i key="card_packsName_0">Paket Kartu Biasa</i>
         <i key="card_packsName_1">Paket Kartu Pengrajin</i>
         <i key="card_packsName_2">Paket Kartu Master</i>
-        <i key="card_packsDesc_1">Peluang mendapatkan kartu </i>
+        <i key="card_packsDesc_1">Peluang mendapatkan kartu
+</i>
         <i key="card_packsDesc_2">Minimal 1 kartu utuh</i>
         <i key="card_packs_btn_buy">Beli</i>
         <i key="ladder_introduction_title">Aturan</i>
         <i key="ladder_introduction_desc">1. Kesempatan gratis diperbarui setiap hari pukul %s.
 
-2. Pemain dengan Kehormatan di atas 7500 dan telah menyelesaikan %d pertarungan akan masuk ke Daftar Kehormatan!
+2. Pemain dengan Kehormatan di atas 7500 dan telah menyelesaikan %d
+pertarungan akan masuk ke Daftar Kehormatan!
 
 3. Setiap pertarungan memberimu Poin Peringkat.</i>
         <i key="ladder_report_win">Menang</i>
@@ -418,27 +476,39 @@ Ketuk untuk melihat.</i>
         <i key="ladder_rank_title_win">Menang</i>
         <i key="ladder_title">Pertandingan Peringkat</i>
         <i key="tutorial_card1">Ketuk di sini untuk membuka Galeri Kartu.
-Kamu bisa membeli kartu untuk digunakan di Arena.</i>
-        <i key="tutorial_card3">Ketuk di sini untuk membeli Paket Kartu.</i>
-        <i key="tutorial_card4">Ketuk untuk membeli Paket Kartu
+Kamu bisa membeli kartu untuk digunakan di
+Arena.</i>
+        <i key="tutorial_card3">Ketuk di sini untuk
+membeli Paket Kartu.</i>
+        <i key="tutorial_card4">Ketuk untuk membeli
+Paket Kartu
 (PAKET BONUS GRATIS)</i>
         <i key="tutorial_card5">Ketuk di sini untuk melihat kartu,
 yang penting dalam pertarungan PvP.</i>
         <i key="tutorial_ladder1">Arena terbuka!
 Ketuk untuk melihat.</i>
-        <i key="tutorial_ladder2">Ketuk untuk masuk ke Pertandingan Peringkat.</i>
-        <i key="tutorial_ladder3">Ketuk untuk menyegarkan daftar lawan.</i>
+        <i key="tutorial_ladder2">Ketuk untuk masuk ke
+Pertandingan Peringkat.</i>
+        <i key="tutorial_ladder3">Ketuk untuk menyegarkan
+daftar lawan.</i>
         <i key="pass_level_to_unlock_cards">Selesaikan tahap 3-2 untuk membuka Galeri Kartu.</i>
-        <i key="pass_level_to_unlock_ladder">Selesaikan tahap 3-2 untuk membuka Pertandingan Peringkat.</i>
-        <i key="pass_level_to_unlock_pvp">Selesaikan tahap 3-2 untuk membuka Arena.</i>
+        <i key="pass_level_to_unlock_ladder">Selesaikan tahap 3-2 untuk membuka
+Pertandingan Peringkat.</i>
+        <i key="pass_level_to_unlock_pvp">Selesaikan tahap 3-2 untuk membuka
+Arena.</i>
         <i key="pvpTicket_buyTitle">Beli Token</i>
-        <i key="pvpTicket_buyDesc0">Batas pembelian: 1 kali per hari</i>
-        <i key="pvpTicket_buyDesc1">Voucher dapat digunakan untuk menantang pemain lain.</i>
-        <i key="pvpTicket_buyDesc2">Kesempatan gratis hari ini sudah habis. Beli voucher untuk melanjutkan tantangan.</i>
-        <i key="pvpTicket_buyDesc3">Dalam %02d jam %02 menit, jumlah pertarungan gratis akan direset dan kamu mendapat satu kesempatan lagi untuk membeli voucher.</i>
+        <i key="pvpTicket_buyDesc0">Batas pembelian: 1 kali
+per hari</i>
+        <i key="pvpTicket_buyDesc1">Voucher dapat digunakan untuk menantang pemain
+lain.</i>
+        <i key="pvpTicket_buyDesc2">Kesempatan gratis hari ini sudah habis. Beli voucher untuk melanjutkan
+tantangan.</i>
+        <i key="pvpTicket_buyDesc3">Dalam %02d jam %02 menit, jumlah pertarungan gratis akan direset dan
+kamu mendapat satu kesempatan lagi untuk membeli voucher.</i>
         <i key="ladder_freeChances">Gratis:</i>
         <i key="ladder_chooseOppt">Silakan pilih lawan berikutnya:</i>
-        <i key="pvpTicket_giftDesc0">Selamat, kamu mendapat %d voucher. Voucher dapat digunakan untuk menantang pemain lain.</i>
+        <i key="pvpTicket_giftDesc0">Selamat, kamu mendapat %d voucher. Voucher dapat digunakan untuk
+menantang pemain lain.</i>
         <i key="pvpBtn_auto">Otomatis</i>
         <i key="revive_game">Bangkitkan Tim</i>
         <i key="report_revenge">Balas Dendam</i>
@@ -447,18 +517,24 @@ Ketuk untuk melihat.</i>
         <i key="ID">ID</i>
         <i key="toast_playerNotFind">Pemain tidak ditemukan. Silakan coba lagi.</i>
         <i key="ladder_free">Gratis</i>
-        <i key="toast_withOutSelf">Kamu tidak bisa melawan dirimu sendiri!</i>
+        <i key="toast_withOutSelf">Kamu tidak bisa melawan
+dirimu sendiri!</i>
         <i key="videoBonus_title">Bioskop Goblin</i>
-        <i key="videoBonus_desc0">Tonton video singkat untuk menerima bonus.</i>
+        <i key="videoBonus_desc0">Tonton video singkat untuk menerima
+bonus.</i>
         <i key="videoBonus_desc1">Bonus</i>
         <i key="videoBonus_btn0">Tonton</i>
         <i key="videoBonus_btn1">Terima</i>
-        <i key="pvp_bonus_message">Selamat, kamu memenangkan hadiah mingguan peringkat teratas! Periksa kotak pesanmu.</i>
+        <i key="pvp_bonus_message">Selamat, kamu memenangkan hadiah mingguan peringkat teratas! Periksa
+kotak pesanmu.</i>
         
         <i key="world_boss_title_beholder">Seribu Mata</i>
-        <i key="world_boss_desc_beholder">Thousand Eyes adalah pasukan monster seorang diri!
-Ribuan matanya menembus jiwa para hero dan dapat
-memanggil tiruan jahat dari hero paling suci sekalipun
+        <i key="world_boss_desc_beholder">Thousand Eyes adalah pasukan monster
+seorang diri!
+Ribuan matanya menembus jiwa para hero
+dan dapat
+memanggil tiruan jahat dari hero paling
+suci sekalipun
 untuk bertarung melawanmu!</i>
         
         <i key="map_icon_story_name">Kampanye</i>
@@ -473,7 +549,8 @@ untuk bertarung melawanmu!</i>
         <i key="mall_month_card_get_crystals_immediately_left">Langsung dapatkan</i>
         <i key="mall_month_card_get_crystals_immediately_right">Kristal</i>
         <i key="mall_month_card_instruction_left">Selama </i>
-        <i key="mall_month_card_instruction_right"> hari, dapatkan setiap hari:</i>
+        <i key="mall_month_card_instruction_right">hari, dapatkan setiap
+hari:</i>
         <i key="mall_month_card_last_days_left">Sisa:</i>
         <i key="mall_month_card_last_days_right">hari</i>
         <i key="mall_month_card_get">Dapatkan</i>
@@ -482,8 +559,10 @@ untuk bertarung melawanmu!</i>
         
         <i key="popup_story_spoil">Sapu Otomatis</i>
         <i key="popup_story_battle">Bertarung</i>
-        <i key="popup_story_blue_message">Selesaikan tahap untuk mendapatkan...</i>
-        <i key="popup_story_instruction">Dapatkan peringkat S pada sebuah tahap untuk memperoleh Koin Goblin bonus dan membuka Sapu Otomatis.</i>
+        <i key="popup_story_blue_message">Selesaikan tahap untuk
+mendapatkan...</i>
+        <i key="popup_story_instruction">Dapatkan peringkat S pada sebuah tahap untuk memperoleh Koin Goblin
+bonus dan membuka Sapu Otomatis.</i>
         
         <i key="popup_exchange_goblin_title">Penukaran Koin Goblin</i>
         <i key="popup_exchange_goblin_times_today">Penukaran Hari Ini:</i>
@@ -507,24 +586,30 @@ untuk bertarung melawanmu!</i>
         
         <i key="awarkening_success_title">Kebangkitan berhasil</i>
         <i key="awarkening_success_get_new_skill">Mempelajari skill baru:</i>
-        <i key="convert_growthValueLerlevel">Nilai Pertumbuhan</i>
-        <i key="convert_skill">Ski
-ll</i>
-        <i key="convert_awake">Bang
+        <i key="convert_growthValueLerlevel">Pertumbuhan</i>
+        <i key="convert_skill">Skill</i>
+        <i key="convert_awake">Bang-
 kit</i>
         <i key="convert_confirm">Rekrut Hero</i>
         
         <i key="team_unlock">Rekrut</i>
         <i key="transfer_determine">Konfirmasi</i>
-        <i key="luckPackTitle">Paket Dollar</i>
+        <i key="luckPackTitle">Paket Barter</i>
         
-        <i key="toast_fastBattleUnlockHint">Kamu hanya dapat menyapu otomatis setelah memperoleh peringkat S.</i>
-        <i key="toast_fastBattleUnlockHintPrev">Selesaikan tahap 1-7 untuk membuka fungsi Sapu Otomatis.</i>
-        <i key="toast_get_score_to_exchange_armor">Kumpulkan poin yang cukup untuk menukarnya dengan perlengkapan langka.</i>
+        <i key="toast_fastBattleUnlockHint">Kamu hanya dapat menyapu otomatis setelah memperoleh
+peringkat S.</i>
+        <i key="toast_fastBattleUnlockHintPrev">Selesaikan tahap 1-7 untuk membuka fungsi Sapu
+Otomatis.</i>
+        <i key="toast_get_score_to_exchange_armor">Kumpulkan poin yang cukup untuk menukarnya dengan perlengkapan
+langka.</i>
         
-        <i key="tutorial_map_into_story">Ketuk di sini untuk masuk ke Kampanye</i>
-        <i key="tutorial_story_into_battle">Ketuk untuk bertarung. Pertarungan menghabiskan makanan!</i>
-        <i key="tutorial_story_into_fast_battle">Ketuk untuk menyapu tahap otomatis.
+        <i key="tutorial_map_into_story">Ketuk di sini untuk masuk ke
+Kampanye</i>
+        <i key="tutorial_story_into_battle">Ketuk untuk bertarung.
+Pertarungan menghabiskan
+makanan!</i>
+        <i key="tutorial_story_into_fast_battle">Ketuk untuk menyapu tahap
+otomatis.
 Membutuhkan 3 makanan.</i>
         <i key="tutorial_story_fast_battle">Fitur Sapu Otomatis dibuka!
 Pilih tahap untuk disapu!</i>
@@ -533,28 +618,41 @@ Pilih tahap untuk disapu!</i>
         <i key="wheelPlayCost">Putar</i>
         
         <i key="popup_crystal_egg_hint_tittle">Selamat!</i>
-        <i key="popup_crystal_egg_hint_info">Telur Kristal dapat menetas menjadi perlengkapan misterius. Kamu bisa mendapatkannya dari Roda Keberuntungan!</i>
-        <i key="popup_crystal_egg_hint_ps">Catatan: Set zirah merah mitis menantimu.</i>
+        <i key="popup_crystal_egg_hint_info">Telur Kristal dapat menetas menjadi perlengkapan misterius. Kamu bisa
+mendapatkannya dari Roda Keberuntungan!</i>
+        <i key="popup_crystal_egg_hint_ps">Catatan: Set zirah merah mitis
+menantimu.</i>
         <i key="popup_crystal_egg_hint_confirm">Konfirmasi</i>
         
         <i key="popup_goblin_thief_hint_tittle">Perhatian!</i>
-        <i key="popup_goblin_thief_hint_info">Goblin misterius yang membawa banyak harta tiba-tiba muncul. Kalahkan sekarang!</i>
-        <i key="popup_goblin_thief_hint_ps">Catatan: Kalahkan dia untuk mendapatkan hadiah besar.</i>
+        <i key="popup_goblin_thief_hint_info">Goblin misterius yang membawa banyak harta tiba-tiba muncul. Kalahkan
+sekarang!</i>
+        <i key="popup_goblin_thief_hint_ps">Catatan: Kalahkan dia untuk
+mendapatkan hadiah besar.</i>
         <i key="popup_goblin_thief_hint_confirm">Pergi</i>
         
-        <i key="story_back_to_home_hint">Ada sesuatu yang terjadi di perkemahan.</i>
-        <i key="story_bth_daily_mission_hint">Ada acara baru. Ketuk untuk memeriksa.</i>
-        <i key="story_bth_achievement_hint">Ada pencapaian baru. Ketuk untuk melihat!</i>
-        <i key="story_bth_conquer_hint">Ekspedisi dapat disegarkan! Ketuk untuk memeriksa!</i>
-        <i key="story_bth_world_boss_hint">Tantangan BOS sedang berlangsung. Ketuk untuk bergabung!</i>
-        <i key="story_bth_ladder_hint">Pertandingan Peringkat sedang berlangsung. Tantangan menantimu!</i>
+        <i key="story_back_to_home_hint">Ada sesuatu yang terjadi di
+perkemahan.</i>
+        <i key="story_bth_daily_mission_hint">Ada acara baru. Ketuk
+untuk memeriksa.</i>
+        <i key="story_bth_achievement_hint">Ada pencapaian baru. Ketuk
+untuk melihat!</i>
+        <i key="story_bth_conquer_hint">Ekspedisi dapat disegarkan! Ketuk untuk
+memeriksa!</i>
+        <i key="story_bth_world_boss_hint">Tantangan BOS sedang berlangsung. Ketuk
+untuk bergabung!</i>
+        <i key="story_bth_ladder_hint">Pertandingan Peringkat sedang berlangsung.
+Tantangan menantimu!</i>
         
         <i key="hero_pack_alltake">Beli Paket</i>
         <i key="hero_pack_original_price">Asli</i>
         
-        <i key="pass_level_to_unlock_rotary">Butuh 5 Koin Goblin untuk menggunakan Roda Keberuntungan</i>
-        <i key="pass_level_to_unlock_mission">Selesaikan tahap 1-4 untuk membuka Ujian Api</i>
-        <i key="pass_level_to_unlock_achievement">Selesaikan tahap 1-5 untuk membuka Pencapaian</i>
+        <i key="pass_level_to_unlock_rotary">Butuh 5 Koin Goblin untuk menggunakan Roda
+Keberuntungan</i>
+        <i key="pass_level_to_unlock_mission">Selesaikan tahap 1-4 untuk membuka
+Ujian Api</i>
+        <i key="pass_level_to_unlock_achievement">Selesaikan tahap 1-5
+untuk membuka Pencapaian</i>
         
         <i key="exclusiveWeapons">Senjata Eksklusif</i>
         <i key="toast_buy_success">Pembelian Berhasil</i>
@@ -564,17 +662,20 @@ Pilih tahap untuk disapu!</i>
         <i key="promotingHint2">Pelajari Bakat</i>
         <i key="promotingHint3">Tingkatkan Serangan</i>
         <i key="promotingGoButton">Pergi</i>
-        <i key="revive_game_desc">Kemenangan tinggal selangkah lagi, bantu kami</i>
+        <i key="revive_game_desc">Kemenangan tinggal selangkah lagi,
+bantu kami</i>
         
         <i key="promoting_hint_layer_abandon">Menyerah</i>
-        <i key="promoting_hint_layer_tip">CATATAN: Selesaikan jalur berikut untuk menjadi kuat!</i>
+        <i key="promoting_hint_layer_tip">CATATAN: Selesaikan jalur berikut untuk menjadi
+kuat!</i>
         
         <i key="promotingHintGift1">Rekomendasi</i>
         <i key="promotingHintGift2">Paket Pemula</i>
-        <i key="promotingHintGift3">Paket Dollar</i>
+        <i key="promotingHintGift3">Paket Barter</i>
         <i key="promotingHintGift4">Paket Perlengkapan</i>
         <i key="promotingHintGift5">Paket Hero</i>
-        <i key="promotingHintGift6">Hero yang Direkomendasikan</i>
+        <i key="promotingHintGift6">Hero yang
+Direkomendasikan</i>
         <i key="promotingOpenButton">Buka</i>
         <i key="promotingOpenButton2">Lihat Sekarang</i>
         <i key="rookieGiftTitle">Peningkatan Pemula</i>
@@ -598,7 +699,8 @@ Pilih tahap untuk disapu!</i>
         <i key="events_life_gift">Ayam BBQ x%d</i>
         <i key="events_life_day6">Sabtu</i>
         <i key="events_life_day0">Minggu</i>
-        <i key="events_life_text1">Login pada hari Sabtu dan Minggu untuk mendapat makanan gratis!</i>
+        <i key="events_life_text1">Login pada hari Sabtu dan Minggu untuk mendapat
+makanan gratis!</i>
         <i key="events_life_text2">Jangan lupa manfaatkan kesempatan ini!</i>
         <i key="events_life_button1">%s ayo!</i>
         <i key="events_life_button2">Sudah diklaim</i>
@@ -620,386 +722,675 @@ Pilih tahap untuk disapu!</i>
         <i key="pop_fast_battle_today_remain">Hari Ini</i>
         <i key="month_card_vip_button">Hak Istimewa</i>
         <i key="halloween_receive">TERIMA</i>
-        <i key="halloween_info">Kamu mendapatkan mata Jack-o’-lantern. Semoga harimu menyenangkan.</i>
+        <i key="halloween_info">Kamu mendapatkan mata Jack-o’-lantern.
+Semoga harimu menyenangkan.</i>
         <i key="pop_vip_desc">1. Jumlah Ekspedisi harian bertambah
 
 2. Jumlah Sapu Otomatis harian bertambah
 
 3. Jatah makanan harian bertambah
 
-4. Kesempatan menukar Koin Goblin hijau bertambah</i>
+4. Kesempatan menukar Koin Goblin hijau
+bertambah</i>
         
         <i key="pirate_hint">Silakan unduh dari situs resmi. Terima kasih!</i>
-        <i key="mall_month_card_instruction_ios">lalu, kamu bisa mendapatkan setiap hari:</i>
+        <i key="mall_month_card_instruction_ios">lalu, kamu bisa
+mendapatkan setiap hari:</i>
         <i key="mall_month_card_hint_ios">Catatan: pembelian permanen.</i>
         <i key="mall_month_card_name_ios">VIP Melimpah</i>
         <i key="ui_tab_store_icon_mouthcard_ios">VIP</i>
         
         <i key="best_record">Rekor Terbaik</i>
-        <i key="popQuitGame">Apakah kamu ingin keluar?</i>
+        <i key="popQuitGame">Apakah kamu ingin
+keluar?</i>
         <i key="popQuitGameNo">Batal</i>
         <i key="popQuitGameYes">Oke</i>
         <i key="free_bonus">Bonus Gratis</i>
-        <i key="keyBackToast">Belum dapat kembali untuk sementara</i>
-        <i key="synchonizeToast">Maaf, file hanya dapat digunakan pada perangkat yang sama</i>
+        <i key="keyBackToast">Belum dapat kembali untuk
+sementara</i>
+        <i key="synchonizeToast">Maaf, file hanya dapat digunakan pada perangkat yang
+sama</i>
     </global>
     
     <tips>
-        <i roleKey="scarecrow" value="45">Saat orang-orangan sawah mati, ia akan melepaskan gagak iblis! Kamu harus mengalahkan gagak-gagak itu untuk menuntaskannya.</i>
-        <i roleKey="goblin_bomber">Goblin pengebom akan meledak saat dikalahkan dan melukai semua yang berada di dekatnya.</i>
-        <i roleKey="goblin_healer">Sebagian musuh sangat kuat, tetapi memiliki kelemahan. Kalahkan mereka secepatnya!</i>
-        <i roleKey="cousin">Waspadalah terhadap Morocyclops!</i>
+        <i roleKey="scarecrow" value="45">Saat orang-orangan sawah mati, ia akan melepaskan gagak iblis! Kamu
+harus mengalahkan gagak-gagak itu untuk menuntaskannya.</i>
+        <i roleKey="goblin_bomber">Goblin pengebom akan meledak saat dikalahkan dan melukai semua yang
+berada di dekatnya.</i>
+        <i roleKey="goblin_healer">Sebagian musuh sangat kuat, tetapi memiliki kelemahan.
+Kalahkan mereka secepatnya!</i>
+        <i roleKey="cousin">Waspadalah terhadap
+Morocyclops!</i>
         <i roleKey="cousin" value="-100" victory="1000">Morocyclops pemalu dan suka menyendiri.</i>
         
         
-        <i roleKey="sand_worm">Tetap waspada! Cacing pasir dapat menyerang sasaran dalam urutan apa pun!</i>
-        <i roleKey="sand_worm">Pasir hisap tidak melukai hero, tetapi membuat mereka tidak bisa bergerak.</i>
-        <i roleKey="sand_worm">Setelah cacing pasir menggali pasir, bersiaplah menghadapi bahaya!</i>
+        <i roleKey="sand_worm">Tetap waspada! Cacing pasir dapat menyerang sasaran dalam
+urutan apa pun!</i>
+        <i roleKey="sand_worm">Pasir hisap tidak melukai hero, tetapi membuat mereka tidak bisa
+bergerak.</i>
+        <i roleKey="sand_worm">Setelah cacing pasir menggali pasir, bersiaplah menghadapi
+bahaya!</i>
         
-        <i scene="2">Karena perang baru-baru ini, banyak jasad orc dan manusia terkubur di bawah pasir.</i>
+        <i scene="2">Karena perang baru-baru ini, banyak jasad orc dan manusia terkubur di
+bawah pasir.</i>
         
         
         <i roleKey="orc_commander">Hantaman palu Komandan Orc sangat kuat.</i>
         <i roleKey="orc_warlock">Dukun Orc meningkatkan kecepatan serangan semua sekutunya.</i>
-        <i roleKey="wolf">Raungan menandakan bahaya sudah dekat!</i>
-        <i roleKey="wolf">Bagi orc, membunuh serigala dengan tangan kosong adalah ujian kedewasaan. Berani mencoba?</i>
-        <i roleKey="dakarai">Totem batu bukan hanya sekeras batu; totem ini juga memberi pertahanan kuat kepada petarung berotot!</i>
+        <i roleKey="wolf">Raungan menandakan bahaya sudah
+dekat!</i>
+        <i roleKey="wolf">Bagi orc, membunuh serigala dengan tangan kosong adalah ujian
+kedewasaan. Berani mencoba?</i>
+        <i roleKey="dakarai">Totem batu bukan hanya sekeras batu; totem ini juga memberi pertahanan
+kuat kepada petarung berotot!</i>
         
         
-        <i roleKey="elf_caster">Saat Tetua Elf menggunakan mantra pelindung, jangan sia-siakan tenagamu untuk menyerang mereka.</i>
-        <i roleKey="elfin">Gunakan serangan jarak jauh untuk mengalahkan Elf; mereka dapat berpindah tempat seketika.</i>
-        <i roleKey="twine" defeat="100">Hancurkan kantong tanaman anggur vampir untuk menyelamatkan hero yang ditawan.</i>
+        <i roleKey="elf_caster">Saat Tetua Elf menggunakan mantra pelindung, jangan sia-siakan tenagamu
+untuk menyerang mereka.</i>
+        <i roleKey="elfin">Gunakan serangan jarak jauh untuk mengalahkan Elf; mereka dapat
+berpindah tempat seketika.</i>
+        <i roleKey="twine" defeat="100">Hancurkan kantong tanaman anggur vampir untuk
+menyelamatkan hero yang ditawan.</i>
         
         
-        <i roleKey="dragon">Waspadai Incendrak yang kelaparan, jangan sampai kamu menjadi santapan berikutnya.</i>
+        <i roleKey="dragon">Waspadai Incendrak yang kelaparan, jangan sampai kamu menjadi
+santapan berikutnya.</i>
         <i roleKey="dragon" value="-100" victory="1000">Konon, gunung es adalah tempat beristirahat Leviathan.</i>
         
         
-        <i roleKey="sirbedivere">Apa yang dibicarakan Tyler muda dengan Jenderal malang itu?</i>
-        <i roleKey="witch">Hati-hati terhadap mantra Perubahan Wujud sang penyihir.</i>
+        <i roleKey="sirbedivere">Apa yang dibicarakan Tyler muda dengan Jenderal
+malang itu?</i>
+        <i roleKey="witch">Hati-hati terhadap mantra Perubahan Wujud
+sang penyihir.</i>
         <i scene="6">Kota Astor adalah kota terpenting bagi David.</i>
         <i scene="6">Jenderal malang</i>
         
         
-        <i roleKey="tauras">Waspadai perisai bos! Perisai itu dapat memantulkan hampir semua jenis kerusakan!</i>
+        <i roleKey="tauras">Waspadai perisai bos! Perisai itu dapat memantulkan hampir semua
+jenis kerusakan!</i>
         
-        <i scene="7">Gelembung berdesis, iblis berlipat ganda; selama satu masih hidup, keduanya membawa masalah.</i>
+        <i scene="7">Gelembung berdesis, iblis berlipat ganda; selama satu masih hidup,
+keduanya membawa masalah.</i>
         <i scene="7">Iblis itu licik; mungkin kamu sedang ditipu!</i>
         
         
         <i roleKey="1">Gunakan hero paling tangguh untuk melindungi hero yang lebih rentan.</i>
         <i vocation="5">Saat mengamuk, semua mantra Berserker menjadi lebih kuat.</i>
         
-        <i roleKey="7">Imam wanita dapat menyembuhkan sekutu.</i>
+        <i roleKey="7">Imam wanita dapat menyembuhkan
+sekutu.</i>
         <i vocation="11">Saat Uskup menciptakan aura, efek tambahan akan langsung aktif.</i>
         
-        <i vocation="13">Kamu hanya mendapat bonus emas jika memilih mantra pasif “Pemburu Emas” dan pencurimu selamat dari pertarungan.</i>
+        <i vocation="13">Kamu hanya mendapat bonus emas jika memilih mantra pasif “Pemburu Emas”
+dan pencurimu selamat dari pertarungan.</i>
         <i vocation="17">Semakin banyak poin tempur yang dimiliki, semakin efektif mantramu.</i>
         
-        <i roleKey="19">Perapal memiliki banyak mantra kuat. Lepaskan semuanya kepada musuh terkuatmu.</i>
+        <i roleKey="19">Perapal memiliki banyak mantra kuat. Lepaskan semuanya kepada musuh
+terkuatmu.</i>
         
-        <i vocation="27">Ke mana pun panah Ranger jatuh, anjing pemburunya akan menyusul.</i>
+        <i vocation="27">Ke mana pun panah Ranger jatuh, anjing pemburunya akan
+menyusul.</i>
         
-        <i home="100">Jangan lupa mengambil bonus login harian!</i>
-        <i home="100" androidAvoid="1">Jika perlu memasang ulang game, gunakan fitur “Pulihkan Pembelian” di “Pengaturan” untuk memulihkan konten premium.</i>
-        <i home="20">Promosi gila selalu menghadirkan kejutan.</i>
+        <i home="100">Jangan lupa mengambil bonus login
+harian!</i>
+        <i home="100" androidAvoid="1">Jika perlu memasang ulang game, gunakan fitur “Pulihkan Pembelian” di
+“Pengaturan” untuk memulihkan konten premium.</i>
+        <i home="20">Promosi gila selalu menghadirkan
+kejutan.</i>
         
         <i modeType="4" value="-1">Misi harian memberimu banyak hadiah Kristal.</i>
-        <i modeType="4" value="-1">Perhatikan syarat kemenangan pada misi harian.</i>
+        <i modeType="4" value="-1">Perhatikan syarat kemenangan pada misi
+harian.</i>
         <i modeType="4" value="-1">Setelah misi selesai, tersedia banyak hadiah.</i>
         
         <i modeType="5" value="-1">Poin Tantangan Bos dapat ditukar dengan aksesori langka!</i>
-        <i modeType="5" value="-1">Semakin besar total kerusakan yang kamu berikan kepada BOS, semakin banyak poin yang didapat.</i>
+        <i modeType="5" value="-1">Semakin besar total kerusakan yang kamu berikan kepada BOS,
+semakin banyak poin yang didapat.</i>
         <i modeType="5" value="-1">Hanya dengan bekerja sama semua pemain bisa mengalahkan BOS DUNIA!</i>
-        <i modeType="5" value="-1">Rahasia skor tinggi: gunakan peningkat sebelum bertarung dan kuasai skill yang kuat.</i>
+        <i modeType="5" value="-1">Rahasia skor tinggi: gunakan peningkat sebelum bertarung dan kuasai
+skill yang kuat.</i>
         
         <i modeType="6" value="-1">Poin Peringkat dapat ditukar dengan benda langka!</i>
-        <i modeType="6" value="-1">Gunakan kartu bidik untuk menentukan sasaran. Seret kartunya dan cobalah!</i>
-        <i modeType="6" value="-1">Semakin tinggi tingkat kartu, semakin kuat efeknya.</i>
-        <i modeType="6" value="-1">Rahasia kemenangan peringkat: susun tim dengan tepat, lalu gunakan skill dan kartu secara bijak.</i>
-        <i modeType="6" value="-1">Kamu dapat menentukan siapa yang menantangmu.</i>
-        <i modeType="6" value="-1">Kamu dapat menonton video pertandingan peringkat melalui antarmuka laporan perang.</i>
+        <i modeType="6" value="-1">Gunakan kartu bidik untuk menentukan sasaran. Seret kartunya dan
+cobalah!</i>
+        <i modeType="6" value="-1">Semakin tinggi tingkat kartu, semakin kuat
+efeknya.</i>
+        <i modeType="6" value="-1">Rahasia kemenangan peringkat: susun tim dengan tepat, lalu gunakan skill
+dan kartu secara bijak.</i>
+        <i modeType="6" value="-1">Kamu dapat menentukan siapa
+yang menantangmu.</i>
+        <i modeType="6" value="-1">Kamu dapat menonton video pertandingan peringkat melalui
+antarmuka laporan perang.</i>
         <i modeType="6" value="-1">Menonton video pertarungan dapat membantumu memahami taktik lawan.</i>
         
-        <i modeType="7" value="-1">Setiap pemain mendapat satu kesempatan reset Ekspedisi setiap hari.</i>
-        <i modeType="7" value="-1">Mengembangkan hero cadangan dapat mencegah kekurangan personel dalam Ekspedisi.</i>
+        <i modeType="7" value="-1">Setiap pemain mendapat satu kesempatan reset Ekspedisi
+setiap hari.</i>
+        <i modeType="7" value="-1">Mengembangkan hero cadangan dapat mencegah kekurangan personel dalam
+Ekspedisi.</i>
         <i modeType="7" value="-1">Berapa banyak harta yang ada di peti Ekspedisi?</i>
         
         <i scene="1" ui="40">Pengelolaan hero yang tepat akan memudahkan pertarungan.</i>
-        <i scene="2" ui="40">Merekrut hero kuat akan meningkatkan kekuatan tim secara drastis.</i>
-        <i scene="2" ui="40">Gerak Lambat saat menyeret: waktu melambat sesaat ketika kamu memberi perintah kepada hero.</i>
-        <i scene="3" ui="40">Gerak Lambat saat menyeret: waktu melambat sesaat ketika kamu memberi perintah kepada hero.</i>
-        <i ui="50">Hero yang dikendalikan AI akan menggunakan mantra secara otomatis.</i>
-        <i ui="50">Kamu dapat menyeret hero yang dikendalikan AI untuk memindahkannya.</i>
+        <i scene="2" ui="40">Merekrut hero kuat akan meningkatkan kekuatan tim secara
+drastis.</i>
+        <i scene="2" ui="40">Gerak Lambat saat menyeret: waktu melambat sesaat ketika kamu memberi
+perintah kepada hero.</i>
+        <i scene="3" ui="40">Gerak Lambat saat menyeret: waktu melambat sesaat ketika kamu memberi
+perintah kepada hero.</i>
+        <i ui="50">Hero yang dikendalikan AI akan menggunakan mantra
+secara otomatis.</i>
+        <i ui="50">Kamu dapat menyeret hero yang dikendalikan AI
+untuk memindahkannya.</i>
         
-        <i ui="50">Pelajari bakat agar hero dapat bangkit menjadi lebih kuat.</i>
+        <i ui="50">Pelajari bakat agar hero dapat bangkit
+menjadi lebih kuat.</i>
         <i ui="50">Setelah bangkit, hero mendapat banyak bonus dan sebuah skill baru!</i>
-        <i ui="50">Skill inisiatif hero dapat ditingkatkan dengan mempelajari bakat.</i>
-        <i ui="50">Buka ruang inventaris tambahan untuk menyimpan lebih banyak perlengkapan.</i>
-        <i ui="50">Ada enam tingkat kualitas perlengkapan, ditandai warna putih, hijau, biru, ungu, jingga, dan merah.</i>
-        <i ui="50">Bagikan pencapaianmu di Facebook untuk mendapatkan hadiah.</i>
-        <i ui="50">Kumpulkan 5 Koin Goblin, lalu putar Roda Keberuntungan untuk berkesempatan mendapat benda langka.</i>
-        <i ui="50">Coba ketuk dua kali untuk mempelajari bakat baru.</i>
-        <i ui="40">Jangan lupa menyegarkan daftar barang di toko.</i>
-        <i ui="40">Terlalu banyak perlengkapan tak berguna? Coba Jual Massal.</i>
+        <i ui="50">Skill inisiatif hero dapat ditingkatkan dengan
+mempelajari bakat.</i>
+        <i ui="50">Buka ruang inventaris tambahan untuk menyimpan lebih banyak
+perlengkapan.</i>
+        <i ui="50">Ada enam tingkat kualitas perlengkapan, ditandai warna putih, hijau,
+biru, ungu, jingga, dan merah.</i>
+        <i ui="50">Bagikan pencapaianmu di Facebook untuk
+mendapatkan hadiah.</i>
+        <i ui="50">Kumpulkan 5 Koin Goblin, lalu putar Roda Keberuntungan untuk
+berkesempatan mendapat benda langka.</i>
+        <i ui="50">Coba ketuk dua kali untuk mempelajari
+bakat baru.</i>
+        <i ui="40">Jangan lupa menyegarkan daftar barang
+di toko.</i>
+        <i ui="40">Terlalu banyak perlengkapan tak berguna? Coba
+Jual Massal.</i>
         
-        <i ui="50" defeat="100">Terjebak di suatu tahap? Ulangi tahap sebelumnya untuk mengumpulkan hadiah.</i>
-        <i ui="50" defeat="100">Terjebak? Cobalah merekrut hero baru, mempelajari bakat, atau meningkatkan perlengkapan.</i>
+        <i ui="50" defeat="100">Terjebak di suatu tahap? Ulangi tahap
+sebelumnya untuk mengumpulkan hadiah.</i>
+        <i ui="50" defeat="100">Terjebak? Cobalah merekrut hero baru, mempelajari bakat, atau
+meningkatkan perlengkapan.</i>
     </tips>
     
     <skill>
         <activeskilldescribe>
-            <i index="1" order="1,2,0">Mengurangi kerusakan yang diterima sebesar %P selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="2" order="0">Memancing amarah musuh agar mereka menyerang prajurit ini. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="3" order="1,2,0">Serangan kuat yang memberikan %P kerusakan biasa dan %D kerusakan langsung kepada sasaran. (Waktu pemulihan: %D detik)</i>
-            <i index="4" order="0">Memanggil pancaran cahaya surgawi untuk menyembuhkan sekutu yang paling terluka. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="5" order="2,3,0">Melompat dan menghantam tanah, mengurangi dampak serangan musuh sebesar %P selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="6" order="1,2,3,4,0">Mengurangi HP musuh saat ini sebesar %P. Jika keberuntungan berpihak padamu (%P peluang), serangan memberikan kerusakan %D kali lipat atau %D kali kekuatan seranganmu. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="7" order="2,0">Menghantam musuh dengan perisai hingga jatuh selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="8" order="2,1,0">Menciptakan aura suci selama %D detik yang menyerap %P kerusakan dari serangan musuh. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="9" order="1,2,3,4,0">Mengorbankan %P HP untuk memperoleh tambahan %P kekuatan serangan dan %P kecepatan serangan selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="10" order="0">Melompat ke sasaran dan mendarat dengan kekuatan dahsyat, menyerang musuh di dekatnya. Saat mengamuk, semua musuh yang terkena akan terjatuh. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="11" order="2,3,0">Mengaum keras hingga musuh kabur selama %D detik. Saat mengamuk, mereka kabur %P lebih lama. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="12" order="3,0">Berputar seperti badai bilah baja dan melukai semua musuh di sekitar. Saat mengamuk, kerusakan bertambah %P. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="13" order="2,3,0">Melepaskan amarah dan menghantam musuh sebanyak %D kali berturut-turut, atau %D kali saat mengamuk. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="14" order="0">Menciptakan aura penyembuhan yang memulihkan sedikit HP semua hero. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="15" order="1,2,0">Meningkatkan zirah sekutu sebesar %P selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="16" order="2,0">Memulihkan HP sekutu selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="17" order="1,0">Seketika memulihkan %P HP sekutu. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="18" order="1,0">Menyerap HP dari semua jiwa di medan perang dan memberikannya kepada sasaran. Jumlah yang dipulihkan setara dengan %P kekuatan penyembuhan. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="19" order="2,3,0">Memberkati sekutu selama %D detik dan memulihkan HP sebesar %P setiap detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="20" order="1,2,3,0">Berubah menjadi malaikat, meningkatkan efek mantra penyembuhan sebesar %P dan mengurangi kerusakan yang diterima sebesar %P selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="21" order="2,0">Mengorbankan sebagian besar HP pendeta wanita untuk menghidupkan kembali sekutu yang baru gugur dengan %P HP. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="22" order="1,0">Melukai semua musuh sedikit dan meningkatkan kekuatan serangan semua sekutu sebesar %P. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="23" order="1,0">Menyembuhkan sedikit HP semua sekutu dan meningkatkan kecepatan pemulihan mereka sebesar %P. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="24" order="1,3,0">Meningkatkan zirah sekutu sebesar %P dan membuat semua musuh terpana selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="25" order="2,1,0">Seketika meningkatkan kecepatan merapal semua sekutu selama %D detik serta meningkatkan kecepatan gerak sebesar %P. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="26" order="1,0">Memanggil malaikat pelindung untuk menyembuhkan sekutu dengan HP terendah selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="27" order="0">Melancarkan satu pukulan dahsyat ke arah musuh sasaran. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="28" order="0">Melemparkan pisau ke semua musuh di depan, menimbulkan kerusakan besar. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="29" order="2,3,0">Mengurangi zirah sasaran sebesar %P selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="30" order="4,0">Menghilang selama %D detik dan tidak menerima kerusakan kecuali saat menyerang atau merapal mantra. HP pulih perlahan. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="31" order="0">Menyayat celah zirah musuh sehingga zirahnya menjadi 0% untuk satu serangan. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="32" order="2,0">Menimbulkan kerusakan besar. Jika HP musuh berada di bawah %P, kerusakannya menjadi dua kali lipat. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="33" order="0">Mencoba membunuh sasaran secara diam-diam. Semakin banyak HP sasaran yang hilang, semakin kuat seranganmu, hingga maksimum 100%. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="34" order="0">Melancarkan serangkaian serangan secepat kilat ke satu sasaran. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="35" order="3,2,0">Bergerak senyap seperti bayangan dan menyerang %D kali, memperoleh tambahan %D poin tempur. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="36" order="3,0">Semakin kuat musuh, semakin keras ia jatuh! Musuh yang lebih kuat menerima lebih banyak kerusakan. Memperoleh tambahan %D poin tempur. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="37" order="3,0">Menerobos zirah musuh; semakin tebal zirahnya, semakin besar kerusakan yang ditimbulkan. Memperoleh tambahan %D poin tempur. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="38" order="3,4,0">Tiba-tiba muncul di belakang sasaran dan memberi serangan kritis, membuatnya terpana selama %D detik. Menghabiskan semua poin tempur; setiap poin menambah durasi pingsan %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="39" order="2,0">Menggunakan semua poin tempur untuk mengisap nyawa musuh dan memulihkan si penjahat. Setiap poin meningkatkan kerusakan dan efek sebesar %P. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="40" order="2,3,0">Menusuk musuh dengan sambaran es, menimbulkan sedikit kerusakan dan memperlambat sasaran sebesar %P selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="41" order="0">Memanggil meteor yang menimbulkan kerusakan besar kepada semua musuh di area ledakan. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="42" order="0">Menyambar musuh dengan kilat, menjatuhkannya dan menimbulkan kerusakan besar. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="43" order="1,2,0">Memanggil perisai dengan HP sebesar %P dari total HP penyihir. Perisai menerima kerusakan sebagai pengganti penyihir selama %Ds atau sampai hancur. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="44" order="0">Memanggil naga api raksasa untuk membakar musuh! (Waktu penggunaan ulang: %Ds)</i>
-            <i index="45" order="3,4,0">Membekukan musuh hingga ke tulang dan memperlambat semua musuh di sekitar sebesar %P selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="46" order="0">Menyambar tiga musuh dengan trisula dari langit! (Waktu penggunaan ulang: %Ds)</i>
-            <i index="47" order="1,2,0">Meningkatkan kekuatan serangan sekutu sebesar %P selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="48" order="0">Mengisap nyawa musuh, mengurangi HP mereka dan menambah HP milikmu. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="49" order="2,0">Mengubah musuh menjadi alpaka selama %D detik. Alpaka tidak dapat menyerangmu, tetapi kamu tetap dapat menyerangnya. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="50" order="4,0">Menyebarkan wabah yang menginfeksi sasaran dan musuh di dekatnya, mengurangi HP selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="51" order="1,4,0">Membuat musuh menua dan pikun, mengurangi semua atribut sebesar %P selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="52" order="0">Memanggil lima bola sihir hitam yang melayang menuju sasaran lalu meledak, menimbulkan kerusakan besar. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="53" order="2,0">Mengenai titik lemah sasaran dengan tepat dan mengabaikan %P zirahnya. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="54" order="0">Menghantam musuh dengan ledakan kuat hingga terpental jauh. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="55" order="2,3,0">Menembakkan peluru mematikan. Selama %D detik, musuh hanya menerima %P efek dari mantra penyembuhan. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="56" order="2,3,0">Menimbulkan sedikit kerusakan dan memperlambat musuh sebesar %P selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="57" order="3,0">Meracuni musuh dan menimbulkan kerusakan selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="58" order="0">Menembakkan peluru peledak yang pecah dan turut mengenai sasaran di dekatnya. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="59" order="0">Melepaskan rentetan panah, satu untuk setiap musuh, dan menimbulkan kerusakan besar pada masing-masing sasaran. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="60" order="0">Menembakkan panah sihir yang menjatuhkan dan melukai semua musuh di jalurnya. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="61" order="0">Menghantam musuh tiga kali dengan rentetan tembakan mematikan. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="62" order="2,0">Amunisi pembakar menyala dan membakar area selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="63" order="0">Melempar granat ke kelompok musuh—awas, granat meledak! (Waktu penggunaan ulang: %Ds)</i>
-            <i index="64" order="3,0">Senapan gentel memiliki jangkauan terbatas, tetapi menimbulkan kerusakan besar dan menjatuhkan musuh selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
-            <i index="65" order="0">Mengisi ulang seketika. Gunakan kembali mantra lain tanpa menunggu! (Waktu penggunaan ulang: %Ds)</i>
-            <i index="131" order="2,3,4,0">Memanggil Hercules Sang Petinju untuk menghantam musuh di barisan depan, mengurangi serangan sebesar %P dan zirah sebesar %P selama %D detik. (Waktu pemulihan: %D detik)</i>
+            <i index="1" order="1,2,0">Mengurangi kerusakan yang diterima sebesar %P selama %D detik.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="2" order="0">Memancing amarah musuh agar mereka menyerang prajurit ini. (Waktu
+penggunaan ulang: %Ds)</i>
+            <i index="3" order="1,2,0">Serangan kuat yang memberikan %P kerusakan biasa dan %D kerusakan
+langsung kepada sasaran. (Waktu pemulihan: %D detik)</i>
+            <i index="4" order="0">Memanggil pancaran cahaya surgawi untuk menyembuhkan sekutu
+yang paling terluka.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="5" order="2,3,0">Melompat dan menghantam tanah, mengurangi dampak serangan musuh sebesar
+%P selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="6" order="1,2,3,4,0">Mengurangi HP musuh saat ini sebesar %P. Jika keberuntungan berpihak
+padamu (%P peluang), serangan memberikan kerusakan %D kali lipat atau %D
+kali kekuatan seranganmu. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="7" order="2,0">Menghantam musuh dengan perisai hingga jatuh selama %D detik.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="8" order="2,1,0">Menciptakan aura suci selama %D detik yang menyerap %P kerusakan dari
+serangan musuh. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="9" order="1,2,3,4,0">Mengorbankan %P HP untuk memperoleh tambahan %P kekuatan
+serangan dan %P kecepatan serangan selama %D detik. (Waktu
+penggunaan ulang: %Ds)</i>
+            <i index="10" order="0">Melompat ke sasaran dan mendarat dengan kekuatan dahsyat, menyerang
+musuh di dekatnya. Saat mengamuk, semua musuh yang terkena akan
+terjatuh.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="11" order="2,3,0">Mengaum keras hingga musuh kabur selama %D detik. Saat mengamuk, mereka
+kabur %P lebih lama. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="12" order="3,0">Berputar seperti badai bilah baja dan melukai semua musuh di sekitar.
+Saat mengamuk, kerusakan bertambah %P. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="13" order="2,3,0">Melepaskan amarah dan menghantam musuh sebanyak %D kali berturut-turut,
+atau %D kali saat mengamuk. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="14" order="0">Menciptakan aura penyembuhan yang memulihkan sedikit HP semua hero.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="15" order="1,2,0">Meningkatkan zirah sekutu sebesar %P selama %D detik. (Waktu
+penggunaan ulang: %Ds)</i>
+            <i index="16" order="2,0">Memulihkan HP sekutu selama %D detik. (Waktu penggunaan
+ulang: %Ds)</i>
+            <i index="17" order="1,0">Seketika memulihkan %P HP sekutu. (Waktu penggunaan ulang:
+%Ds)</i>
+            <i index="18" order="1,0">Menyerap HP dari semua jiwa di medan perang dan memberikannya kepada
+sasaran. Jumlah yang dipulihkan setara dengan %P kekuatan penyembuhan.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="19" order="2,3,0">Memberkati sekutu selama %D detik dan memulihkan HP sebesar %P
+setiap detik.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="20" order="1,2,3,0">Berubah menjadi malaikat, meningkatkan efek mantra penyembuhan sebesar
+%P dan mengurangi kerusakan yang diterima sebesar %P selama %D detik.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="21" order="2,0">Mengorbankan sebagian besar HP pendeta wanita untuk menghidupkan kembali
+sekutu yang baru gugur dengan %P HP. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="22" order="1,0">Melukai semua musuh sedikit dan meningkatkan kekuatan serangan semua
+sekutu sebesar %P. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="23" order="1,0">Menyembuhkan sedikit HP semua sekutu dan meningkatkan kecepatan
+pemulihan mereka sebesar %P. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="24" order="1,3,0">Meningkatkan zirah sekutu sebesar %P dan membuat semua musuh terpana
+selama %D detik.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="25" order="2,1,0">Seketika meningkatkan kecepatan merapal semua sekutu selama %D detik
+serta meningkatkan kecepatan gerak sebesar %P. (Waktu penggunaan ulang:
+%Ds)</i>
+            <i index="26" order="1,0">Memanggil malaikat pelindung untuk menyembuhkan sekutu dengan HP
+terendah selama %D detik.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="27" order="0">Melancarkan satu pukulan dahsyat ke arah musuh sasaran. (Waktu
+penggunaan ulang: %Ds)</i>
+            <i index="28" order="0">Melemparkan pisau ke semua musuh di depan, menimbulkan kerusakan besar.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="29" order="2,3,0">Mengurangi zirah sasaran sebesar %P selama %D detik. (Waktu
+penggunaan ulang: %Ds)</i>
+            <i index="30" order="4,0">Menghilang selama %D detik dan tidak menerima kerusakan kecuali saat
+menyerang atau merapal mantra. HP pulih perlahan. (Waktu penggunaan
+ulang: %Ds)</i>
+            <i index="31" order="0">Menyayat celah zirah musuh sehingga zirahnya menjadi 0% untuk satu
+serangan. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="32" order="2,0">Menimbulkan kerusakan besar. Jika HP musuh berada di bawah %P,
+kerusakannya menjadi dua kali lipat. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="33" order="0">Mencoba membunuh sasaran secara diam-diam. Semakin banyak HP sasaran
+yang hilang, semakin kuat seranganmu, hingga maksimum 100%. (Waktu
+penggunaan ulang: %Ds)</i>
+            <i index="34" order="0">Melancarkan serangkaian serangan secepat kilat ke satu sasaran. (Waktu
+penggunaan ulang: %Ds)</i>
+            <i index="35" order="3,2,0">Bergerak senyap seperti bayangan dan menyerang %D kali, memperoleh
+tambahan %D poin tempur. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="36" order="3,0">Semakin kuat musuh, semakin keras ia jatuh! Musuh yang lebih kuat
+menerima lebih banyak kerusakan. Memperoleh tambahan %D poin tempur.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="37" order="3,0">Menerobos zirah musuh; semakin tebal zirahnya, semakin besar kerusakan
+yang ditimbulkan. Memperoleh tambahan %D poin tempur. (Waktu penggunaan
+ulang: %Ds)</i>
+            <i index="38" order="3,4,0">Tiba-tiba muncul di belakang sasaran dan memberi serangan kritis,
+membuatnya terpana selama %D detik. Menghabiskan semua poin tempur;
+setiap poin menambah durasi pingsan %D detik. (Waktu penggunaan ulang:
+%Ds)</i>
+            <i index="39" order="2,0">Menggunakan semua poin tempur untuk mengisap nyawa musuh dan memulihkan
+si penjahat. Setiap poin meningkatkan kerusakan dan efek sebesar %P.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="40" order="2,3,0">Menusuk musuh dengan sambaran es, menimbulkan sedikit kerusakan dan
+memperlambat sasaran sebesar %P selama %D detik. (Waktu penggunaan
+ulang: %Ds)</i>
+            <i index="41" order="0">Memanggil meteor yang menimbulkan kerusakan besar kepada semua musuh di
+area ledakan.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="42" order="0">Menyambar musuh dengan kilat, menjatuhkannya dan menimbulkan kerusakan
+besar. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="43" order="1,2,0">Memanggil perisai dengan HP sebesar %P dari total HP penyihir. Perisai
+menerima kerusakan sebagai pengganti penyihir selama %Ds atau sampai
+hancur. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="44" order="0">Memanggil naga api raksasa untuk membakar musuh! (Waktu penggunaan
+ulang: %Ds)</i>
+            <i index="45" order="3,4,0">Membekukan musuh hingga ke tulang dan memperlambat semua musuh di
+sekitar sebesar %P selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="46" order="0">Menyambar tiga musuh dengan trisula dari langit! (Waktu penggunaan
+ulang: %Ds)</i>
+            <i index="47" order="1,2,0">Meningkatkan kekuatan serangan sekutu sebesar %P selama %D detik.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="48" order="0">Mengisap nyawa musuh, mengurangi HP mereka dan menambah HP milikmu.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="49" order="2,0">Mengubah musuh menjadi alpaka selama %D detik. Alpaka tidak dapat
+menyerangmu, tetapi kamu tetap dapat menyerangnya. (Waktu penggunaan
+ulang: %Ds)</i>
+            <i index="50" order="4,0">Menyebarkan wabah yang menginfeksi sasaran dan musuh di dekatnya,
+mengurangi HP selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="51" order="1,4,0">Membuat musuh menua dan pikun, mengurangi semua atribut sebesar %P
+selama %D detik. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="52" order="0">Memanggil lima bola sihir hitam yang melayang menuju sasaran lalu
+meledak, menimbulkan kerusakan besar. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="53" order="2,0">Mengenai titik lemah sasaran dengan tepat dan mengabaikan %P zirahnya.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="54" order="0">Menghantam musuh dengan ledakan kuat hingga terpental jauh. (Waktu
+penggunaan ulang: %Ds)</i>
+            <i index="55" order="2,3,0">Menembakkan peluru mematikan. Selama %D detik, musuh hanya menerima %P
+efek dari mantra penyembuhan. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="56" order="2,3,0">Menimbulkan sedikit kerusakan dan memperlambat musuh sebesar %P
+selama %D detik.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="57" order="3,0">Meracuni musuh dan menimbulkan kerusakan selama %D detik. (Waktu
+penggunaan ulang: %Ds)</i>
+            <i index="58" order="0">Menembakkan peluru peledak yang pecah dan turut mengenai sasaran di
+dekatnya. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="59" order="0">Melepaskan rentetan panah, satu untuk setiap musuh, dan menimbulkan
+kerusakan besar pada masing-masing sasaran. (Waktu penggunaan ulang:
+%Ds)</i>
+            <i index="60" order="0">Menembakkan panah sihir yang menjatuhkan dan melukai semua musuh di
+jalurnya. (Waktu penggunaan ulang: %Ds)</i>
+            <i index="61" order="0">Menghantam musuh tiga kali dengan rentetan tembakan mematikan.
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="62" order="2,0">Amunisi pembakar menyala dan membakar area selama %D detik. (Waktu
+penggunaan ulang: %Ds)</i>
+            <i index="63" order="0">Melempar granat ke kelompok musuh—awas, granat meledak! (Waktu
+penggunaan ulang: %Ds)</i>
+            <i index="64" order="3,0">Senapan gentel memiliki jangkauan terbatas, tetapi menimbulkan kerusakan
+besar dan menjatuhkan musuh selama %D detik. (Waktu penggunaan ulang:
+%Ds)</i>
+            <i index="65" order="0">Mengisi ulang seketika. Gunakan kembali mantra lain tanpa menunggu!
+(Waktu penggunaan ulang: %Ds)</i>
+            <i index="131" order="2,3,4,0">Memanggil Hercules Sang Petinju untuk menghantam musuh di barisan
+depan, mengurangi serangan sebesar %P dan zirah sebesar %P selama %D
+detik. (Waktu pemulihan: %D detik)</i>
         </activeskilldescribe>
         
         <passiveskilldescribe>
-            <i index="1" order="0">Meningkatkan total HP prajurit sebesar %P. (Mantra pasif)</i>
-            <i index="2" order="0">Meningkatkan ketahanan terhadap serangan musuh sebesar %P. (Mantra pasif)</i>
-            <i index="3" order="0">Meningkatkan HP, kekuatan serangan, dan zirah Paladin sebesar %P. (Mantra pasif)</i>
-            <i index="4" order="0">Setiap HP berkurang %1, zirah meningkat sebesar %D%. (Mantra pasif)</i>
-            <i index="5" order="0">Setiap HP berkurang %1, kekuatan serangan meningkat sebesar %D%. (Mantra pasif)</i>
-            <i index="6" order="0">Setiap HP berkurang %1, kecepatan serangan meningkat sebesar %D%. (Mantra pasif)</i>
-            <i index="7" order="0,1">Meningkatkan zirah sekutu sebesar %P setiap %D detik. (Mantra pasif)</i>
-            <i index="8" order="0,1">Memperkuat serangan sekutu sebesar %P setiap %D detik. (Mantra pasif)</i>
-            <i index="9" order="0">Menyembuhkan sasaran dan juga memulihkan sekutu di dekatnya sebesar %P dari kekuatan penyembuhan. (Mantra pasif)</i>
-            <i index="10" order="0">Saat menyembuhkan orang lain, kamu juga menyembuhkan diri sendiri sebesar %P dari kekuatan penyembuhan. (Mantra pasif)</i>
-            <i index="11" order="0">Saat menggunakan penyembuhan otomatis, semua musuh di sekitar sasaran menerima kerusakan sebesar %P. (Mantra pasif)</i>
-            <i index="12" order="0">Meningkatkan efektivitas penyembuhan otomatis sebesar %P. (Mantra pasif)</i>
-            <i index="13" order="0">Mencuri emas dari musuh sehingga emas yang diperoleh setelah menang meningkat sebesar %P. (Mantra pasif)</i>
-            <i index="14" order="0">Meningkatkan kerusakan serangan sebesar %P. (Mantra pasif)</i>
-            <i index="15" order="0">Semua mantra memiliki peluang %P untuk menimbulkan kerusakan dua kali lipat. (Mantra pasif)</i>
-            <i index="16" order="1">Kecepatan serangan ke satu sasaran meningkat bertahap hingga %P. (Mantra pasif)</i>
-            <i index="17" order="">Meningkatkan batas maksimum poin tempur dari 5 menjadi 7. (Mantra pasif)</i>
-            <i index="18" order="0">Mendapatkan satu poin tempur setiap %D detik. (Mantra pasif)</i>
-            <i index="19" order="0">Menguasai mantra dan meningkatkan kerusakannya sebesar %P. (Mantra pasif)</i>
+            <i index="1" order="0">Meningkatkan total HP prajurit sebesar %P. (Mantra
+pasif)</i>
+            <i index="2" order="0">Meningkatkan ketahanan terhadap serangan musuh sebesar %P.
+(Mantra pasif)</i>
+            <i index="3" order="0">Meningkatkan HP, kekuatan serangan, dan zirah Paladin
+sebesar %P.
+(Mantra pasif)</i>
+            <i index="4" order="0">Setiap HP berkurang %1, zirah meningkat sebesar %D%.
+(Mantra pasif)</i>
+            <i index="5" order="0">Setiap HP berkurang %1, kekuatan serangan meningkat sebesar %D%.
+(Mantra pasif)</i>
+            <i index="6" order="0">Setiap HP berkurang %1, kecepatan serangan meningkat sebesar %D%.
+(Mantra pasif)</i>
+            <i index="7" order="0,1">Meningkatkan zirah sekutu sebesar %P setiap %D detik. (Mantra
+pasif)</i>
+            <i index="8" order="0,1">Memperkuat serangan sekutu sebesar %P setiap %D detik. (Mantra
+pasif)</i>
+            <i index="9" order="0">Menyembuhkan sasaran dan juga memulihkan sekutu di dekatnya sebesar %P
+dari kekuatan penyembuhan.
+(Mantra pasif)</i>
+            <i index="10" order="0">Saat menyembuhkan orang lain, kamu juga menyembuhkan diri sendiri
+sebesar %P dari kekuatan penyembuhan.
+(Mantra pasif)</i>
+            <i index="11" order="0">Saat menggunakan penyembuhan otomatis, semua musuh di sekitar sasaran
+menerima kerusakan sebesar %P.
+(Mantra pasif)</i>
+            <i index="12" order="0">Meningkatkan efektivitas penyembuhan otomatis sebesar %P.
+(Mantra pasif)</i>
+            <i index="13" order="0">Mencuri emas dari musuh sehingga emas yang diperoleh setelah menang
+meningkat sebesar %P. (Mantra pasif)</i>
+            <i index="14" order="0">Meningkatkan kerusakan serangan sebesar %P.
+(Mantra pasif)</i>
+            <i index="15" order="0">Semua mantra memiliki peluang %P untuk menimbulkan kerusakan dua kali
+lipat. (Mantra pasif)</i>
+            <i index="16" order="1">Kecepatan serangan ke satu sasaran meningkat bertahap hingga %P. (Mantra
+pasif)</i>
+            <i index="17" order="">Meningkatkan batas maksimum poin tempur dari 5 menjadi 7.
+(Mantra pasif)</i>
+            <i index="18" order="0">Mendapatkan satu poin tempur setiap %D detik. (Mantra
+pasif)</i>
+            <i index="19" order="0">Menguasai mantra dan meningkatkan kerusakannya sebesar %P.
+(Mantra pasif)</i>
             <i index="20" order="">Berpindah seketika ke lokasi mana pun di medan perang. (Mantra pasif)</i>
             <i index="21" order="0">Sihir es memperlambat musuh dan meningkatkan %P. (Skill pasif)</i>
             <i index="22" order="">Ledakan petir memanggil satu sambaran petir tambahan. (Skill pasif)</i>
-            <i index="23" order="0,1">Setiap merapal mantra, muncul bola energi sihir yang meningkatkan serangan sebesar %P selama %D detik. (Mantra pasif)</i>
-            <i index="24" order="0,2">Ada peluang %P untuk menginfeksi musuh dengan wabah saat menyerangnya, menimbulkan kerusakan selama %D detik. (Mantra pasif)</i>
-            <i index="25" order="0,1">Mengurangi zirah musuh sebesar %P selama %D detik. (Mantra pasif)</i>
-            <i index="26" order="">Mengalihkan perhatian musuh agar menyerang sekutumu yang paling kuat. (Mantra pasif)</i>
-            <i index="27" order="">Memanggil anjing untuk membantumu!</i>
-            <i index="28" order="0">Ada peluang %P agar kamu dapat merapal mantra lagi tanpa menunggu. (Mantra pasif)</i>
-            <i index="29" order="0">Meningkatkan kecepatan menembak sebesar %P.</i>
-            <i index="30" order="0">Meningkatkan kecepatan merapal mantra sebesar %P. (Mantra pasif)</i>
+            <i index="23" order="0,1">Setiap merapal mantra, muncul bola energi sihir yang meningkatkan
+serangan sebesar %P selama %D detik. (Mantra pasif)</i>
+            <i index="24" order="0,2">Ada peluang %P untuk menginfeksi musuh dengan wabah saat menyerangnya,
+menimbulkan kerusakan selama %D detik. (Mantra pasif)</i>
+            <i index="25" order="0,1">Mengurangi zirah musuh sebesar %P selama %D detik. (Mantra
+pasif)</i>
+            <i index="26" order="">Mengalihkan perhatian musuh agar menyerang sekutumu yang paling kuat.
+(Mantra pasif)</i>
+            <i index="27" order="">Memanggil anjing untuk
+membantumu!</i>
+            <i index="28" order="0">Ada peluang %P agar kamu dapat merapal mantra lagi tanpa menunggu.
+(Mantra pasif)</i>
+            <i index="29" order="0">Meningkatkan kecepatan
+menembak sebesar %P.</i>
+            <i index="30" order="0">Meningkatkan kecepatan merapal mantra sebesar %P. (Mantra
+pasif)</i>
         </passiveskilldescribe>
         
         <superioractivedescribe>
             <i index="1" order="">✦ Efek Cahaya Surgawi meningkat pesat!</i>
             <i index="2" order="0">✦ Kerusakan serangan musuh berkurang sekitar %P.</i>
             <i index="3" order="0">✦ Waktu penggunaan ulang Penghakiman Ilahi menjadi %D detik.</i>
-            <i index="4" order="0">✦ Durasi menjatuhkan musuh meningkat menjadi %D detik.</i>
-            <i index="5" order="0">✦ Aura menyerap dan memberikan %P dari kerusakan yang diterima.</i>
+            <i index="4" order="0">✦ Durasi menjatuhkan musuh meningkat
+menjadi %D detik.</i>
+            <i index="5" order="0">✦ Aura menyerap dan memberikan %P dari kerusakan
+yang diterima.</i>
             <i index="6" order="">✦ Tidak perlu lagi mengorbankan HP.</i>
             <i index="7" order="">✦ Efek mantra ini menjangkau semua musuh.</i>
             <i index="8" order="0,1">✦ Musuh juga melambat sebesar %P selama %D detik.</i>
             <i index="9" order="0">✦ Kerusakan Angin Puyuh dikalikan %O.</i>
-            <i index="10" order="0">✦ Waktu penggunaan ulang berkurang menjadi %D detik.</i>
+            <i index="10" order="0">✦ Waktu penggunaan ulang berkurang menjadi %D
+detik.</i>
             <i index="11" order="0">✦ Memulihkan %P HP sekutu.</i>
-            <i index="12" order="0">✦ Jumlah HP yang diserap dan diberikan meningkat menjadi %P dari kekuatan penyembuhan.</i>
-            <i index="13" order="">✦ Manfaatnya menjadi dua kali lipat dan durasi pingsan berkurang setengah.</i>
-            <i index="14" order="">✦ Menjadi tak terkalahkan selama berada dalam Wujud Malaikat.</i>
-            <i index="15" order="0">✦ Waktu penggunaan ulang berkurang menjadi %D detik.</i>
-            <i index="16" order="0">✦ Meningkatkan kekuatan serangan semua sekutu sebesar %P.</i>
-            <i index="17" order="">✦ Jumlah HP yang dipulihkan meningkat drastis.</i>
+            <i index="12" order="0">✦ Jumlah HP yang diserap dan diberikan meningkat menjadi %P dari
+kekuatan penyembuhan.</i>
+            <i index="13" order="">✦ Manfaatnya menjadi dua kali lipat dan
+durasi pingsan berkurang setengah.</i>
+            <i index="14" order="">✦ Menjadi tak terkalahkan selama berada
+dalam Wujud Malaikat.</i>
+            <i index="15" order="0">✦ Waktu penggunaan ulang berkurang menjadi %D
+detik.</i>
+            <i index="16" order="0">✦ Meningkatkan kekuatan serangan semua
+sekutu sebesar %P.</i>
+            <i index="17" order="">✦ Jumlah HP yang dipulihkan meningkat
+drastis.</i>
             <i index="18" order="0">✦ Durasi stun semua musuh bertambah menjadi %D detik.</i>
-            <i index="19" order="0">✦ Efek peningkatan kecepatan merapal berlangsung selama %D detik.</i>
+            <i index="19" order="0">✦ Efek peningkatan kecepatan merapal
+berlangsung selama %D detik.</i>
             <i index="20" order="0">✦ Durasi Malaikat Pelindung bertambah menjadi %D detik.</i>
             <i index="21" order="">✦ Saat menghilang, HP pulih dengan cepat.</i>
             <i index="22" order="0">✦ Selain itu, musuh akan terpana selama %D detik.</i>
             <i index="23" order="0,1">✦ Jika HP sasaran kurang dari %P, kerusakan dikalikan %P.</i>
             <i index="24" order="0">✦ Kerusakan mantra ini dikalikan %O.</i>
-            <i index="25" order="0">✦ Waktu penggunaan ulang berkurang menjadi %D detik.</i>
+            <i index="25" order="0">✦ Waktu penggunaan ulang berkurang menjadi %D
+detik.</i>
             <i index="26" order="0">✦ Kerusakan mantra ini dikalikan %O.</i>
             <i index="27" order="0,1">✦ Mengurangi kekuatan serangan musuh sebesar %P selama %D detik.</i>
             <i index="28" order="0,1">✦ Mengurangi zirah musuh sebesar %P selama %D detik.</i>
-            <i index="29" order="0">✦ Setiap poin tempur membuat musuh terpana selama %D detik.</i>
-            <i index="30" order="0">✦ Setiap poin tempur meningkatkan kerusakan dan efek sebesar %P.</i>
+            <i index="29" order="0">✦ Setiap poin tempur membuat musuh terpana selama %D
+detik.</i>
+            <i index="30" order="0">✦ Setiap poin tempur meningkatkan kerusakan dan efek sebesar
+%P.</i>
             <i index="31" order="0">✦ Daya tahan perisai meningkat menjadi %P dari total HP penyihir.</i>
             <i index="32" order="">✦ Intensitas api naga meningkat drastis.</i>
             <i index="33" order="">✦ Efek mantra ini menjangkau semua musuh.</i>
-            <i index="34" order="0">✦ Jumlah sambaran petir meningkat menjadi %D.</i>
-            <i index="35" order="0">✦ Durasi efek meningkat menjadi %D detik.</i>
+            <i index="34" order="0">✦ Jumlah sambaran petir meningkat menjadi
+%D.</i>
+            <i index="35" order="0">✦ Durasi efek meningkat menjadi %D
+detik.</i>
             <i index="36" order="">✦ Jumlah nyawa yang diserap meningkat drastis.</i>
             <i index="37" order="0">✦ Musuh tetap menjadi alpaka selama %D detik.</i>
             <i index="38" order="">✦ Wabah menjadi jauh lebih parah.</i>
             <i index="39" order="0">✦ Pengurangan atribut musuh meningkat menjadi %P.</i>
-            <i index="40" order="0">✦ Waktu penggunaan ulang berkurang menjadi %D detik.</i>
-            <i index="41" order="0">✦ Kerusakan tetap sama, tetapi musuh melambat sebesar %P.</i>
+            <i index="40" order="0">✦ Waktu penggunaan ulang berkurang menjadi
+%D detik.</i>
+            <i index="41" order="0">✦ Kerusakan tetap sama, tetapi musuh melambat sebesar
+%P.</i>
             <i index="42" order="">✦ Kekuatan racun meningkat drastis.</i>
             <i index="43" order="0">✦ Musuh juga terjatuh selama %D detik.</i>
-            <i index="44" order="0">✦ Kerusakan meningkat menjadi %D kali kekuatan serangan.</i>
+            <i index="44" order="0">✦ Kerusakan meningkat menjadi %D kali kekuatan
+serangan.</i>
             <i index="45" order="">✦ Kerusakan Panah Apollo meningkat drastis.</i>
             <i index="46" order="0">✦ Musuh juga terpana selama %D detik.</i>
             <i index="47" order="0">✦ Semua musuh yang terkena api melambat sebesar %P.</i>
-            <i index="48" order="0">✦ Waktu penggunaan ulang berkurang menjadi %D detik.</i>
+            <i index="48" order="0">✦ Waktu penggunaan ulang berkurang
+menjadi %D detik.</i>
             <i index="49" order="">✦ Kerusakan meningkat drastis.</i>
-            <i index="50" order="0">✦ Waktu penggunaan ulang berkurang menjadi %D detik.</i>
-            <i index="51" order="0">✦ Efek pertahanan Tanpa Gentar meningkat hingga %P.</i>
-            <i index="52" order="0,1">✦ Musuh yang terkena kehilangan %P zirah dan terus melambat selama %D detik.</i>
-            <i index="53" order="0">✦ Kerusakan hantaman meningkat hingga %O kali lipat.</i>
-            <i index="54" order="0">✦ Jumlah penyembuhan tim meningkat hingga %O kali lipat.</i>
-            <i index="55" order="0">✦ Bonus zirah dari perisai meningkat menjadi %P.</i>
-            <i index="56" order="1">✦ Durasi penyembuhan meningkat menjadi %D detik.</i>
-            <i index="57" order="0">✦ Kerusakan Serangan Jahat meningkat hingga %O kali lipat.</i>
-            <i index="58" order="0">✦ Efek penghancuran zirah meningkat menjadi %P.</i>
-            <i index="59" order="0">✦ Kerusakan Pemotong Terbang meningkat hingga %O kali lipat.</i>
-            <i index="60" order="0">✦ Memperlambat gerakan dan mengurangi kecepatan serangan musuh sebesar %P.</i>
-            <i index="61" order="0">✦ Kerusakan Meteor meningkat hingga %O kali lipat.</i>
-            <i index="62" order="0">✦ Kerusakan Kilat meningkat hingga %O kali lipat.</i>
-            <i index="63" order="1">✦ Tembakan Penembus mengabaikan pertahanan musuh hingga %P.</i>
-            <i index="64" order="0">✦ Kerusakan Ledakan Dahsyat meningkat hingga %O kali lipat.</i>
-            <i index="65" order="0,1">✦ Serangan jatuh ditingkatkan dan Penghancur Zirah mengurangi serangan musuh tambahan sebesar %P; efek penghancuran zirah meningkat menjadi %P.</i>
+            <i index="50" order="0">✦ Waktu penggunaan ulang berkurang
+menjadi %D detik.</i>
+            <i index="51" order="0">✦ Efek pertahanan Tanpa Gentar
+meningkat hingga %P.</i>
+            <i index="52" order="0,1">✦ Musuh yang terkena kehilangan %P zirah dan terus melambat selama %D
+detik.</i>
+            <i index="53" order="0">✦ Kerusakan hantaman meningkat
+hingga %O kali lipat.</i>
+            <i index="54" order="0">✦ Jumlah penyembuhan tim meningkat hingga %O
+kali lipat.</i>
+            <i index="55" order="0">✦ Bonus zirah dari perisai
+meningkat menjadi %P.</i>
+            <i index="56" order="1">✦ Durasi penyembuhan meningkat menjadi
+%D detik.</i>
+            <i index="57" order="0">✦ Kerusakan Serangan Jahat meningkat
+hingga %O kali lipat.</i>
+            <i index="58" order="0">✦ Efek penghancuran zirah meningkat
+menjadi %P.</i>
+            <i index="59" order="0">✦ Kerusakan Pemotong Terbang meningkat
+hingga %O kali lipat.</i>
+            <i index="60" order="0">✦ Memperlambat gerakan dan mengurangi kecepatan serangan
+musuh sebesar %P.</i>
+            <i index="61" order="0">✦ Kerusakan Meteor meningkat
+hingga %O kali lipat.</i>
+            <i index="62" order="0">✦ Kerusakan Kilat meningkat hingga
+%O kali lipat.</i>
+            <i index="63" order="1">✦ Tembakan Penembus mengabaikan pertahanan musuh hingga
+%P.</i>
+            <i index="64" order="0">✦ Kerusakan Ledakan Dahsyat
+meningkat hingga %O kali lipat.</i>
+            <i index="65" order="0,1">✦ Serangan jatuh ditingkatkan dan Penghancur Zirah mengurangi serangan
+musuh tambahan sebesar %P; efek penghancuran zirah meningkat menjadi %P.</i>
         </superioractivedescribe>
         
         <gearskill>
-            <i index="1" order="0">✦ Peluang %P untuk menghasilkan kerusakan atau penyembuhan 1,5 kali lipat.</i>
+            <i index="1" order="0">✦ Peluang %P untuk menghasilkan kerusakan atau penyembuhan 1,5 kali
+lipat.</i>
             <i index="2" order="0">✦ Mempercepat pemulihan HP otomatis sebesar %P per detik.</i>
-            <i index="3" order="0">✦ Meningkatkan kecepatan gerak sebesar %P.</i>
-            <i index="4" order="0,2">✦ Saat menyerang, ada peluang %P untuk membuat musuh ketakutan dan kabur selama %D detik.</i>
-            <i index="5" order="0,2">✦ Saat menyerang, ada peluang %P untuk membuat musuh terpana selama %D detik.</i>
-            <i index="6" order="0,2">✦ Saat menyerang, ada peluang %P untuk menjatuhkan musuh selama %D detik.</i>
-            <i index="7" order="0,2">✦ Saat menyerang, ada peluang %P untuk mengubah musuh menjadi alpaka selama %D detik.</i>
-            <i index="8" order="0,1,2">✦ Saat menyerang, ada peluang %P untuk memperlambat musuh sebesar %P selama %D detik.</i>
-            <i index="9" order="0">✦ Seranganmu menyerap nyawa sebesar %P.</i>
-            <i index="10" order="1">✦ Saat menyerang, menimbulkan kerusakan sebesar %P kepada musuh di dekat sasaran.</i>
-            <i index="11" order="0,1">✦ Saat menyerang, ada peluang %P untuk menyambar musuh dengan petir dan menimbulkan kerusakan %P.</i>
-            <i index="12" order="0,1,2">✦ Saat menyembuhkan, ada peluang %P untuk meningkatkan serangan sasaran sebesar %P selama %D detik.</i>
-            <i index="13" order="0,1,2">✦ Saat menyembuhkan, ada peluang %P untuk meningkatkan zirah sasaran sebesar %P selama %D detik.</i>
-            <i index="14" order="0,1">✦ Saat menyembuhkan, ada peluang %P untuk mempercepat perapalan mantra sasaran sebesar %D detik.</i>
-            <i index="15" order="0">✦ Saat menyembuhkan, ada peluang %P untuk membuat semua mantra sasaran siap digunakan.</i>
-            <i index="16" order="0,1">✦ Saat menyembuhkan, ada peluang %P untuk mempercepat perapalan mantramu sendiri sebesar %D detik.</i>
-            <i index="17" order="0">✦ Saat merapal mantra, ada peluang %P untuk langsung dapat menggunakannya kembali.</i>
+            <i index="3" order="0">✦ Meningkatkan kecepatan gerak
+sebesar %P.</i>
+            <i index="4" order="0,2">✦ Saat menyerang, ada peluang %P untuk membuat musuh ketakutan dan kabur
+selama %D detik.</i>
+            <i index="5" order="0,2">✦ Saat menyerang, ada peluang %P untuk membuat musuh terpana
+selama %D detik.</i>
+            <i index="6" order="0,2">✦ Saat menyerang, ada peluang %P untuk menjatuhkan musuh selama %D
+detik.</i>
+            <i index="7" order="0,2">✦ Saat menyerang, ada peluang %P untuk mengubah musuh menjadi alpaka
+selama %D detik.</i>
+            <i index="8" order="0,1,2">✦ Saat menyerang, ada peluang %P untuk memperlambat musuh sebesar %P
+selama %D detik.</i>
+            <i index="9" order="0">✦ Seranganmu menyerap nyawa sebesar
+%P.</i>
+            <i index="10" order="1">✦ Saat menyerang, menimbulkan kerusakan sebesar %P kepada
+musuh di dekat sasaran.</i>
+            <i index="11" order="0,1">✦ Saat menyerang, ada peluang %P untuk menyambar musuh dengan
+petir dan menimbulkan kerusakan %P.</i>
+            <i index="12" order="0,1,2">✦ Saat menyembuhkan, ada peluang %P untuk meningkatkan serangan
+sasaran sebesar %P selama %D detik.</i>
+            <i index="13" order="0,1,2">✦ Saat menyembuhkan, ada peluang %P untuk meningkatkan zirah sasaran
+sebesar %P selama %D detik.</i>
+            <i index="14" order="0,1">✦ Saat menyembuhkan, ada peluang %P untuk mempercepat perapalan mantra
+sasaran sebesar %D detik.</i>
+            <i index="15" order="0">✦ Saat menyembuhkan, ada peluang %P untuk membuat semua mantra
+sasaran siap digunakan.</i>
+            <i index="16" order="0,1">✦ Saat menyembuhkan, ada peluang %P untuk mempercepat perapalan mantramu
+sendiri sebesar %D detik.</i>
+            <i index="17" order="0">✦ Saat merapal mantra, ada peluang %P untuk langsung dapat
+menggunakannya kembali.</i>
             <i index="18" order="0">✦ Saat mengalahkan musuh, pulihkan %P HP milikmu.</i>
-            <i index="19" order="0">✦ Saat diserang, ada peluang %P untuk tidak menerima kerusakan.</i>
-            <i index="20" order="0">✦ Saat diserang, balas dengan kerusakan sebesar %P dari daya serang penyerang.</i>
-            <i index="21" order="0,2">✦ Saat diserang, ada peluang %P untuk membuat penyerang terpana selama %D detik.</i>
+            <i index="19" order="0">✦ Saat diserang, ada peluang %P untuk tidak menerima
+kerusakan.</i>
+            <i index="20" order="0">✦ Saat diserang, balas dengan kerusakan sebesar %P dari daya
+serang penyerang.</i>
+            <i index="21" order="0,2">✦ Saat diserang, ada peluang %P untuk membuat penyerang terpana
+selama %D detik.</i>
             <i index="22" order="0">✦ Menambah HP sebesar %P.</i>
-            <i index="23" order="0">✦ Meningkatkan kekuatan serangan sebesar %P.</i>
-            <i index="24" order="0">✦ Meningkatkan zirah sebesar %P.</i>
-            <i index="25" order="0,1">✦ Saat HP di bawah %P, meningkatkan kekuatan serangan sebesar %P.</i>
-            <i index="26" order="0,1">✦ Saat HP di bawah %P, meningkatkan zirah sebesar %P.</i>
-            <i index="27" order="0">✦ Meningkatkan kecepatan merapal mantra sebesar %P.</i>
-            <i index="28" order="0">✦ Menambah pengalaman yang diperoleh setelah setiap pertarungan sebesar %P.</i>
-            <i index="29" order="0">✦ Menambah emas yang diperoleh setelah setiap pertarungan sebesar %P.</i>
-            <i index="30" order="0">✦ Menambah Kristal yang diperoleh setelah setiap pertarungan sebesar %P.</i>
-            <i index="31" order="0">✦ Meningkatkan kecepatan serangan sebesar %P.</i>
-            <i index="32" order="0">✦ Peluang %P agar hero kebal terhadap efek terpana.</i>
+            <i index="23" order="0">✦ Meningkatkan kekuatan
+serangan sebesar %P.</i>
+            <i index="24" order="0">✦ Meningkatkan zirah
+sebesar %P.</i>
+            <i index="25" order="0,1">✦ Saat HP di bawah %P, meningkatkan kekuatan serangan
+sebesar %P.</i>
+            <i index="26" order="0,1">✦ Saat HP di bawah %P, meningkatkan zirah sebesar
+%P.</i>
+            <i index="27" order="0">✦ Meningkatkan kecepatan
+merapal mantra sebesar %P.</i>
+            <i index="28" order="0">✦ Menambah pengalaman yang diperoleh setelah setiap pertarungan
+sebesar %P.</i>
+            <i index="29" order="0">✦ Menambah emas yang diperoleh setelah setiap pertarungan
+sebesar %P.</i>
+            <i index="30" order="0">✦ Menambah Kristal yang diperoleh setelah setiap
+pertarungan sebesar %P.</i>
+            <i index="31" order="0">✦ Meningkatkan kecepatan
+serangan sebesar %P.</i>
+            <i index="32" order="0">✦ Peluang %P agar hero kebal terhadap efek
+terpana.</i>
             <i index="33" order="0">✦ Peluang %P agar hero kebal terhadap efek jatuh.</i>
-            <i index="34" order="0">✦ Peluang %P agar hero kebal terhadap rasa takut.</i>
-            <i index="35" order="0">✦ Peluang %P agar hero kebal terhadap perubahan menjadi alpaka.</i>
-            <i index="36" order="0,1">✦ Berkah Natal: meningkatkan serangan pemakai sebesar tingkat pembawa x%D dan zirah sebesar tingkat pembawa x%D.</i>
-            <i index="37" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar tingkat pembawa x%D.</i>
-            <i index="38" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar tingkat pembawa x%D.</i>
-            <i index="39" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar tingkat pembawa x%D.</i>
-            <i index="40" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar tingkat pembawa x%D.</i>
-            <i index="41" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar tingkat pembawa x%D.</i>
-            <i index="42" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar tingkat pembawa x%D.</i>
-            <i index="43" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar tingkat pembawa x%D.</i>
-            <i index="44" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar tingkat pembawa x%D.</i>
-            <i index="45" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar tingkat pembawa x%D.</i>
-            <i index="46" order="0">✦ Saat diserang, ada peluang %P untuk mengubah kerusakan serangan itu menjadi pemulihan HP hero.</i>
+            <i index="34" order="0">✦ Peluang %P agar hero kebal terhadap
+rasa takut.</i>
+            <i index="35" order="0">✦ Peluang %P agar hero kebal terhadap perubahan
+menjadi alpaka.</i>
+            <i index="36" order="0,1">✦ Berkah Natal: meningkatkan serangan pemakai sebesar tingkat pembawa
+x%D dan zirah sebesar tingkat pembawa x%D.</i>
+            <i index="37" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar
+tingkat pembawa x%D.</i>
+            <i index="38" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar
+tingkat pembawa x%D.</i>
+            <i index="39" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar
+tingkat pembawa x%D.</i>
+            <i index="40" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar
+tingkat pembawa x%D.</i>
+            <i index="41" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar
+tingkat pembawa x%D.</i>
+            <i index="42" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar
+tingkat pembawa x%D.</i>
+            <i index="43" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar
+tingkat pembawa x%D.</i>
+            <i index="44" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar
+tingkat pembawa x%D.</i>
+            <i index="45" order="0">✦ Berkah Natal: meningkatkan serangan pemakai sebesar
+tingkat pembawa x%D.</i>
+            <i index="46" order="0">✦ Saat diserang, ada peluang %P untuk mengubah kerusakan serangan itu
+menjadi pemulihan HP hero.</i>
             
-            <i index="47" order="0,1">✦ Meningkatkan serangan pemakai sebanyak %d tingkat dan zirah pemakai sebanyak %d tingkat.</i>
-            <i index="48" order="0">✦ Meningkatkan kekuatan serangan pemakai.</i>
-            <i index="49" order="0">✦ Meningkatkan kekuatan serangan pemakai.</i>
-            <i index="50" order="0">✦ Meningkatkan kekuatan serangan pemakai.</i>
-            <i index="51" order="0">✦ Meningkatkan kekuatan serangan pemakai.</i>
-            <i index="52" order="0">✦ Meningkatkan kekuatan serangan pemakai.</i>
-            <i index="53" order="0">✦ Meningkatkan kekuatan serangan pemakai.</i>
+            <i index="47" order="0,1">✦ Meningkatkan serangan pemakai sebanyak %d tingkat dan zirah pemakai
+sebanyak %d tingkat.</i>
+            <i index="48" order="0">✦ Meningkatkan kekuatan serangan
+pemakai.</i>
+            <i index="49" order="0">✦ Meningkatkan kekuatan serangan
+pemakai.</i>
+            <i index="50" order="0">✦ Meningkatkan kekuatan serangan
+pemakai.</i>
+            <i index="51" order="0">✦ Meningkatkan kekuatan serangan
+pemakai.</i>
+            <i index="52" order="0">✦ Meningkatkan kekuatan serangan
+pemakai.</i>
+            <i index="53" order="0">✦ Meningkatkan kekuatan serangan
+pemakai.</i>
             
-            <i index="54" order="0,1,2,3">✦ Meningkatkan zirah. Saat terluka, ada peluang %P untuk meningkatkan zirah sebesar %P selama %D detik. Efek dapat ditumpuk.</i>
-            <i index="55" order="0,1,2,3">✦ Meningkatkan zirah. Saat terluka, ada peluang %P untuk meningkatkan serangan sebesar %P selama % D detik. Efek dapat ditumpuk.</i>
-            <i index="56" order="0,1,2,3,4">✦ Meningkatkan zirah. Saat terluka, ada peluang %P untuk meningkatkan kecepatan gerak sebesar %P dan kecepatan serang sebesar %P selama %D detik. Efek dapat ditumpuk.</i>
-            <i index="57" order="0,1,2">✦ Meningkatkan serangan %P, zirah %P, dan darah/HP %P.</i>
+            <i index="54" order="0,1,2,3">✦ Meningkatkan zirah. Saat terluka, ada peluang %P untuk meningkatkan
+zirah sebesar %P selama %D detik. Efek dapat ditumpuk.</i>
+            <i index="55" order="0,1,2,3">✦ Meningkatkan zirah. Saat terluka, ada peluang %P untuk meningkatkan
+serangan sebesar %P selama % D detik. Efek dapat ditumpuk.</i>
+            <i index="56" order="0,1,2,3,4">✦ Meningkatkan zirah. Saat terluka, ada peluang %P untuk
+meningkatkan kecepatan gerak sebesar %P dan kecepatan serang sebesar
+%P selama %D detik. Efek dapat ditumpuk.</i>
+            <i index="57" order="0,1,2">✦ Meningkatkan serangan %P, zirah %P,
+dan darah/HP %P.</i>
         </gearskill>
         
         <cardskill>
-            <i index="1" order="0,1,2">Memunculkan duri es tajam di bawah kaki musuh, melukai semua musuh di area jangkauan (faktor kerusakan: %P). Memperlambat sebesar %P selama %D detik.</i>
-            <i index="2" order="0">Memanggil sulur mematikan dari atas. HP 3 musuh acak berkurang sebesar %P.</i>
-            <i index="3" order="0">Mengelilingi unitmu dengan ledakan energi yang melukai musuh di dekatnya (faktor kerusakan: %P).</i>
-            <i index="4" order="0,1">Menimbulkan kerusakan kepada satu musuh (faktor kerusakan: %P); jika HP musuh di bawah %P, musuh langsung dikalahkan.</i>
-            <i index="5" order="1">Membebaskan hero dari takut, pusing, jatuh, atau perubahan menjadi alpaka selama %D detik.</i>
-            <i index="6" order="1,0">Mengurangi kemampuan penyembuhan musuh sebesar %P selama %D detik.</i>
-            <i index="7" order="0">Semua serangan dan penyembuhan selama %D detik menjadi serangan kritis.</i>
-            <i index="8" order="0">Memanggil Morocyclops (faktor kekuatan: %P). Ia terus menyerang sampai dikalahkan. Maksimal satu Morocyclops pada satu waktu.</i>
-            <i index="9" order="0">Hero musuh tidak dapat menggunakan skill selama %D detik.</i>
-            <i index="10" order="0">Menahan musuh dengan tanaman pemakan manusia. Musuh yang terperangkap tidak dapat bergerak atau menyerang selama %D detik.</i>
-            <i index="11" order="0">Menciptakan perisai angin selama %D detik. Penyerang di dekatnya akan terpental.</i>
-            <i index="12" order="1,0">Menciptakan medan magnet yang menarik musuh di sekitar menuju seorang hero dan mengurangi zirah mereka sebesar %P selama %D detik.</i>
-            <i index="13" order="0,1">Memanggil peri untuk membantu menyembuhkan hero selama %D detik (faktor penyembuhan: %P).</i>
-            <i index="14" order="0,3">Memanggil totem petir (faktor kekuatan: %P). Totem terus menyerang sampai dihancurkan; maksimal %D totem.</i>
-            <i index="15" order="0,2">Memanggil tim juara untuk melukai musuh (faktor kerusakan: %P) dan menjatuhkan mereka selama %D detik.</i>
-            <i index="16" order="0,1">Memanggil totem haus darah selama %D detik untuk meningkatkan kecepatan serangan hero sebesar %P.</i>
+            <i index="1" order="0,1,2">Memunculkan duri es tajam di bawah kaki musuh, melukai semua musuh di
+area jangkauan (faktor kerusakan: %P). Memperlambat sebesar %P selama %D
+detik.</i>
+            <i index="2" order="0">Memanggil sulur mematikan dari atas. HP 3 musuh acak berkurang sebesar
+%P.</i>
+            <i index="3" order="0">Mengelilingi unitmu dengan ledakan energi yang melukai musuh di dekatnya
+(faktor kerusakan: %P).</i>
+            <i index="4" order="0,1">Menimbulkan kerusakan kepada satu musuh (faktor kerusakan: %P); jika HP
+musuh di bawah %P, musuh langsung dikalahkan.</i>
+            <i index="5" order="1">Membebaskan hero dari takut, pusing, jatuh, atau perubahan menjadi
+alpaka selama %D detik.</i>
+            <i index="6" order="1,0">Mengurangi kemampuan penyembuhan musuh sebesar %P
+selama %D detik.</i>
+            <i index="7" order="0">Semua serangan dan penyembuhan selama %D detik menjadi serangan
+kritis.</i>
+            <i index="8" order="0">Memanggil Morocyclops (faktor kekuatan: %P). Ia terus menyerang sampai
+dikalahkan. Maksimal satu Morocyclops pada satu waktu.</i>
+            <i index="9" order="0">Hero musuh tidak dapat menggunakan skill selama
+%D detik.</i>
+            <i index="10" order="0">Menahan musuh dengan tanaman pemakan manusia. Musuh yang terperangkap
+tidak dapat bergerak atau menyerang selama %D detik.</i>
+            <i index="11" order="0">Menciptakan perisai angin selama %D detik. Penyerang di dekatnya akan
+terpental.</i>
+            <i index="12" order="1,0">Menciptakan medan magnet yang menarik musuh di sekitar menuju seorang
+hero dan mengurangi zirah mereka sebesar %P selama %D detik.</i>
+            <i index="13" order="0,1">Memanggil peri untuk membantu menyembuhkan hero selama %D detik (faktor
+penyembuhan: %P).</i>
+            <i index="14" order="0,3">Memanggil totem petir (faktor kekuatan: %P). Totem terus menyerang
+sampai dihancurkan; maksimal %D totem.</i>
+            <i index="15" order="0,2">Memanggil tim juara untuk melukai musuh (faktor kerusakan: %P) dan
+menjatuhkan mereka selama %D detik.</i>
+            <i index="16" order="0,1">Memanggil totem haus darah selama %D detik untuk meningkatkan kecepatan
+serangan hero sebesar %P.</i>
             <i index="17" order="0">Mencegah lawan memainkan kartu selama %D detik.</i>
-            <i index="18" order="0,1">Langsung mendapatkan %D kartu baru dengan peluang %P untuk mendapat kartu bonus.</i>
-            <i index="19" order="0">Membuat lawan kehilangan 1 kartu; ada peluang %P agar semua kartunya hilang.</i>
+            <i index="18" order="0,1">Langsung mendapatkan %D kartu baru dengan peluang %P untuk
+mendapat kartu bonus.</i>
+            <i index="19" order="0">Membuat lawan kehilangan 1 kartu; ada peluang %P agar semua kartunya
+hilang.</i>
             <i index="20" order="1">Mencuri kartu lawan dengan peluang %P untuk memperoleh kartu bonus.</i>
         </cardskill>
     </skill>
@@ -1009,14 +1400,16 @@ Pilih tahap untuk disapu!</i>
         <i index="2">Paladin Sir Potato</i>
         <i index="3">Berserker Crazy Hands</i>
         <i index="4">Imam Daisy</i>
-        <i index="5">Pendeta Agung Mother Superior</i>
+        <i index="5">Pendeta Agung Mother
+Superior</i>
         <i index="6">Uskup Halo Haley</i>
         <i index="7">Pencuri Jacob</i>
         <i index="8">Pembunuh Marcus</i>
         <i index="9">Penjahat Scar</i>
         <i index="10">Master Sophia</i>
         <i index="11">Master Cahaya Winky</i>
-        <i index="12">Penyihir Kegelapan Sianoid</i>
+        <i index="12">Penyihir Kegelapan
+Sianoid</i>
         <i index="13">Penembak Jitu Bran</i>
         <i index="14">Ranger Sang Pawang</i>
         <i index="15">Musketeer Gerilya</i>
@@ -1041,35 +1434,56 @@ Pilih tahap untuk disapu!</i>
     </heronameOnly>
     
     <herodescribe>
-        <i index="1">Eric dahulu adalah komandan Pengawal Kerajaan. Para prajurit mengenalnya karena selalu bergegas menuju tempat yang paling berbahaya.
+        <i index="1">Eric dahulu adalah komandan Pengawal Kerajaan. Para prajurit
+mengenalnya karena selalu bergegas menuju tempat yang paling berbahaya.
 “Setiap goblin yang kubasmi berarti satu sekutu terselamatkan!”</i>
-        <i index="2">Kekuatan Sir Potato bukan berasal dari tubuh, melainkan dari keyakinan. Hubungannya dengan kuasa ilahi memungkinkannya melindungi sekutu dan menjatuhkan hukuman kepada musuh.
-“Keadilan bukan tentang apa yang kau inginkan, tetapi tentang apa yang benar.”</i>
-        <i index="3">Belati beterbangan dari kedua tangannya dan meninggalkan luka lebih dari sekadar goresan! Saat terluka, Crazy Hands menjadi semakin ganas dengan daya serang yang mengerikan.
+        <i index="2">Kekuatan Sir Potato bukan berasal dari tubuh, melainkan dari keyakinan.
+Hubungannya dengan kuasa ilahi memungkinkannya melindungi sekutu dan
+menjatuhkan hukuman kepada musuh.
+“Keadilan bukan tentang apa yang kau inginkan, tetapi tentang apa yang
+benar.”</i>
+        <i index="3">Belati beterbangan dari kedua tangannya dan meninggalkan luka lebih dari
+sekadar goresan! Saat terluka, Crazy Hands menjadi semakin ganas dengan
+daya serang yang mengerikan.
 “Kau belum benar-benar hidup jika belum pernah terluka!”</i>
-        <i index="4">Suster Daisy adalah biarawati misionaris di garis depan. Ia ahli merawat dan mendukung sekutu yang terluka.
+        <i index="4">Suster Daisy adalah biarawati misionaris di garis depan. Ia ahli merawat
+dan mendukung sekutu yang terluka.
 “Aku tidak lahir kemarin; aku lahir kembali kemarin!” — Daisy</i>
-        <i index="5">Tugas imam adalah menyembuhkan yang sakit, tetapi Mother Superior mampu menghidupkan kembali hero yang gugur agar dapat bertempur lagi.
+        <i index="5">Tugas imam adalah menyembuhkan yang sakit, tetapi Mother Superior mampu
+menghidupkan kembali hero yang gugur agar dapat bertempur lagi.
 “Jangan sentuh aku!” — Mother Superior</i>
-        <i index="6">Halo Haley menggunakan cahaya untuk memperkuat kemampuan hero. Ia menciptakan peluang bagi sekutu dalam pertempuran dan memanggil bantuan malaikat saat dibutuhkan.
+        <i index="6">Halo Haley menggunakan cahaya untuk memperkuat kemampuan hero. Ia
+menciptakan peluang bagi sekutu dalam pertempuran dan memanggil bantuan
+malaikat saat dibutuhkan.
 “Cahaya dunia adalah hati manusia!” — Halo Haley</i>
-        <i index="7">Jacob adalah pencuri lincah dengan serangan eksplosif yang patut diwaspadai. Ia menyukai segala sesuatu yang berkilau seperti emas.
+        <i index="7">Jacob adalah pencuri lincah dengan serangan eksplosif yang patut
+diwaspadai. Ia menyukai segala sesuatu yang berkilau seperti emas.
 “Uang membuat hati semakin terpikat!” — Jacob si Pencuri</i>
-        <i index="8">Bersembunyi dalam bayangan, Marcus melancarkan serangan mematikan kepada musuh yang lengah. Serangannya dari kegelapan menebar ketakutan.
+        <i index="8">Bersembunyi dalam bayangan, Marcus melancarkan serangan mematikan
+kepada musuh yang lengah. Serangannya dari kegelapan menebar
+ketakutan.
 “Kau bahkan tidak menyadari potongan rambut baruku, kan?” — Marcus</i>
-        <i index="9">Scar mampu menyerang banyak musuh sekaligus. Ia mengumpulkan poin tempur lalu melepaskannya untuk menghasilkan kerusakan besar.
+        <i index="9">Scar mampu menyerang banyak musuh sekaligus. Ia mengumpulkan poin tempur
+lalu melepaskannya untuk menghasilkan kerusakan besar.
 “Pisauku sudah berada di punggungmu.” — Scar</i>
-        <i index="10">Di balik topinya terdapat lambang berbentuk kilat di dahinya. Saat kecil, ia dikirim untuk mempelajari ilmu sihir.
+        <i index="10">Di balik topinya terdapat lambang berbentuk kilat di dahinya. Saat
+kecil, ia dikirim untuk mempelajari ilmu sihir.
 “Perenungan akan memberimu jawaban yang kau cari.” — Master Sophia</i>
-        <i index="11">Penguasaan mantra Winky memungkinkannya memberi kerusakan besar kepada banyak musuh sekaligus. Ia juga dapat membuat musuh kuat kehilangan daya.
+        <i index="11">Penguasaan mantra Winky memungkinkannya memberi kerusakan besar kepada
+banyak musuh sekaligus. Ia juga dapat membuat musuh kuat kehilangan
+daya.
 “Aku datang, lalu menghilang.” — Winky</i>
         <i index="12">Ahli sihir gelap ini gemar menyiksa dan melahap musuhnya.
 “Bergabunglah dengan sisi gelap.” — Sianoid</i>
-        <i index="13">Bran adalah pemburu terampil yang dapat mengenai sasaran jauh dengan busurnya.
+        <i index="13">Bran adalah pemburu terampil yang dapat mengenai sasaran jauh dengan
+busurnya.
 “Ada yang salah dengan panah itu!” — Bran</i>
-        <i index="14">Pawang ini ahli melukai musuh jarak jauh dengan tembakan yang terlalu cepat untuk dilihat. Anjingnya pun ganas dan kejam.
-“Jika aku sedang baik hati, titik tengah sasaran adalah kepalamu.” — Sang Pawang</i>
-        <i index="15">Prajurit gerilya ini menyerang dari jauh dengan kemampuan menembak legendaris. Ia mahir menggunakan berbagai senjata api dan amunisi.
+        <i index="14">Pawang ini ahli melukai musuh jarak jauh dengan tembakan yang terlalu
+cepat untuk dilihat. Anjingnya pun ganas dan kejam.
+“Jika aku sedang baik hati, titik tengah sasaran adalah kepalamu.” —
+Sang Pawang</i>
+        <i index="15">Prajurit gerilya ini menyerang dari jauh dengan kemampuan menembak
+legendaris. Ia mahir menggunakan berbagai senjata api dan amunisi.
 “Peluru tak punya mata.” — Gerilya</i>
     </herodescribe>
     
@@ -1176,86 +1590,126 @@ Pilih tahap untuk disapu!</i>
     </passiveskillname>
     
     <superioractivename>
-        <i index="1">Peningkatan Cahaya Surgawi</i>
-        <i index="2">Peningkatan Hentakan Perang</i>
-        <i index="3">Peningkatan Penghakiman Ilahi</i>
-        <i index="4">Peningkatan Hantaman Perisai</i>
+        <i index="1">Peningkatan Cahaya
+Surgawi</i>
+        <i index="2">Peningkatan Hentakan
+Perang</i>
+        <i index="3">Peningkatan Penghakiman
+Ilahi</i>
+        <i index="4">Peningkatan Hantaman
+Perisai</i>
         <i index="5">Peningkatan Perisai Suci</i>
         <i index="6">Peningkatan Amukan</i>
-        <i index="7">Peningkatan Lompatan Liar</i>
+        <i index="7">Peningkatan Lompatan
+Liar</i>
         <i index="8">Peningkatan Auman Singa</i>
         <i index="9">Peningkatan Angin Puyuh</i>
-        <i index="10">Peningkatan Lepaskan Amarah</i>
+        <i index="10">Peningkatan Lepaskan
+Amarah</i>
         <i index="11">Peningkatan Keselamatan</i>
-        <i index="12">Peningkatan Pengumpulan Jiwa</i>
+        <i index="12">Peningkatan Pengumpulan
+Jiwa</i>
         <i index="13">Peningkatan Tebusan</i>
-        <i index="14">Peningkatan Wujud Malaikat</i>
+        <i index="14">Peningkatan Wujud
+Malaikat</i>
         <i index="15">Peningkatan Kebangkitan</i>
-        <i index="16">Peningkatan Aura Keberanian</i>
+        <i index="16">Peningkatan Aura
+Keberanian</i>
         <i index="17">Peningkatan Aura Berkah</i>
-        <i index="18">Peningkatan Aura Keteguhan</i>
-        <i index="19">Peningkatan Aura Kelincahan</i>
-        <i index="20">Peningkatan Malaikat Pelindung</i>
+        <i index="18">Peningkatan Aura
+Keteguhan</i>
+        <i index="19">Peningkatan Aura
+Kelincahan</i>
+        <i index="20">Peningkatan Malaikat
+Pelindung</i>
         <i index="21">Peningkatan Menghilang</i>
-        <i index="22">Peningkatan Sayatan Akurat</i>
-        <i index="23">Peningkatan Sayat Tenggorokan</i>
-        <i index="24">Peningkatan Pembunuhan Senyap</i>
+        <i index="22">Peningkatan Sayatan
+Akurat</i>
+        <i index="23">Peningkatan Sayat
+Tenggorokan</i>
+        <i index="24">Peningkatan Pembunuhan
+Senyap</i>
         <i index="25">Peningkatan Amukan Darah</i>
-        <i index="26">Peningkatan Pedang Bayangan</i>
+        <i index="26">Peningkatan Pedang
+Bayangan</i>
         <i index="27">Peningkatan Peruntuh</i>
-        <i index="28">Peningkatan Penghancur Zirah</i>
-        <i index="29">Peningkatan Serangan Bayangan</i>
-        <i index="30">Peningkatan Pedang Pengisap Darah</i>
+        <i index="28">Peningkatan Penghancur
+Zirah</i>
+        <i index="29">Peningkatan Serangan
+Bayangan</i>
+        <i index="30">Peningkatan Pedang
+Pengisap Darah</i>
         <i index="31">Peningkatan Kulit Batu</i>
         <i index="32">Peningkatan Naga Api</i>
         <i index="33">Peningkatan Nova Es</i>
-        <i index="34">Peningkatan Ledakan Badai</i>
-        <i index="35">Peningkatan Kecerdasan Gaib</i>
+        <i index="34">Peningkatan Ledakan
+Badai</i>
+        <i index="35">Peningkatan Kecerdasan
+Gaib</i>
         <i index="36">Peningkatan Daya Tahan Vampir</i>
-        <i index="37">Peningkatan Ubah Jadi Alpaka</i>
+        <i index="37">Peningkatan Ubah Jadi
+Alpaka</i>
         <i index="38">Peningkatan Wabah</i>
         <i index="39">Peningkatan Penuaan</i>
-        <i index="40">Peningkatan Bola Kematian</i>
+        <i index="40">Peningkatan Bola
+Kematian</i>
         <i index="41">Peningkatan Panah Es</i>
-        <i index="42">Peningkatan Panah Beracun</i>
-        <i index="43">Peningkatan Panah Peledak</i>
+        <i index="42">Peningkatan Panah
+Beracun</i>
+        <i index="43">Peningkatan Panah
+Peledak</i>
         <i index="44">Peningkatan Hujan Panah</i>
         <i index="45">Peningkatan Panah Apollo</i>
-        <i index="46">Peningkatan Tembakan Tiga Kali</i>
-        <i index="47">Peningkatan Amunisi Pembakar</i>
+        <i index="46">Peningkatan Tembakan
+Tiga Kali</i>
+        <i index="47">Peningkatan Amunisi
+Pembakar</i>
         <i index="48">Peningkatan Granat</i>
-        <i index="49">Peningkatan Senapan Gentel</i>
+        <i index="49">Peningkatan Senapan
+Gentel</i>
         <i index="50">Peningkatan Isi Ulang</i>
         <i index="51">Peningkatan Tanpa Gentar</i>
         <i index="52">Peningkatan Ejekan</i>
         <i index="53">Peningkatan Hantaman</i>
-        <i index="54">Peningkatan Penyembuhan Tim</i>
+        <i index="54">Peningkatan Penyembuhan
+Tim</i>
         <i index="55">Peningkatan Perisai</i>
         <i index="56">Peningkatan Pemulihan</i>
-        <i index="57">Peningkatan Serangan Jahat</i>
-        <i index="58">Peningkatan Penghancur Zirah</i>
-        <i index="59">Peningkatan Pemotong Terbang</i>
+        <i index="57">Peningkatan Serangan
+Jahat</i>
+        <i index="58">Peningkatan Penghancur
+Zirah</i>
+        <i index="59">Peningkatan Pemotong
+Terbang</i>
         <i index="60">Peningkatan Sambaran Es</i>
         <i index="61">Peningkatan Meteor</i>
         <i index="62">Peningkatan Kilat</i>
         <i index="63">Peningkatan Tembakan Penembus</i>
-        <i index="64">Peningkatan Ledakan Dahsyat</i>
-        <i index="65">Peningkatan Serangan Jatuh dan Penghancur Zirah</i>
+        <i index="64">Peningkatan Ledakan
+Dahsyat</i>
+        <i index="65">Peningkatan Serangan
+Jatuh dan Penghancur
+Zirah</i>
     </superioractivename>
     
     <gearname>
         <i index="1">Pedang lebar berkarat</i>
         <i index="2">Pedang lebar beralur</i>
         <i index="3">Pedang falchion</i>
-        <i index="4">Pedang falchion berkualitas baja</i>
-        <i index="5">Pedang dan perisai tempa Avalon</i>
-        <i index="6">Pedang dan perisai tempa Camelot</i>
+        <i index="4">Pedang falchion
+berkualitas baja</i>
+        <i index="5">Pedang dan perisai tempa
+Avalon</i>
+        <i index="6">Pedang dan perisai tempa
+Camelot</i>
         <i index="7">Persenjataan Ksatria Hijau</i>
-        <i index="8">Pedang dan perisai Esclados</i>
+        <i index="8">Pedang dan perisai
+Esclados</i>
         <i index="9">Pedang dan perisai Esclabor</i>
         <i index="10">Senjata Sir Erec</i>
         <i index="11">Senjata Sir Dinadan</i>
-        <i index="12">Senjata terkutuk Sir Balan</i>
+        <i index="12">Senjata terkutuk Sir
+Balan</i>
         <i index="13">Senjata Sir Gawaine</i>
         <i index="14">Senjata Sir Ector</i>
         <i index="15">Senjata Sir Lamorak</i>
@@ -1289,24 +1743,33 @@ Pilih tahap untuk disapu!</i>
         <i index="43">Tongkat kayu alder</i>
         <i index="44">Tongkat kayu rambat</i>
         <i index="45">Tongkat sihir Akolit</i>
-        <i index="46">Tongkat sihir Akolit Agung</i>
+        <i index="46">Tongkat sihir Akolit
+Agung</i>
         <i index="47">Tongkat sihir kayu ek</i>
         <i index="48">Bibit Pohon Abadi</i>
-        <i index="49">Tongkat sihir penghormatan</i>
+        <i index="49">Tongkat sihir
+penghormatan</i>
         <i index="50">Tongkat sihir peralihan</i>
-        <i index="51">Tongkat sihir sempurna zaman kuno</i>
-        <i index="52">Tongkat Sihir Misterius yang Terdistorsi</i>
+        <i index="51">Tongkat sihir sempurna
+zaman kuno</i>
+        <i index="52">Tongkat Sihir Misterius
+yang Terdistorsi</i>
         <i index="53">Permata Darah Martir</i>
-        <i index="54">Bola sihir perkembangbiakan</i>
+        <i index="54">Bola sihir
+perkembangbiakan</i>
         <i index="55">Tongkat Sihir Deva</i>
         <i index="56">Tombak Penghakiman Ilahi</i>
-        <i index="57">Tongkat Kerajaan yang Dipuja</i>
+        <i index="57">Tongkat Kerajaan yang
+Dipuja</i>
         <i index="58">Pemulih Keseimbangan Bumi</i>
-        <i index="59">Tongkat sihir surgawi pancaran</i>
-        <i index="60">Tongkat sihir Malaikat Agung Michael</i>
+        <i index="59">Tongkat sihir surgawi
+pancaran</i>
+        <i index="60">Tongkat sihir Malaikat
+Agung Michael</i>
         <i index="61">Pembawa terakhir bulan</i>
         <i index="62">Batu Cahaya Spiritual</i>
-        <i index="63">Tongkat kerajaan Uther Pendragon</i>
+        <i index="63">Tongkat kerajaan Uther
+Pendragon</i>
         <i index="64">Pelindung Orang Benar</i>
         <i index="65">Utusan Tuhan</i>
         <i index="66">Senjata galah suci</i>
@@ -1320,14 +1783,17 @@ Pilih tahap untuk disapu!</i>
         <i index="74">Illuminas</i>
         <i index="75">Tongkat Penebusan</i>
         <i index="76">Jimat Bunda Perawan</i>
-        <i index="77">Tongkat uskup suci cahaya</i>
+        <i index="77">Tongkat uskup suci
+cahaya</i>
         <i index="78">Exorsiser</i>
         <i index="79">Bola sihir pengampunan</i>
         <i index="80">Virga kebebasan</i>
         <i index="81">Penyalib</i>
         <i index="82">Smokey</i>
-        <i index="83">Tongkat sihir agung Gabriel</i>
-        <i index="84">Tongkat sihir agung ilahi intervention</i>
+        <i index="83">Tongkat sihir agung
+Gabriel</i>
+        <i index="84">Tongkat sihir agung ilahi
+intervention</i>
         <i index="85">Belati berkarat besi</i>
         <i index="86">Belati berkualitas besi</i>
         <i index="87">Belati baja</i>
@@ -1347,7 +1813,8 @@ Pilih tahap untuk disapu!</i>
         <i index="101">Bilah Misteri Jiwa</i>
         <i index="102">Bilah beracun keenness</i>
         <i index="103">Belati Viking</i>
-        <i index="104">Belati Pengawal Kerajaan Kuno</i>
+        <i index="104">Belati Pengawal Kerajaan
+Kuno</i>
         <i index="105">Belati agony</i>
         <i index="106">Gigitan Es</i>
         <i index="107">Carnwennan</i>
@@ -1370,27 +1837,36 @@ Pilih tahap untuk disapu!</i>
         <i index="124">Bilah Pemburu Iblis Kuno</i>
         <i index="125">Haus Darah</i>
         <i index="126">Cakar Ascalon</i>
-        <i index="127">Tongkat Sihir Kayu Terpilin</i>
-        <i index="128">Tongkat sihir terpesona kayu</i>
+        <i index="127">Tongkat Sihir Kayu
+Terpilin</i>
+        <i index="128">Tongkat sihir terpesona
+kayu</i>
         <i index="129">Kayu ek lilitan</i>
         <i index="130">Dryad kayu ek lilitan</i>
-        <i index="131">Tongkat sihir Morgan Le Fay</i>
+        <i index="131">Tongkat sihir Morgan Le
+Fay</i>
         <i index="132">Halberd badai</i>
-        <i index="133">Tongkat sihir agung keberanian</i>
+        <i index="133">Tongkat sihir agung
+keberanian</i>
         <i index="134">Battlestaff pemanggilan</i>
         <i index="135">Tongkat sihir batu rune</i>
-        <i index="136">Tongkat sihir hilang kitab</i>
-        <i index="137">Tongkat sihir Permata Badai</i>
+        <i index="136">Tongkat sihir hilang
+kitab</i>
+        <i index="137">Tongkat sihir Permata
+Badai</i>
         <i index="138">Tangan holi treeman</i>
         <i index="139">Bident petir</i>
-        <i index="140">Tongkat sihir gaib pemanggilan</i>
+        <i index="140">Tongkat sihir gaib
+pemanggilan</i>
         <i index="141">Triton</i>
         <i index="142">Tongkat Hellawes</i>
-        <i index="143">Tongkat sihir agung ramalan</i>
+        <i index="143">Tongkat sihir agung
+ramalan</i>
         <i index="144">Benteng pengetahuan</i>
         <i index="145">Halbard api</i>
         <i index="146">Way Tao</i>
-        <i index="147">Tongkat matahari pembakaran</i>
+        <i index="147">Tongkat matahari
+pembakaran</i>
         <i index="148">Tongkat sihir Taurus</i>
         <i index="149">Panji St. George</i>
         <i index="150">Tongkat Ular</i>
@@ -1411,7 +1887,8 @@ Pilih tahap untuk disapu!</i>
         <i index="165">Tongkat sihir gigi naga</i>
         <i index="166">Pertanda sampar</i>
         <i index="167">Duri sabit matahari</i>
-        <i index="168">Tongkat sihir tiada akhir kegelapan</i>
+        <i index="168">Tongkat sihir tiada akhir
+kegelapan</i>
         <i index="169">Busur panjang</i>
         <i index="170">Busur Panjang Kayu Yew</i>
         <i index="171">Busur busur lengkung</i>
@@ -1422,21 +1899,25 @@ Pilih tahap untuk disapu!</i>
         <i index="176">Busur Akurasi</i>
         <i index="177">Busur Kepala Suku Makya</i>
         <i index="178">Busur Aconite Iblis</i>
-        <i index="179">Busur Berzirah dari Kayu Ash Berurat</i>
+        <i index="179">Busur Berzirah dari Kayu
+Ash Berurat</i>
         <i index="180">Busur Pembasmi Naga</i>
         <i index="181">Busur Tajam Buatan Ahli</i>
         <i index="182">Busur Majemuk Pembalasan</i>
         <i index="183">Busur Berbilah Teucer</i>
-        <i index="184">Busur legendaris keberanian</i>
+        <i index="184">Busur legendaris
+keberanian</i>
         <i index="185">Hujan Baja</i>
         <i index="186">Busur Panjang Hero</i>
         <i index="187">Busur Agung Kehancuran</i>
         <i index="188">Murka Apollo</i>
-        <i index="189">Busur Penguasa Tinggi Elf Gelap</i>
+        <i index="189">Busur Penguasa Tinggi Elf
+Gelap</i>
         <i index="190">Pelontar Maut</i>
         <i index="191">Tulang Satan</i>
         <i index="192">Senapan gentel kuno</i>
-        <i index="193">Senapan gentel sumbu batu</i>
+        <i index="193">Senapan gentel sumbu
+batu</i>
         <i index="194">Senapan Coach</i>
         <i index="195">Senapan musket peluru</i>
         <i index="196">Enfield</i>
@@ -1444,7 +1925,8 @@ Pilih tahap untuk disapu!</i>
         <i index="198">Senapan kecil</i>
         <i index="199">Senapan kecil peluru</i>
         <i index="200">Blaster Multitembak</i>
-        <i index="201">Senapan laras panjang Sharps</i>
+        <i index="201">Senapan laras panjang
+Sharps</i>
         <i index="202">Charleville</i>
         <i index="203">Berbidik Winchester</i>
         <i index="204">Pembakar Timah</i>
@@ -1454,18 +1936,27 @@ Pilih tahap untuk disapu!</i>
         <i index="208">Senapan Gentel Agung</i>
         <i index="209">Blaster Guntur</i>
         <i index="210">Blaster Kolosal</i>
-        <i index="211">Kopiah baja besi bertanduk</i>
-        <i index="212">Kopiah baja besi berjambul</i>
-        <i index="213">Kopiah baja diperkuat baja</i>
-        <i index="214">Helm barbuta baja bertanduk</i>
-        <i index="215">Helm barbuta bersepuh emas bertanduk</i>
+        <i index="211">Kopiah baja besi
+bertanduk</i>
+        <i index="212">Kopiah baja besi
+berjambul</i>
+        <i index="213">Kopiah baja diperkuat
+baja</i>
+        <i index="214">Helm barbuta baja
+bertanduk</i>
+        <i index="215">Helm barbuta bersepuh
+emas bertanduk</i>
         <i index="216">Helm Kesatria Baja</i>
-        <i index="217">Helm Kesatria Baja yang Diperkeras</i>
+        <i index="217">Helm Kesatria Baja yang
+Diperkeras</i>
         <i index="218">Helm Agung Sir Lucan</i>
-        <i index="219">Baja helm sallet dengan pelindung wajah</i>
-        <i index="220">Helm Sallet Baja Diperkeras dengan Pelindung Wajah</i>
+        <i index="219">Baja helm sallet dengan
+pelindung wajah</i>
+        <i index="220">Helm Sallet Baja Diperkeras
+dengan Pelindung Wajah</i>
         <i index="221">Helm barbuta Viking</i>
-        <i index="222">Helm Barbuta Kapten Viking</i>
+        <i index="222">Helm Barbuta Kapten
+Viking</i>
         <i index="223">Helm bersayap juara</i>
         <i index="224">Helm bersayap Uncle Dap</i>
         <i index="225">Ikat kepala kain</i>
@@ -1473,14 +1964,21 @@ Pilih tahap untuk disapu!</i>
         <i index="227">Tudung gunung serigala</i>
         <i index="228">Tudung hutan serigala</i>
         <i index="229">Topi Stetson dari Suede</i>
-        <i index="230">Topi Stetson yang Disamak Krom</i>
-        <i index="231">Topeng setengah wajah dari kulit</i>
-        <i index="232">Topeng setengah wajah dari kulit Tough</i>
-        <i index="233">Diperkuat kulit setengah face fask</i>
-        <i index="234">Topeng setengah wajah Inpenetrable</i>
-        <i index="235">Topi topi tricorne Soldiers</i>
+        <i index="230">Topi Stetson yang
+Disamak Krom</i>
+        <i index="231">Topeng setengah wajah
+dari kulit</i>
+        <i index="232">Topeng setengah wajah dari
+kulit Tough</i>
+        <i index="233">Diperkuat kulit setengah face
+fask</i>
+        <i index="234">Topeng setengah wajah
+Inpenetrable</i>
+        <i index="235">Topi topi tricorne
+Soldiers</i>
         <i index="236">Topi mewah topi tricorne</i>
-        <i index="237">Topeng bersepuh emas intimidasi</i>
+        <i index="237">Topeng bersepuh emas
+intimidasi</i>
         <i index="238">Topeng ketakutan</i>
         <i index="239">Tudung kain</i>
         <i index="240">Tudung kulit</i>
@@ -1489,7 +1987,8 @@ Pilih tahap untuk disapu!</i>
         <i index="243">Topi Runcing Satin</i>
         <i index="244">Topi Runcing Penyihir</i>
         <i index="245">Mahkota kecil rubi</i>
-        <i index="246">Mahkota kecil ketiga mata</i>
+        <i index="246">Mahkota kecil ketiga
+mata</i>
         <i index="247">Mitra pemujaan</i>
         <i index="248">Mitra kemurnian</i>
         <i index="249">Tudung misterius bersulam</i>
@@ -1498,44 +1997,71 @@ Pilih tahap untuk disapu!</i>
         <i index="252">Hiasan Kepala Elemental Bumi</i>
         <i index="253">Pelindung dada besi</i>
         <i index="254">Pelindung dada baja</i>
-        <i index="255">Pelindung dada dengan pelindung bahu</i>
-        <i index="256">Pelindung dada perunggu dengan pelindung bahu</i>
+        <i index="255">Pelindung dada dengan
+pelindung bahu</i>
+        <i index="256">Pelindung dada perunggu dengan
+pelindung bahu</i>
         <i index="257">Pelindung dada tembaga baja</i>
-        <i index="258">Pelat dada besi dengan pelindung leher</i>
-        <i index="259">Pelindung Dada Pengawal Kerajaan</i>
-        <i index="260">Pelat dada baja dengan pelindung leher</i>
+        <i index="258">Pelat dada besi dengan
+pelindung leher</i>
+        <i index="259">Pelindung Dada Pengawal
+Kerajaan</i>
+        <i index="260">Pelat dada baja dengan
+pelindung leher</i>
         <i index="261">Pelindung Dada Juara Gladiator</i>
-        <i index="262">Pelindung dada kuno Yunani</i>
-        <i index="263">Pelindung dada bersepuh emas dengan zirah dada</i>
+        <i index="262">Pelindung dada kuno
+Yunani</i>
+        <i index="263">Pelindung dada bersepuh emas
+dengan zirah dada</i>
         <i index="264">Pelindung Dada Juara Titanium</i>
         <i index="265">Zirah pelat ringan</i>
         <i index="266">Pelindung dada Theseus'</i>
-        <i index="267">Pelindung Dada Titanium dengan Zirah Dada</i>
-        <i index="268">Pelindung Dada Kesatria Elf Gelap</i>
+        <i index="267">Pelindung Dada Titanium dengan
+Zirah Dada</i>
+        <i index="268">Pelindung Dada Kesatria Elf
+Gelap</i>
         <i index="269">Zirah pelat baja</i>
         <i index="270">Zirah pelat Spartacus</i>
-        <i index="271">Pelindung Dada Jenderal Elf Gelap</i>
-        <i index="272">Pelindung Dada Mithril Hero</i>
-        <i index="273">Pelindung dada usang kulit</i>
-        <i index="274">Pelindung dada berkualitas kulit</i>
-        <i index="275">Pelindung dada kulit dengan pelindung bahu</i>
+        <i index="271">Pelindung Dada Jenderal Elf
+Gelap</i>
+        <i index="272">Pelindung Dada Mithril
+Hero</i>
+        <i index="273">Pelindung dada usang
+kulit</i>
+        <i index="274">Pelindung dada
+berkualitas kulit</i>
+        <i index="275">Pelindung dada kulit dengan pelindung
+bahu</i>
         <i index="276">Zirah Tubuh Prajurit</i>
         <i index="277">Diperkeras tubuh zirah Officer</i>
         <i index="278">Pelindung dada tangguh kulit</i>
-        <i index="279">Zirah Rantai Ranger Berjaring</i>
-        <i index="280">Jaket Kulit Kapten dengan Pelindung Bahu Baja Berkualitas</i>
+        <i index="279">Zirah Rantai Ranger
+Berjaring</i>
+        <i index="280">Jaket Kulit Kapten dengan Pelindung Bahu
+Baja Berkualitas</i>
         <i index="281">Pelindung Dada Elf Gelap</i>
-        <i index="282">Pelindung dada bersepuh emas</i>
-        <i index="283">Zirah rantai tak lapuk berjaring</i>
-        <i index="284">Pelindung dada diperkeras kulit Deathmonger</i>
-        <i index="285">Pelindung dada bersepuh emas berkualitas</i>
-        <i index="286">Baja berlapis zirah brigandin</i>
-        <i index="287">Rompi Hero dengan Pelindung Bahu Tak Tergoyahkan</i>
-        <i index="288">Bersepuh emas zirah dada General</i>
-        <i index="289">Tak tergoyahkan zirah brigandin</i>
-        <i index="290">Terberkati bersepuh emas zirah dada</i>
-        <i index="291">Pelindung dada legendaris dengan tak tergoyahkan pelindung bahu</i>
-        <i index="292">Pelindung Dada Kulit Iblis dan Mithril</i>
+        <i index="282">Pelindung dada bersepuh
+emas</i>
+        <i index="283">Zirah rantai tak lapuk
+berjaring</i>
+        <i index="284">Pelindung dada diperkeras kulit
+Deathmonger</i>
+        <i index="285">Pelindung dada bersepuh
+emas berkualitas</i>
+        <i index="286">Baja berlapis zirah
+brigandin</i>
+        <i index="287">Rompi Hero dengan Pelindung Bahu Tak
+Tergoyahkan</i>
+        <i index="288">Bersepuh emas zirah dada
+General</i>
+        <i index="289">Tak tergoyahkan zirah
+brigandin</i>
+        <i index="290">Terberkati bersepuh emas
+zirah dada</i>
+        <i index="291">Pelindung dada legendaris dengan tak
+tergoyahkan pelindung bahu</i>
+        <i index="292">Pelindung Dada Kulit Iblis dan
+Mithril</i>
         <i index="293">Rompi kain</i>
         <i index="294">Rompi Tailored</i>
         <i index="295">Gaun Merchant</i>
@@ -1549,41 +2075,58 @@ Pilih tahap untuk disapu!</i>
         <i index="303">Gaun Komisaris Agung</i>
         <i index="304">Mantel Yeti kulit</i>
         <i index="305">Gaun Penyihir Bayangan</i>
-        <i index="306">Mantel Nandi beruang kulit</i>
-        <i index="307">Tunik Misteri Jiwa bertudung</i>
+        <i index="306">Mantel Nandi beruang
+kulit</i>
+        <i index="307">Tunik Misteri Jiwa
+bertudung</i>
         <i index="308">Busana Penyihir</i>
         <i index="309">Jubah gnostik Ucadia</i>
-        <i index="310">Tunik bersepuh emas ketahanan</i>
+        <i index="310">Tunik bersepuh emas
+ketahanan</i>
         <i index="311">Jubah Pasupati</i>
         <i index="312">Jubah indah pancaran cahaya</i>
         <i index="313">Sabuk besi rantai</i>
         <i index="314">Ikat pinggang baja</i>
         <i index="315">Sabuk iblis besi</i>
-        <i index="316">Ikat pinggang berkualitas tembaga</i>
+        <i index="316">Ikat pinggang
+berkualitas tembaga</i>
         <i index="317">Sabuk iblis baja</i>
-        <i index="318">Pelindung pinggang bersepuh emas baja</i>
-        <i index="319">Ikat pinggang berlapis besi</i>
-        <i index="320">Ikat pinggang berlapis tembaga berkualitas</i>
-        <i index="321">Sabuk Camelot tempa tembaga</i>
+        <i index="318">Pelindung pinggang
+bersepuh emas baja</i>
+        <i index="319">Ikat pinggang berlapis
+besi</i>
+        <i index="320">Ikat pinggang berlapis
+tembaga berkualitas</i>
+        <i index="321">Sabuk Camelot tempa
+tembaga</i>
         <i index="322">Sabuk kerasukan tembaga</i>
-        <i index="323">Pelindung pinggang diperkuat</i>
-        <i index="324">Pelindung pinggang diperkuat keagungan</i>
+        <i index="323">Pelindung pinggang
+diperkuat</i>
+        <i index="324">Pelindung pinggang diperkuat
+keagungan</i>
         <i index="325">Ikat Pinggang Mithril</i>
         <i index="326">Ikat pinggang kekuatan</i>
         <i index="327">Sabuk lama kulit</i>
         <i index="328">Sabuk berkualitas kulit</i>
         <i index="329">Sabuk diperkeras kulit</i>
         <i index="330">Sabuk Ranger</i>
-        <i index="331">Sabuk Kulit Bersepuh Tembaga</i>
-        <i index="332">Sabuk Kulit dengan Paku Keling Tembaga</i>
-        <i index="333">Sabuk Kulit Orc Titanium Bersepuh Emas</i>
-        <i index="334">Sabuk kerajaan bersepuh emas</i>
+        <i index="331">Sabuk Kulit Bersepuh
+Tembaga</i>
+        <i index="332">Sabuk Kulit dengan Paku
+Keling Tembaga</i>
+        <i index="333">Sabuk Kulit Orc Titanium
+Bersepuh Emas</i>
+        <i index="334">Sabuk kerajaan bersepuh
+emas</i>
         <i index="335">Sabuk inner circle</i>
-        <i index="336">Sabuk dengan tembaga pelindung lengan</i>
+        <i index="336">Sabuk dengan tembaga
+pelindung lengan</i>
         <i index="337">Pelindung Lengan Titanium Pejalan Roh</i>
         <i index="338">Sabuk Elf Bersepuh Emas</i>
-        <i index="339">Sabuk Elf Tinggi Bersepuh Emas</i>
-        <i index="340">Sabuk Kulit Iblis Titanium Bersepuh Emas</i>
+        <i index="339">Sabuk Elf Tinggi
+Bersepuh Emas</i>
+        <i index="340">Sabuk Kulit Iblis Titanium
+Bersepuh Emas</i>
         <i index="341">Balutan kain</i>
         <i index="342">Balutan Tailored</i>
         <i index="343">Balutan kulit</i>
@@ -1594,31 +2137,41 @@ Pilih tahap untuk disapu!</i>
         <i index="348">Selempang kerajaan</i>
         <i index="349">Sabuk kerajaan ketahanan</i>
         <i index="350">Ikat pinggang kerajaan</i>
-        <i index="351">Ikat pinggang terberkati kerajaan</i>
+        <i index="351">Ikat pinggang terberkati
+kerajaan</i>
         <i index="352">Sabuk zirah roh</i>
         <i index="353">Sabuk diperkuat zirah roh</i>
         <i index="354">Sabuk surgawi protection</i>
         <i index="355">Sepatu kayu</i>
         <i index="356">Sepatu kayu berpaku</i>
         <i index="357">Sepatu zirah baja</i>
-        <i index="358">Sepatu zirah berkualitas baja</i>
-        <i index="359">Pelindung tulang kering baja</i>
-        <i index="360">Pelindung tulang kering kerajaan</i>
-        <i index="361">Pelindung Tulang Kering Hero</i>
+        <i index="358">Sepatu zirah berkualitas
+baja</i>
+        <i index="359">Pelindung tulang kering
+baja</i>
+        <i index="360">Pelindung tulang kering
+kerajaan</i>
+        <i index="361">Pelindung Tulang Kering
+Hero</i>
         <i index="362">Sepatu usang kulit</i>
         <i index="363">Sepatu bot kulit</i>
         <i index="364">Sepatu Yetihide</i>
         <i index="365">Kulit turnboots</i>
         <i index="366">Mewah turnboots</i>
-        <i index="367">Sepatu bot berpaku keling tough kulit</i>
+        <i index="367">Sepatu bot berpaku keling
+tough kulit</i>
         <i index="368">Sepatu bot Cavalier</i>
         <i index="369">Sepatu bot kain</i>
-        <i index="370">Sepatu bot kulit anak sapi</i>
-        <i index="371">Sepatu bot ujung terbuka kain</i>
-        <i index="372">Sepatu bot ujung terbuka kulit</i>
+        <i index="370">Sepatu bot kulit anak
+sapi</i>
+        <i index="371">Sepatu bot ujung terbuka
+kain</i>
+        <i index="372">Sepatu bot ujung terbuka
+kulit</i>
         <i index="373">Terberkati swathes</i>
         <i index="374">Sepatu mewah agility</i>
-        <i index="375">Sepatu bot berkualitas Lockseley</i>
+        <i index="375">Sepatu bot berkualitas
+Lockseley</i>
         <i index="376">Kain jubah tetua</i>
         <i index="377">Kain jubah tetua</i>
         <i index="378">Kain jubah tetua</i>
@@ -1664,15 +2217,24 @@ Pilih tahap untuk disapu!</i>
         <i index="418">Jubah kulit beruang</i>
         <i index="419">Jubah kulit beruang</i>
         <i index="420">Jubah kulit beruang</i>
-        <i index="421">Penutup kepala eteris biru langit</i>
-        <i index="422">Penutup kepala eteris biru langit</i>
-        <i index="423">Penutup kepala eteris biru langit</i>
-        <i index="424">Penutup kepala eteris biru langit</i>
-        <i index="425">Penutup kepala eteris biru langit</i>
-        <i index="426">Penutup kepala eteris biru langit</i>
-        <i index="427">Penutup kepala eteris biru langit</i>
-        <i index="428">Penutup kepala eteris biru langit</i>
-        <i index="429">Penutup kepala eteris biru langit</i>
+        <i index="421">Penutup kepala eteris
+biru langit</i>
+        <i index="422">Penutup kepala eteris
+biru langit</i>
+        <i index="423">Penutup kepala eteris
+biru langit</i>
+        <i index="424">Penutup kepala eteris
+biru langit</i>
+        <i index="425">Penutup kepala eteris
+biru langit</i>
+        <i index="426">Penutup kepala eteris
+biru langit</i>
+        <i index="427">Penutup kepala eteris
+biru langit</i>
+        <i index="428">Penutup kepala eteris
+biru langit</i>
+        <i index="429">Penutup kepala eteris
+biru langit</i>
         <i index="430">Kalung iolite</i>
         <i index="431">Kalung iolite</i>
         <i index="432">Kalung iolite</i>
@@ -1754,15 +2316,24 @@ Pilih tahap untuk disapu!</i>
         <i index="508">Cincin rubi</i>
         <i index="509">Cincin rubi</i>
         <i index="510">Cincin rubi</i>
-        <i index="511">Mahkota lingkar malam perayaan</i>
-        <i index="512">Mahkota lingkar malam perayaan</i>
-        <i index="513">Mahkota lingkar malam perayaan</i>
-        <i index="514">Mahkota lingkar malam perayaan</i>
-        <i index="515">Mahkota lingkar malam perayaan</i>
-        <i index="516">Mahkota lingkar malam perayaan</i>
-        <i index="517">Mahkota lingkar malam perayaan</i>
-        <i index="518">Mahkota lingkar malam perayaan</i>
-        <i index="519">Mahkota lingkar malam perayaan</i>
+        <i index="511">Mahkota lingkar malam
+perayaan</i>
+        <i index="512">Mahkota lingkar malam
+perayaan</i>
+        <i index="513">Mahkota lingkar malam
+perayaan</i>
+        <i index="514">Mahkota lingkar malam
+perayaan</i>
+        <i index="515">Mahkota lingkar malam
+perayaan</i>
+        <i index="516">Mahkota lingkar malam
+perayaan</i>
+        <i index="517">Mahkota lingkar malam
+perayaan</i>
+        <i index="518">Mahkota lingkar malam
+perayaan</i>
+        <i index="519">Mahkota lingkar malam
+perayaan</i>
         <i index="520">Mata kekacauan</i>
         <i index="521">Mata kekacauan</i>
         <i index="522">Mata kekacauan</i>
@@ -1815,46 +2386,60 @@ Pilih tahap untuk disapu!</i>
         <i index="569">Bulu Ekor Phoenix</i>
         <i index="570">Pewahyu Astral</i>
         <i index="571">BoneStaff Dracula</i>
-        <i index="572">Busur Windrider yang Ditingkatkan</i>
+        <i index="572">Busur Windrider yang
+Ditingkatkan</i>
         <i index="573">Master Blaster 3000</i>
         <i index="574">Helm bersayap Angels</i>
         <i index="575">Topeng Musa</i>
         <i index="576">Topeng Malaikat</i>
         <i index="577">Zirah Pelat Orichalcum</i>
-        <i index="578">Pelindung Dada Pemburu Iblis</i>
+        <i index="578">Pelindung Dada Pemburu
+Iblis</i>
         <i index="579">Jubah Sihir Elemental</i>
-        <i index="580">Pelindung Pinggang Heracles</i>
+        <i index="580">Pelindung Pinggang
+Heracles</i>
         <i index="581">Sabuk Dunia Hantu</i>
         <i index="582">Sabuk Kulit Leviathan</i>
-        <i index="583">Pelindung Tulang Kering Pengejar Matahari</i>
-        <i index="584">Sepatu bot iblis naga kulit</i>
-        <i index="585">Sepatu Bot Penasihat Kerajaan</i>
+        <i index="583">Pelindung Tulang Kering
+Pengejar Matahari</i>
+        <i index="584">Sepatu bot iblis naga
+kulit</i>
+        <i index="585">Sepatu Bot Penasihat
+Kerajaan</i>
         <i index="586">Perlengkapan Natal Kokoh</i>
         <i index="587">Paha Babi Berserker</i>
         <i index="588">Tongkat sihir suci holi</i>
-        <i index="589">Tongkat Lonceng Pembantai Rudolph</i>
+        <i index="589">Tongkat Lonceng Pembantai
+Rudolph</i>
         <i index="590">Lolipop Beracun</i>
         <i index="591">Duri Penderitaan</i>
-        <i index="592">Tongkat Ajaib Musim Dingin</i>
+        <i index="592">Tongkat Ajaib Musim
+Dingin</i>
         <i index="593">Tongkat Permen Pembunuh</i>
-        <i index="594">Busur Tanduk Berhidung Merah</i>
+        <i index="594">Busur Tanduk Berhidung
+Merah</i>
         <i index="595">Senapan BB Red Rider</i>
         <i index="596">Helm Kapten Pengawal</i>
         <i index="597">Helm Upacara Istana</i>
-        <i index="598">Topi Badut Istana Kerajaan</i>
-        <i index="599">Pelindung Dada Mithril Menteri</i>
+        <i index="598">Topi Badut Istana
+Kerajaan</i>
+        <i index="599">Pelindung Dada Mithril
+Menteri</i>
         <i index="600">Zirah Kulit Orc</i>
         <i index="601">Jubah Perang Menteri</i>
         <i index="602">Sabuk Berlapis Minster</i>
         <i index="603">Sabuk Kulit Menteri</i>
         <i index="604">Kain Sabuk Menteri</i>
-        <i index="605">Pelindung Tulang Kering Perang Menteri</i>
+        <i index="605">Pelindung Tulang Kering
+Perang Menteri</i>
         <i index="606">Sepatu Bot Kulit Menteri</i>
         <i index="607">Sepatu Bot Menteri</i>
         <i index="608">Excalibur 2.0</i>
         <i index="609">Kapak Perang Berkilau</i>
-        <i index="610">Tongkat Hadiah Orang Majus</i>
-        <i index="611">Tongkat Suci Malaikat Agung</i>
+        <i index="610">Tongkat Hadiah Orang
+Majus</i>
+        <i index="611">Tongkat Suci Malaikat
+Agung</i>
         <i index="612">Bilah Pembunuh Ulung</i>
         <i index="613">Belati Menteri</i>
         <i index="614">Tongkat Sayap Bayi Naga</i>
@@ -1871,8 +2456,10 @@ Pilih tahap untuk disapu!</i>
         <i index="625">Mantel senja malam</i>
         <i index="626">Jubah kulit beruang</i>
         <i index="627">Jubah kulit beruang</i>
-        <i index="628">Penutup kepala eteris biru langit</i>
-        <i index="629">Penutup kepala eteris biru langit</i>
+        <i index="628">Penutup kepala eteris
+biru langit</i>
+        <i index="629">Penutup kepala eteris
+biru langit</i>
         <i index="630">Kalung iolite</i>
         <i index="631">Kalung iolite</i>
         <i index="632">Rantai leher api</i>
@@ -1891,8 +2478,10 @@ Pilih tahap untuk disapu!</i>
         <i index="645">Cincin perak berlapis</i>
         <i index="646">Cincin rubi</i>
         <i index="647">Cincin rubi</i>
-        <i index="648">Mahkota lingkar malam perayaan</i>
-        <i index="649">Mahkota lingkar malam perayaan</i>
+        <i index="648">Mahkota lingkar malam
+perayaan</i>
+        <i index="649">Mahkota lingkar malam
+perayaan</i>
         <i index="650">Mata kekacauan</i>
         <i index="651">Mata kekacauan</i>
         <i index="652">Cincin emas keteguhan</i>
@@ -1925,7 +2514,8 @@ Pilih tahap untuk disapu!</i>
         <i index="679">Jubah Universal</i>
         <i index="680">Kalung Universal</i>
         <i index="681">Cincin Universal</i>
-        <i index="682">Pedang dan Perisai Halloween</i>
+        <i index="682">Pedang dan Perisai
+Halloween</i>
         <i index="683">Palu Labu Halloween</i>
         <i index="684">Grand Forks</i>
         <i index="685">Belati Halloween</i>
@@ -1939,7 +2529,8 @@ Pilih tahap untuk disapu!</i>
         <i index="2">Pembasmi Monster</i>
         <i index="3">Perang Suci</i>
         <i index="4">Kok Bisa?</i>
-        <i index="5">Sekarang Tidak Tangguh Lagi</i>
+        <i index="5">Sekarang Tidak Tangguh
+Lagi</i>
         <i index="6">Pemburu Penyihir</i>
         <i index="7">Pemusnahan!</i>
         <i index="8">Pengusir Roh</i>
@@ -1954,7 +2545,8 @@ Pilih tahap untuk disapu!</i>
         <i index="17">Penyelamat Umat Manusia</i>
         <i index="18">Tukang Kebun</i>
         <i index="19">Orang Terakhir Bertahan</i>
-        <i index="20">Obat Itu untuk yang Lemah</i>
+        <i index="20">Obat Itu untuk yang
+Lemah</i>
         <i index="21">Skuad Elit</i>
         <i index="22">Pertempuran Dua Pejuang</i>
         <i index="23">Jika Gagal, Coba Lagi...</i>
@@ -1998,16 +2590,21 @@ Pilih tahap untuk disapu!</i>
     </achievementname>
     
     <achievementdescribe>
-        <i index="1">Kalahkan musuh pertamamu.</i>
+        <i index="1">Kalahkan musuh
+pertamamu.</i>
         <i index="2">Kalahkan %D musuh.</i>
         <i index="3">Kalahkan %D musuh.</i>
         <i index="4">Kalahkan %D hewan.</i>
-        <i index="5">Kalahkan %D petarung iblis.</i>
+        <i index="5">Kalahkan %D petarung
+iblis.</i>
         <i index="6">Kalahkan %D pengguna sihir.</i>
-        <i index="7">Kalahkan %D orc dari jenis apa pun.</i>
+        <i index="7">Kalahkan %D orc dari jenis
+apa pun.</i>
         <i index="8">Kalahkan %D musuh iblis.</i>
-        <i index="9">Kalahkan naga Incendrak sebanyak %D kali.</i>
-        <i index="10">Kalahkan perwira orc Tyler muda sebanyak %d kali.</i>
+        <i index="9">Kalahkan naga Incendrak sebanyak %D
+kali.</i>
+        <i index="10">Kalahkan perwira orc Tyler muda
+sebanyak %d kali.</i>
         <i index="11">Selesaikan Lothian.</i>
         <i index="12">Selesaikan Tanah Tandus.</i>
         <i index="13">Selesaikan Dataran Amesbury.</i>
@@ -2015,15 +2612,20 @@ Pilih tahap untuk disapu!</i>
         <i index="15">Selesaikan Puncak Kembar Api dan Es.</i>
         <i index="16">Selesaikan Astolat.</i>
         <i index="17">Selesaikan Camelot.</i>
-        <i index="18">Basmi semua Venus Deathtrap di tahap 4-5 sebanyak %D kali.</i>
+        <i index="18">Basmi semua Venus Deathtrap di tahap 4-5 sebanyak %D
+kali.</i>
         <i index="19">Menang dengan hanya satu penyintas.</i>
         <i index="20">Raih %D kemenangan tanpa bantuan penyembuh.</i>
-        <i index="21">Raih %D kemenangan dengan 4 hero level 70 atau lebih tinggi.</i>
-        <i index="22">Gunakan hanya dua hero untuk mengalahkan Phenex dan Maurax.</i>
+        <i index="21">Raih %D kemenangan dengan 4 hero level 70 atau lebih
+tinggi.</i>
+        <i index="22">Gunakan hanya dua hero untuk mengalahkan
+Phenex dan Maurax.</i>
         <i index="23">Kalah sebanyak %D kali.</i>
         <i index="24">Hero gugur di desa terbakar (tahap 1-6 atau 1-9).</i>
-        <i index="25">Hidupkan kembali sekutu sebanyak %D kali.</i>
-        <i index="26">Hero dimakan Ascalon sebanyak %D kali.</i>
+        <i index="25">Hidupkan kembali sekutu
+sebanyak %D kali.</i>
+        <i index="26">Hero dimakan Ascalon sebanyak %D
+kali.</i>
         <i index="27">Dapatkan %D Koin emas.</i>
         <i index="28">Dapatkan %D Koin emas.</i>
         <i index="29">Dapatkan %D Koin emas.</i>
@@ -2032,32 +2634,53 @@ Pilih tahap untuk disapu!</i>
         <i index="32">Gunakan %D Kristal.</i>
         <i index="33">Belanjakan %D Koin emas.</i>
         <i index="34">Gunakan %D Kristal.</i>
-        <i index="35">Dapatkan hadiah dari Roda Keberuntungan sebanyak %d kali.</i>
-        <i index="36">Dapatkan telur kristal dari Roda Keberuntungan sebanyak %d kali.</i>
+        <i index="35">Dapatkan hadiah dari
+Roda Keberuntungan
+sebanyak %d kali.</i>
+        <i index="36">Dapatkan telur kristal dari Roda
+Keberuntungan sebanyak %d kali.</i>
         <i index="37">Dapatkan %D Koin Goblin.</i>
-        <i index="38">Putar roda sebanyak %D kali.</i>
-        <i index="39">Segarkan daftar perlengkapan secara gratis sebanyak %D kali.</i>
-        <i index="40">Gunakan emas untuk menyegarkan toko perlengkapan sebanyak %D kali.</i>
-        <i index="41">Segarkan toko dengan koin sebanyak %d kali secara total.</i>
+        <i index="38">Putar roda sebanyak %D
+kali.</i>
+        <i index="39">Segarkan daftar perlengkapan secara
+gratis sebanyak %D kali.</i>
+        <i index="40">Gunakan emas untuk menyegarkan toko
+perlengkapan sebanyak %D kali.</i>
+        <i index="41">Segarkan toko dengan koin
+sebanyak %d kali secara
+total.</i>
         <i index="42">Buka semua perlengkapan.</i>
         <i index="43">Buka semua bakat di halaman pertama seorang hero.</i>
         <i index="44">Buka semua bakat di halaman kedua seorang hero.</i>
         <i index="45">Buka semua bakat di halaman ketiga seorang hero.</i>
         <i index="46">Buka semua bakat di halaman keempat seorang hero.</i>
-        <i index="47">Miliki senjata legendaris (perlengkapan jingga).</i>
-        <i index="48">Kenakan pelindung dada legendaris (jingga).</i>
-        <i index="49">Kenakan perlengkapan epik legendaris (merah).</i>
-        <i index="50">Kenakan delapan perlengkapan epik (merah).</i>
-        <i index="51">Tingkatkan perlengkapan sebanyak %D kali.</i>
-        <i index="52">Tingkatkan perlengkapan sebanyak %D kali.</i>
-        <i index="53">Tingkatkan perlengkapan sebanyak %D kali.</i>
+        <i index="47">Miliki senjata legendaris (perlengkapan
+jingga).</i>
+        <i index="48">Kenakan pelindung dada legendaris
+(jingga).</i>
+        <i index="49">Kenakan perlengkapan epik
+legendaris (merah).</i>
+        <i index="50">Kenakan delapan perlengkapan epik
+(merah).</i>
+        <i index="51">Tingkatkan perlengkapan
+sebanyak %D kali.</i>
+        <i index="52">Tingkatkan perlengkapan
+sebanyak %D kali.</i>
+        <i index="53">Tingkatkan perlengkapan
+sebanyak %D kali.</i>
         <i index="54">Tingkatkan perlengkapan epik ke level maksimum.</i>
-        <i index="55">Tingkatkan perlengkapan legendaris ke level maksimum.</i>
-        <i index="56">Dapatkan peringkat S di %d tahap.</i>
-        <i index="57">Dapatkan peringkat S di %d tahap.</i>
-        <i index="58">Dapatkan peringkat S di %d tahap.</i>
-        <i index="59">Dapatkan peringkat S di %d tahap.</i>
-        <i index="60">Kalahkan pencuri goblin sebanyak %d kali.</i>
+        <i index="55">Tingkatkan perlengkapan legendaris ke level
+maksimum.</i>
+        <i index="56">Dapatkan peringkat S di %d
+tahap.</i>
+        <i index="57">Dapatkan peringkat S di %d
+tahap.</i>
+        <i index="58">Dapatkan peringkat S di %d
+tahap.</i>
+        <i index="59">Dapatkan peringkat S di %d
+tahap.</i>
+        <i index="60">Kalahkan pencuri goblin
+sebanyak %d kali.</i>
     </achievementdescribe>
     
     <scene_name>
@@ -2123,7 +2746,8 @@ Api dan Air</i>
         <i index="0001">Prajurit 1:
 Bos, mengapa kita mengepel lantai?</i>
         <i index="0002">Prajurit 2:
-Benar, seharusnya kita mengabdi kepada Raja
+Benar, seharusnya kita mengabdi kepada
+Raja
 Michael.</i>
         <i index="0003">Eric:
 Uh... kau terlalu bodoh untuk mengerti. Aku
@@ -2132,7 +2756,8 @@ perangai buruk Raja Michael.</i>
         <i index="0004">???:
 Raja Michael? Kalian seharusnya
 mengkhawatirkan diri sendiri!</i>
-        <i index="0005">Beberapa menit kemudian...</i>
+        <i index="0005">Beberapa menit
+kemudian...</i>
         <i index="0006">Daisy:
 Hah? Pasukan depan sudah dihancurkan!
 Apa-apaan ini? Oh... yang tinggi dan kuat
@@ -2168,7 +2793,8 @@ penyembuhan. Ketuk lalu pilih aku.</i>
 Ketuk ikon skill di kiri atas untuk
 menggunakannya.</i>
         <i index="0016">Daisy:
-Lakukan hal yang sama agar Eric menggunakan
+Lakukan hal yang sama agar Eric
+menggunakan
 skill-nya.</i>
         <i index="0017">Enam bulan sebelumnya...</i>
         
@@ -2189,7 +2815,8 @@ Di sana! Tolong!</i>
         <i index="0202">Eric:
 Apa yang terjadi?</i>
         <i index="0203">Sophia:
-Orang-orangan sawah ini mengejarku!</i>
+Orang-orangan sawah ini
+mengejarku!</i>
         <i index="0204">Daisy:
 Saat orang-orangan sawah mati, ia berubah
 menjadi beberapa gagak. Kita harus
@@ -2199,12 +2826,15 @@ menghancurkannya.</i>
 Oh, begitu! Jadi aku tak bisa membunuhnya?
 Lihat, ia datang lagi!</i>
         <i index="0206">Eric:
-Semuanya hati-hati! Ayo kalahkan dia.</i>
+Semuanya hati-hati! Ayo kalahkan
+dia.</i>
         
         <i index="0211">Sophia:
-Terima kasih sudah menolongku!</i>
+Terima kasih sudah
+menolongku!</i>
         <i index="0212">Eric:
-Hahaha, menghukum orang jahat memang
+Hahaha, menghukum orang jahat
+memang
 tugasku.</i>
         <i index="0213">Daisy:
 Akhir-akhir ini banyak monster bermunculan.
@@ -2215,7 +2845,8 @@ Baiklah! Perkenalkan, aku Sophia, seorang
 penyihir. Sihirku kuat, tetapi tubuhku
 rapuh. Tolong lindungi aku dari serangan!</i>
         <i index="0215">Eric:
-Tenang saja, aku akan melindungimu. Ayo
+Tenang saja, aku akan melindungimu.
+Ayo
 berangkat.</i>
         
         <i index="0301">Daisy:
@@ -2264,13 +2895,15 @@ untuk dibersihkan. Temui MOMO si Mata Satu!</i>
 Senang bertemu denganmu... eh... MATI
 KALIAN, MANUSIA!</i>
         <i index="1003">Tabib Goblin:
-Berhenti bicara dan mulai HANCURKAN MEREKA!</i>
+Berhenti bicara dan mulai
+HANCURKAN MEREKA!</i>
         <i index="1004">Daisy:
 Bau busuk apa itu... Oh tidak, ternyata
 kakinya!</i>
         
         <i index="1101">Eric:
-Apakah itu Pangeran Amor?</i>
+Apakah itu Pangeran
+Amor?</i>
         <i index="1102">Sophia:
 Itu benar-benar Pangeran Amor! Apa yang kau
 lakukan di sini?!</i>
@@ -2296,7 +2929,8 @@ Sophia! Apakah kau membawa air suci?</i>
 Aku baru hari ketiga mengikuti kursus
 Alkitab... aku belum bisa membuat air suci.</i>
         <i index="1304">Eric:
-Minggir, biar aku yang melakukannya!</i>
+Minggir, biar aku yang
+melakukannya!</i>
         
         <i index="1601">Pangeran Amor:
 Ada banyak mumi di sekitar sini. Apakah ini
@@ -2322,9 +2956,11 @@ Dengan memandang bintang untuk mencari
 petunjuk... sepertinya kita hampir tiba di
 tepi gurun.</i>
         <i index="2002">Pangeran Amor:
-Bukankah seharusnya sekarang siang?</i>
+Bukankah seharusnya
+sekarang siang?</i>
         <i index="2003">Sophia:
-Itu cacing pasir! Kenapa ukurannya sebesar
+Itu cacing pasir! Kenapa
+ukurannya sebesar
 itu?</i>
         <i index="2004">Eric:
 Bukan hanya besar, ia juga bisa menggali
@@ -2350,13 +2986,15 @@ Amor dan para pemuda gagah ini ada di sini.</i>
 Sekarang sedang musim pengorbanan bangsa
 Orc!</i>
         <i index="2504">Prajurit Orc:
-Loktar! Aku mau manusia yang masih hidup!</i>
+Loktar! Aku mau manusia yang
+masih hidup!</i>
         
         <i index="3001">Eric:
 Itu Pangeran Amor! Kita tak boleh membiarkan
 para orc menyiksanya!</i>
         <i index="3002">Eric:
-Hahaha, sanggupkah kau menerima tiga pukulan
+Hahaha, sanggupkah kau menerima tiga
+pukulan
 dariku?</i>
         <i index="3003">Pria Berotot:
 Kau menang! Kau pejuang yang gagah dan kuat.
@@ -2373,7 +3011,8 @@ Baiklah, aku Raja Para Pria Berotot. Aku
 akan menyuruh anak buahku membiarkan kalian
 pergi dengan aman.</i>
         <i index="3007">Eric:
-Terima kasih banyak. Ayo pergi!</i>
+Terima kasih banyak. Ayo
+pergi!</i>
         
         <i index="3101">Eric:
 Pangeran Amor, ini wilayah bangsa Elf. Kita
@@ -2405,7 +3044,8 @@ Mengapa kau melukai para penjagaku?</i>
         <i index="3902">Eric:
 Yang Mulia, aku Eric, sahabat tepercaya Raja
 Michael. Ini Pangeran Amor.</i>
-        <i index="3903">Eric meminta agar pasukan dikerahkan.</i>
+        <i index="3903">Eric meminta agar pasukan
+dikerahkan.</i>
         <i index="3904">Viron:
 Aku lelah dan tak berdaya. Banyak rakyat Elf
 menghilang belakangan ini.</i>
@@ -2432,7 +3072,8 @@ Pangeran Amor berjanji kita akan membantu
 mengalahkan monster, tetapi sepertinya kita
 justru akan menjadi makanan mereka!</i>
         <i index="4003">Eric:
-Minggir, biar aku yang menangani ini!</i>
+Minggir, biar aku yang
+menangani ini!</i>
         <i index="4004">Viron:
 Terima kasih, para pejuang pemberani! Kami
 akan mengirim pasukan setelah beristirahat.</i>
@@ -2469,7 +3110,8 @@ Sophia, bisakah kau membawaku menemuinya?</i>
 Tentu, Tuanku. Namun kita harus sangat
 tenang, kalau tidak mantranya akan gagal.</i>
         <i index="4105">Sophia:
-Baiklah, baiklah. Ayo pergi!</i>
+Baiklah, baiklah. Ayo
+pergi!</i>
         
         <i index="4301">Pangeran Amor:
 Jembatannya rusak! Sophia, panggil jembatan
@@ -2509,13 +3151,15 @@ Manusia! Pergi! Nagaku bisa mencium bau
 kalian!</i>
         
         <i index="5001">Eric:
-Cepat! Kita harus bergegas!</i>
+Cepat! Kita harus
+bergegas!</i>
         <i index="5002">Sophia:
 Lari sedikit lagi, aku akan memakai mantra
 untuk menyembunyikan kita! Cepat!</i>
         
         <i index="5101">Penjaga:
-Hei! Itu Eric si pengkhianat! Tangkap dia!</i>
+Hei! Itu Eric si pengkhianat! Tangkap
+dia!</i>
         <i index="5102">Eric:
 Siapa yang menyebutku pengkhianat? Aku
 sedang mengawal Pangeran Amor sendiri. Kami
@@ -2569,9 +3213,11 @@ hadapi dia.</i>
         <i index="6103">Viron:
 Lindungi Pangeran Amor dengan baik.</i>
         <i index="6104">Eric:
-Baik! Terima kasih banyak!</i>
+Baik! Terima kasih
+banyak!</i>
         <i index="6105">Kepala Pria Berotot:
-Eric! Ayo bertarung lagi!</i>
+Eric! Ayo bertarung
+lagi!</i>
         <i index="6106">Eric:
 Kepala Pria Berotot? Aku akan melawanmu
 setelah mengalahkan Taimok dan membawa
@@ -2613,7 +3259,8 @@ merebut takhta Raja Michael dan bersekongkol
 dengan Taimok Wong! Aku menjatuhkan hukuman
 mati kepadamu!</i>
         <i index="7002">???:
-Hahaha, kalian payah sekali!</i>
+Hahaha, kalian payah
+sekali!</i>
         <i index="7003">Viron:
 Kami menemukan Pangeran Amor yang asli dan
 Guru Kun! Pangeran Amor telah meminum racun,
@@ -2652,8 +3299,10 @@ Keluar dan lawan kami seperti lelaki sejati!</i>
 Eric, tenanglah.</i>
         
         <i index="7101">Eric:
-Kita di mana? Aku tak bisa melihat apa-apa.</i>
-        <i index="7102">Eric membangunkan semua orang...</i>
+Kita di mana? Aku tak bisa melihat
+apa-apa.</i>
+        <i index="7102">Eric membangunkan semua
+orang...</i>
         <i index="7103">Sophia:
 Aku baik-baik saja! Kita di mana? Kota
 Kanberland ada... di atas kepala kita?</i>
@@ -2691,7 +3340,9 @@ dalam waktu dekat.</i>
 Sepertinya begitu.</i>
         
         <i index="7401">Gladiator Taimok:
-KALIAN SEMUA! BERANI-BERANINYA MENGGANGGU
+KALIAN SEMUA!
+BERANI-BERANINYA
+MENGGANGGU
 KAMI?!</i>
         <i index="7402">Sophia:
 Katanya “mengganggu”? Sepertinya mereka
@@ -2714,7 +3365,8 @@ mengubah seluruh permukaan dunia!</i>
 Artefak sekuat itu! Bagaimana mungkin kita
 bisa merebutnya?</i>
         <i index="7704">Eric:
-Minggir, biar aku yang melakukannya!</i>
+Minggir, biar aku yang
+melakukannya!</i>
         
         <i index="8001">Thousand Eyes:
 Sampah manusia macam apa yang berani masuk
@@ -2773,7 +3425,8 @@ ketuk aku.</i>
 Bagus! Mantraku ditampilkan di sudut kiri
 atas.</i>
         <i index="999904">Marcus:
-Ketuk ikon ini untuk menggunakan mantraku.</i>
+Ketuk ikon ini untuk
+menggunakan mantraku.</i>
         <i index="999905">Marcus:
 Mantra ini aktif saat berada dekat sasaran.
 Ketuk aku dan seret penunjuk ke sasaran
@@ -2787,10 +3440,12 @@ Terus berlatih. Ketuk aku dan seret ke
 sasaran untuk menyerang.</i>
         <i index="999908">Marcus:
 Ketuk ikon mantra untuk menggunakannya.
-Karena aku dekat dengan sasaran, mantra akan
+Karena aku dekat dengan sasaran, mantra
+akan
 langsung aktif.</i>
         <i index="999909">Baldar:
-Bagus! Sekarang lanjutkan latihan, ketuk
+Bagus! Sekarang lanjutkan latihan,
+ketuk
 aku.</i>
         <i index="999910">Baldar:
 Ketuk ikon mantra untuk menggunakannya.
@@ -2850,7 +3505,8 @@ Tunggu! Aku mencium bau darah dari kejauhan.
 Tempat itu tampak berbahaya. Kita harus
 berhati-hati...</i>
         <i index="8103">Daisy:
-Astaga! Jangan berkata begitu.</i>
+Astaga! Jangan berkata
+begitu.</i>
         
         <i index="8401">Centaur:
 Wah, ternyata mendapatkan Jantung Titan
@@ -2859,7 +3515,8 @@ sangat mudah.</i>
 Setelah bertahun-tahun berjuang, akhirnya
 kami melihat cahaya matahari!</i>
         <i index="8403">Elf Kegelapan:
-Buat Viron dan para elf membayar semua ini!</i>
+Buat Viron dan para elf membayar
+semua ini!</i>
         <i index="8404">Centaur:
 Setelah menyerap Jantung Titan, klan Elf
 Kegelapan akan menjadi yang terkuat di
@@ -2876,11 +3533,14 @@ Di tengahnya terdapat Jantung Titan, sumber
 kekuatan tanpa akhir. Jangan takut. Biarkan
 bisikan jahat menuntun jalan kita!</i>
         <i index="9004">Daisy:
-Astaga! Dia menyatu dengan Jantung Titan!</i>
+Astaga! Dia menyatu dengan Jantung
+Titan!</i>
         <i index="9005">Centaur:
-Aku akan membunuh kalian semua!!!</i>
+Aku akan membunuh kalian
+semua!!!</i>
         <i index="9006">Eric:
-Apa-apaan ini? Apa yang terjadi?!</i>
+Apa-apaan ini? Apa yang
+terjadi?!</i>
         
         <i index="9051">Eric:
 Jantung Titan telah mekar!</i>
@@ -2888,19 +3548,26 @@ Jantung Titan telah mekar!</i>
 Kurasa itu hanya tiruan. Elf Kegelapan pasti
 dimanfaatkan oleh kejahatan!</i>
         <i index="9053">Daisy:
-Astaga! Dasar makhluk jahat!</i>
+Astaga! Dasar makhluk
+jahat!</i>
         <i index="9054">Eric:
-Ayo lanjutkan. Kita akan segera mengetahui
+Ayo lanjutkan. Kita akan segera
+mengetahui
 kebenarannya.</i>
     </storyline>
     
     <mission>
         <i index="0">Jumlah penyelesaian</i>
-        <i index="1">Misi 1: Gunakan skill secara optimal untuk meningkatkan efektivitas bertarung.</i>
-        <i index="2">Misi 2: Mengalihkan perhatian musuh dengan tepat adalah kunci kemenangan.</i>
-        <i index="3">Misi hadiah: Para goblin bertahan sampai akhir. Kalahkan mereka sekaligus!</i>
-        <i index="4">Misi hadiah: Jangan macam-macam dengan Hercules!</i>
-        <i index="5">Misi hadiah: Berburu bonus memang menggiurkan, tetapi waspadalah terhadap badai pasir!</i>
+        <i index="1">Misi 1: Gunakan skill secara optimal untuk meningkatkan
+efektivitas bertarung.</i>
+        <i index="2">Misi 2: Mengalihkan perhatian musuh dengan tepat adalah kunci
+kemenangan.</i>
+        <i index="3">Misi hadiah: Para goblin bertahan sampai akhir. Kalahkan mereka
+sekaligus!</i>
+        <i index="4">Misi hadiah: Jangan macam-macam
+dengan Hercules!</i>
+        <i index="5">Misi hadiah: Berburu bonus memang menggiurkan, tetapi waspadalah
+terhadap badai pasir!</i>
         
         <i index="101">Ujian 01</i>
         <i index="102">Ujian 02</i>
@@ -2923,11 +3590,16 @@ kebenarannya.</i>
         <i index="119">Ujian 19</i>
         <i index="120">Ujian 20</i>
         
-        <i index="1001">Misi Harian: Bersih-Bersih 1</i>
-        <i index="1002">Misi Harian: Bersih-Bersih 2</i>
-        <i index="1003">Misi Harian: Bersih-Bersih 3</i>
-        <i index="1004">Misi Harian: Bersih-Bersih 4</i>
-        <i index="1005">Misi Harian: Bersih-Bersih 5</i>
+        <i index="1001">Misi Harian:
+Bersih-Bersih 1</i>
+        <i index="1002">Misi Harian:
+Bersih-Bersih 2</i>
+        <i index="1003">Misi Harian:
+Bersih-Bersih 3</i>
+        <i index="1004">Misi Harian:
+Bersih-Bersih 4</i>
+        <i index="1005">Misi Harian:
+Bersih-Bersih 5</i>
         <i index="1006">Misi Harian: Gerilya Gurun 1</i>
         <i index="1007">Misi Harian: Gerilya Gurun 2</i>
         <i index="1008">Misi Harian: Gerilya Gurun 3</i>
@@ -2943,11 +3615,16 @@ kebenarannya.</i>
         <i index="1018">Misi Harian: Sarang Bunga 3</i>
         <i index="1019">Misi Harian: Sarang Bunga 4</i>
         <i index="1020">Misi Harian: Sarang Bunga 5</i>
-        <i index="1021">Misi Harian: Gunung Berapi 1</i>
-        <i index="1022">Misi Harian: Gunung Berapi 2</i>
-        <i index="1023">Misi Harian: Gunung Berapi 3</i>
-        <i index="1024">Misi Harian: Gunung Berapi 4</i>
-        <i index="1025">Misi Harian: Gunung Berapi 5</i>
+        <i index="1021">Misi Harian: Gunung
+Berapi 1</i>
+        <i index="1022">Misi Harian: Gunung
+Berapi 2</i>
+        <i index="1023">Misi Harian: Gunung
+Berapi 3</i>
+        <i index="1024">Misi Harian: Gunung
+Berapi 4</i>
+        <i index="1025">Misi Harian: Gunung
+Berapi 5</i>
         <i index="1026">Misi Harian: Serang Batalion 1</i>
         <i index="1027">Misi Harian: Serang Batalion 2</i>
         <i index="1028">Misi Harian: Serang Batalion 3</i>
@@ -2958,11 +3635,16 @@ kebenarannya.</i>
         <i index="1033">Misi Harian: Invasi 3</i>
         <i index="1034">Misi Harian: Invasi 4</i>
         <i index="1035">Misi Harian: Invasi 5</i>
-        <i index="1036">Misi Harian: Sihir Mendalam 1</i>
-        <i index="1037">Misi Harian: Sihir Mendalam 2</i>
-        <i index="1038">Misi Harian: Sihir Mendalam 3</i>
-        <i index="1039">Misi Harian: Sihir Mendalam 4</i>
-        <i index="1040">Misi Harian: Sihir Mendalam 5</i>
+        <i index="1036">Misi Harian: Sihir
+Mendalam 1</i>
+        <i index="1037">Misi Harian: Sihir
+Mendalam 2</i>
+        <i index="1038">Misi Harian: Sihir
+Mendalam 3</i>
+        <i index="1039">Misi Harian: Sihir
+Mendalam 4</i>
+        <i index="1040">Misi Harian: Sihir
+Mendalam 5</i>
         <i index="1041">Misi Harian: Tebas Seratus 1 (Syarat: kalahkan 100 musuh)</i>
         <i index="1042">Misi Harian: Tebas Seratus 2 (Syarat: kalahkan 100 musuh)</i>
         <i index="1043">Misi Harian: Tebas Seratus 3 (Syarat: kalahkan 100 musuh)</i>
@@ -2971,72 +3653,129 @@ kebenarannya.</i>
         <i index="1046">Misi Harian: Tebas Seratus 6 (Syarat: kalahkan 100 musuh)</i>
         <i index="1047">Misi Harian: Tebas Seratus (Syarat: kalahkan 100 musuh)</i>
         <i index="1048">Misi Harian: Tebas Seratus 8 (Syarat: kalahkan 100 musuh)</i>
-        <i index="1049">Misi Harian: Kalahkan dalam 100 Detik 1 (Syarat: kurang dari 100 detik)</i>
-        <i index="1050">Misi Harian: Kalahkan dalam 100 Detik 2 (Syarat: kurang dari 100 detik)</i>
-        <i index="1051">Misi Harian: Kalahkan dalam 100 Detik 3 (Syarat: kurang dari 100 detik)</i>
-        <i index="1052">Misi Harian: Kalahkan dalam 100 Detik 4 (Syarat: kurang dari 100 detik)</i>
-        <i index="1053">Misi Harian: Kalahkan dalam 100 Detik 5 (Syarat: kurang dari 100 detik)</i>
-        <i index="1054">Misi Harian: Kalahkan dalam 100 Detik 6 (Syarat: kurang dari 100 detik)</i>
-        <i index="1055">Misi Harian: Kalahkan dalam 100 Detik 7 (Syarat: kurang dari 100 detik)</i>
-        <i index="1056">Misi Harian: Kalahkan dalam 100 Detik 8 (Syarat: kurang dari 100 detik)</i>
-        <i index="1057">Misi Harian: Serbuan 1 (Syarat: selesaikan tahap dalam batas waktu)</i>
-        <i index="1058">Misi Harian: Serbuan 2 (Syarat: selesaikan tahap dalam batas waktu)</i>
-        <i index="1059">Misi Harian: Serbuan 3 (Syarat: selesaikan tahap dalam batas waktu)</i>
-        <i index="1060">Misi Harian: Serbuan 4 (Syarat: selesaikan tahap dalam batas waktu)</i>
-        <i index="1061">Misi Harian: Serbuan 5 (Syarat: selesaikan tahap dalam batas waktu)</i>
-        <i index="1062">Misi Harian: Serbuan 6 (Syarat: selesaikan tahap dalam batas waktu)</i>
-        <i index="1063">Misi Harian: Serbuan 7 (Syarat: selesaikan tahap dalam batas waktu)</i>
-        <i index="1064">Misi Harian: Serbuan 8 (Syarat: selesaikan tahap dalam batas waktu)</i>
-        <i index="1065">Misi Harian: Amuk Pembunuhan 1 (Syarat: kalahkan musuh dalam batas waktu)</i>
-        <i index="1066">Misi Harian: Amuk Pembunuhan 2 (Syarat: kalahkan musuh dalam batas waktu)</i>
-        <i index="1067">Misi Harian: Amuk Pembunuhan 3 (Syarat: kalahkan musuh dalam batas waktu)</i>
-        <i index="1068">Misi Harian: Amuk Pembunuhan 4 (Syarat: kalahkan musuh dalam batas waktu)</i>
-        <i index="1069">Misi Harian: Amuk Pembunuhan 5 (Syarat: kalahkan musuh dalam batas waktu)</i>
-        <i index="1070">Misi Harian: Amuk Pembunuhan 6 (Syarat: kalahkan musuh dalam batas waktu)</i>
-        <i index="1071">Misi Harian: Amuk Pembunuhan 7 (Syarat: kalahkan musuh dalam batas waktu)</i>
-        <i index="1072">Misi Harian: Amuk Pembunuhan 8 (Syarat: kalahkan musuh dalam batas waktu)</i>
-        <i index="1073">Misi Harian: Sembilan Nyawa 1 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1074">Misi Harian: Sembilan Nyawa 2 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1075">Misi Harian: Sembilan Nyawa 3 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1076">Misi Harian: Sembilan Nyawa 4 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1077">Misi Harian: Sembilan Nyawa 5 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1078">Misi Harian: Sembilan Nyawa 6 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1079">Misi Harian: Sembilan Nyawa 7 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1080">Misi Harian: Sembilan Nyawa 8 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1081">Misi Harian: Pembunuh Tersembunyi 1 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1082">Misi Harian: Pembunuh Tersembunyi 2 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1083">Misi Harian: Pembunuh Tersembunyi 3 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1084">Misi Harian: Pembunuh Tersembunyi 4 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1085">Misi Harian: Pembunuh Tersembunyi 5 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1086">Misi Harian: Pembunuh Tersembunyi 6 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1087">Misi Harian: Pembunuh Tersembunyi 7 (Syarat: bertahan hingga waktu habis)</i>
-        <i index="1088">Misi Harian: Pembunuh Tersembunyi 8 (Syarat: bertahan hingga waktu habis)</i>
+        <i index="1049">Misi Harian: Kalahkan dalam 100 Detik 1 (Syarat: kurang dari 100
+detik)</i>
+        <i index="1050">Misi Harian: Kalahkan dalam 100 Detik 2 (Syarat: kurang dari 100
+detik)</i>
+        <i index="1051">Misi Harian: Kalahkan dalam 100 Detik 3 (Syarat: kurang dari 100
+detik)</i>
+        <i index="1052">Misi Harian: Kalahkan dalam 100 Detik 4 (Syarat: kurang dari 100
+detik)</i>
+        <i index="1053">Misi Harian: Kalahkan dalam 100 Detik 5 (Syarat: kurang dari 100
+detik)</i>
+        <i index="1054">Misi Harian: Kalahkan dalam 100 Detik 6 (Syarat: kurang dari 100
+detik)</i>
+        <i index="1055">Misi Harian: Kalahkan dalam 100 Detik 7 (Syarat: kurang dari 100
+detik)</i>
+        <i index="1056">Misi Harian: Kalahkan dalam 100 Detik 8 (Syarat: kurang dari 100
+detik)</i>
+        <i index="1057">Misi Harian: Serbuan 1 (Syarat: selesaikan tahap dalam
+batas waktu)</i>
+        <i index="1058">Misi Harian: Serbuan 2 (Syarat: selesaikan tahap dalam
+batas waktu)</i>
+        <i index="1059">Misi Harian: Serbuan 3 (Syarat: selesaikan tahap dalam
+batas waktu)</i>
+        <i index="1060">Misi Harian: Serbuan 4 (Syarat: selesaikan tahap dalam
+batas waktu)</i>
+        <i index="1061">Misi Harian: Serbuan 5 (Syarat: selesaikan tahap dalam
+batas waktu)</i>
+        <i index="1062">Misi Harian: Serbuan 6 (Syarat: selesaikan tahap dalam
+batas waktu)</i>
+        <i index="1063">Misi Harian: Serbuan 7 (Syarat: selesaikan tahap dalam
+batas waktu)</i>
+        <i index="1064">Misi Harian: Serbuan 8 (Syarat: selesaikan tahap dalam
+batas waktu)</i>
+        <i index="1065">Misi Harian: Amuk Pembunuhan 1 (Syarat: kalahkan musuh dalam
+batas waktu)</i>
+        <i index="1066">Misi Harian: Amuk Pembunuhan 2 (Syarat: kalahkan musuh dalam
+batas waktu)</i>
+        <i index="1067">Misi Harian: Amuk Pembunuhan 3 (Syarat: kalahkan musuh dalam
+batas waktu)</i>
+        <i index="1068">Misi Harian: Amuk Pembunuhan 4 (Syarat: kalahkan musuh dalam
+batas waktu)</i>
+        <i index="1069">Misi Harian: Amuk Pembunuhan 5 (Syarat: kalahkan musuh dalam
+batas waktu)</i>
+        <i index="1070">Misi Harian: Amuk Pembunuhan 6 (Syarat: kalahkan musuh dalam
+batas waktu)</i>
+        <i index="1071">Misi Harian: Amuk Pembunuhan 7 (Syarat: kalahkan musuh dalam
+batas waktu)</i>
+        <i index="1072">Misi Harian: Amuk Pembunuhan 8 (Syarat: kalahkan musuh dalam
+batas waktu)</i>
+        <i index="1073">Misi Harian: Sembilan Nyawa 1 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1074">Misi Harian: Sembilan Nyawa 2 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1075">Misi Harian: Sembilan Nyawa 3 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1076">Misi Harian: Sembilan Nyawa 4 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1077">Misi Harian: Sembilan Nyawa 5 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1078">Misi Harian: Sembilan Nyawa 6 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1079">Misi Harian: Sembilan Nyawa 7 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1080">Misi Harian: Sembilan Nyawa 8 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1081">Misi Harian: Pembunuh Tersembunyi 1 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1082">Misi Harian: Pembunuh Tersembunyi 2 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1083">Misi Harian: Pembunuh Tersembunyi 3 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1084">Misi Harian: Pembunuh Tersembunyi 4 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1085">Misi Harian: Pembunuh Tersembunyi 5 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1086">Misi Harian: Pembunuh Tersembunyi 6 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1087">Misi Harian: Pembunuh Tersembunyi 7 (Syarat: bertahan hingga waktu
+habis)</i>
+        <i index="1088">Misi Harian: Pembunuh Tersembunyi 8 (Syarat: bertahan hingga waktu
+habis)</i>
     </mission>
     
     <notices_desc>
-        <i index="1">Pembelian Koin berhasil. Kamu sekarang memiliki tambahan %d Koin!</i>
-        <i index="2">Pembelian Kristal berhasil. Kamu sekarang memiliki tambahan %d Kristal!</i>
+        <i index="1">Pembelian Koin berhasil. Kamu sekarang memiliki tambahan %d
+Koin!</i>
+        <i index="2">Pembelian Kristal berhasil. Kamu sekarang
+memiliki tambahan %d Kristal!</i>
         <i index="3">Bonus pembelian pertama! Kamu menerima %s x %d!</i>
-        <i index="4">Peringkatmu di Tantangan Bos adalah %d. Klaim hadiahmu: %s x %d!</i>
-        <i index="5">Kamu membelanjakan %s%d. Selamat, kamu menerima tambahan %s x %d!</i>
-        <i index="6">Kamu membayar %s dalam satu pembelian. Ini hadiah untukmu: %s x %d.</i>
-        <i index="7">Pada %s, peringkatmu adalah %d dan kamu menerima bonus %s x %d.</i>
+        <i index="4">Peringkatmu di Tantangan Bos adalah %d. Klaim hadiahmu:
+%s x %d!</i>
+        <i index="5">Kamu membelanjakan %s%d. Selamat, kamu menerima tambahan %s x
+%d!</i>
+        <i index="6">Kamu membayar %s dalam satu pembelian. Ini hadiah untukmu:
+%s x %d.</i>
+        <i index="7">Pada %s, peringkatmu adalah %d dan kamu menerima bonus %s x
+%d.</i>
     </notices_desc>
     
     <store_desc>
-        <i index="1">Merapatlah! Ada banyak barang langka dan menakjubkan di dalam!</i>
-        <i index="2">Para ahli, berusahalah untuk mendapatkan poin.</i>
-        <i index="3">Ketuk untuk melihat informasi barang; ambil langsung jika tertarik!</i>
-        <i index="4">Jangan sungkan melihat-lihat.</i>
+        <i index="1">Merapatlah! Ada banyak barang langka dan
+menakjubkan di dalam!</i>
+        <i index="2">Para ahli, berusahalah
+untuk mendapatkan poin.</i>
+        <i index="3">Ketuk untuk melihat informasi barang; ambil langsung jika
+tertarik!</i>
+        <i index="4">Jangan sungkan
+melihat-lihat.</i>
         <i index="5">Pilihanmu menentukan nasibmu. Jangan lewatkan kesempatan ini.</i>
-        <i index="6">Persediaanku selalu berubah, pastikan untuk datang kembali!</i>
-        <i index="7">Kamu mau membeli atau tidak?! Jadi, beli saja!</i>
-        <i index="8">Waktu adalah uang, temanku.</i>
-        <i index="9">Tepat sekali! Inilah perlengkapan terbaik.</i>
-        <i index="10">Perlengkapan ini sangat sulit didapat; sebenarnya aku enggan menjualnya.</i>
+        <i index="6">Persediaanku selalu berubah, pastikan untuk datang
+kembali!</i>
+        <i index="7">Kamu mau membeli atau
+tidak?! Jadi, beli saja!</i>
+        <i index="8">Waktu adalah uang,
+temanku.</i>
+        <i index="9">Tepat sekali! Inilah perlengkapan
+terbaik.</i>
+        <i index="10">Perlengkapan ini sangat sulit didapat; sebenarnya aku enggan
+menjualnya.</i>
         <i index="11">Acara ini berakhir pada 1 Desember.</i>
-        <i index="12">Jika kau menemukan mataku, aku akan menukarkannya dengan barang legendaris.</i>
-        <i index="13">Apakah kau sudah menemukan mataku?</i>
+        <i index="12">Jika kau menemukan mataku, aku akan menukarkannya dengan barang
+legendaris.</i>
+        <i index="13">Apakah kau sudah
+menemukan mataku?</i>
     </store_desc>
     
     <card_name>
