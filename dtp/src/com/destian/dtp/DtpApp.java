@@ -69,6 +69,7 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
     @Override
     public void onCreate() {
         super.onCreate();
+        CrashReporter.onAppStart(this);
         registerActivityLifecycleCallbacks(this);
     }
 
@@ -118,6 +119,7 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
 
     private void kick(Activity a) {
         kicking = true;
+        CrashReporter.clearMarker(this);
         h.removeCallbacks(poll);
         stopRt();
         stopPlayerStateRealtime();
@@ -135,6 +137,18 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
 
     @Override
     public void onActivityResumed(Activity a) {
+        if (GAME.equals(a.getClass().getName())) {
+            CrashReporter.mark(this, "game resumed");
+            try {
+                onGameResumed(a);
+            } catch (Throwable error) {
+                // Kode DTP (overlay/realtime) tidak boleh menjatuhkan game asli.
+                CrashReporter.mark(this, "hook DTP gagal: " + error);
+            }
+        }
+    }
+
+    private void onGameResumed(Activity a) {
         if (GAME.equals(a.getClass().getName())) {
             // Fail closed immediately while the maintenance status is being verified.
             a.getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
@@ -205,7 +219,7 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
                             }
                         }
                     });
-                } catch (Exception ignored) {
+                } catch (Throwable ignored) {
                     // Player Realtime is optional when no authenticated session exists.
                     // Maintenance is enforced separately and fails closed.
                 }
@@ -230,7 +244,7 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
                 try {
                     SupabaseGameBackend backend = new SupabaseGameBackend(getApplicationContext());
                     cacheRuntimeSnapshot(backend.getMyRuntimeState());
-                } catch (Exception ignored) {
+                } catch (Throwable ignored) {
                     // A later Realtime event or resume retries the runtime snapshot.
                 } finally {
                     boolean refreshAgain;
@@ -267,7 +281,7 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
                 try {
                     SupabaseGameBackend backend = new SupabaseGameBackend(getApplicationContext());
                     if (backend.hasSession()) cacheCaveBossState(backend.getActiveCaveBoss());
-                } catch (Exception ignored) {
+                } catch (Throwable ignored) {
                     // Event status is informational; maintenance enforcement is separate.
                 } finally {
                     synchronized (DtpApp.this) { caveBossRefreshBusy = false; }
@@ -309,7 +323,7 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
                     SupabaseGameBackend backend = new SupabaseGameBackend(getApplicationContext());
                     if (backend.hasSession()) cacheEventStoreState(backend.getActiveEventStore());
                     else cacheEventStoreState(new JSONObject());
-                } catch (Exception ignored) {
+                } catch (Throwable ignored) {
                     // Event shop is optional; do not block the original game on network failures.
                 } finally {
                     boolean refreshAgain;
@@ -365,7 +379,7 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
                             }
                         }
                     });
-                } catch (Exception ignored) {
+                } catch (Throwable ignored) {
                     // The one-second refresh remains as a fallback if Realtime cannot connect.
                 }
             }
@@ -398,7 +412,7 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
                             }
                         }
                     });
-                } catch (Exception ignored) {
+                } catch (Throwable ignored) {
                     // The existing periodic status refresh remains the fallback.
                 }
             }
@@ -437,6 +451,9 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
 
     @Override
     public void onActivityPaused(Activity a) {
+        if (GAME.equals(a.getClass().getName())) {
+            CrashReporter.clearMarker(this);
+        }
         if (a == game) {
             game = null;
             h.removeCallbacks(poll);

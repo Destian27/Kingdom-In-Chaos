@@ -1,6 +1,11 @@
 package com.destian.dtp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.Color;
@@ -10,7 +15,9 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -19,6 +26,7 @@ public final class GameOnlineOverlay {
     private static final String TAG_ACCOUNT_BUTTON = "com.destian.dtp.GAME_ACCOUNT_BUTTON";
     private static final String TAG_CAVE_BOSS_STATUS = "com.destian.dtp.CAVE_BOSS_STATUS";
     private static final String TAG_EVENT_STORE_BUTTON = "com.destian.dtp.EVENT_STORE_BUTTON";
+    private static final String TAG_CRASH_REPORT_BUTTON = "com.destian.dtp.CRASH_REPORT_BUTTON";
 
     private GameOnlineOverlay() { }
 
@@ -97,10 +105,90 @@ public final class GameOnlineOverlay {
                 root.addView(eventButton, eventParams);
                 eventButton.bringToFront();
             }
+            addCrashReportEntry(activity, root);
             accountButton.bringToFront();
-        } catch (RuntimeException ignored) {
+        } catch (Throwable ignored) {
             // The original native game keeps working if an optional overlay cannot be added.
         }
+    }
+
+    /** Tombol kecil yang hanya muncul jika sesi sebelumnya berakhir tidak wajar. */
+    private static void addCrashReportEntry(final Activity activity, FrameLayout root) {
+        try {
+            View existing = root.findViewWithTag(TAG_CRASH_REPORT_BUTTON);
+            String report = CrashReporter.peekReport(activity.getApplicationContext());
+            if (report == null) {
+                if (existing != null) root.removeView(existing);
+                return;
+            }
+            if (existing != null) {
+                existing.bringToFront();
+                return;
+            }
+            Button button = new Button(activity);
+            button.setTag(TAG_CRASH_REPORT_BUTTON);
+            button.setText("LAPORAN CRASH");
+            button.setTextSize(10f);
+            button.setAllCaps(false);
+            button.setTextColor(Color.WHITE);
+            button.setBackground(buttonBackground());
+            button.setContentDescription("Lihat laporan sesi game yang berakhir tidak wajar");
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View view) {
+                    showCrashReportDialog(activity);
+                }
+            });
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    dp(activity, 104), dp(activity, 36), Gravity.TOP | Gravity.LEFT);
+            params.topMargin = dp(activity, 102);
+            params.leftMargin = dp(activity, 8);
+            root.addView(button, params);
+            button.bringToFront();
+        } catch (Throwable ignored) { }
+    }
+
+    private static void showCrashReportDialog(final Activity activity) {
+        try {
+            final String report = CrashReporter.peekReport(activity.getApplicationContext());
+            if (report == null) return;
+            ScrollView scroll = new ScrollView(activity);
+            TextView text = new TextView(activity);
+            text.setText(report);
+            text.setTextSize(9f);
+            text.setTypeface(Typeface.MONOSPACE);
+            text.setTextIsSelectable(true);
+            text.setPadding(dp(activity, 12), dp(activity, 8), dp(activity, 12), dp(activity, 8));
+            scroll.addView(text);
+            new AlertDialog.Builder(activity)
+                    .setTitle("Laporan sesi tidak wajar")
+                    .setView(scroll)
+                    .setPositiveButton("Salin", new DialogInterface.OnClickListener() {
+                        @Override public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                ClipboardManager clipboard = (ClipboardManager)
+                                        activity.getSystemService(Context.CLIPBOARD_SERVICE);
+                                if (clipboard != null) {
+                                    clipboard.setPrimaryClip(ClipData.newPlainText("Laporan KIC DTP", report));
+                                    Toast.makeText(activity, "Laporan disalin", Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (Throwable ignored) { }
+                        }
+                    })
+                    .setNeutralButton("Hapus", new DialogInterface.OnClickListener() {
+                        @Override public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                CrashReporter.deleteReport(activity.getApplicationContext());
+                                View content = activity.findViewById(android.R.id.content);
+                                if (content instanceof FrameLayout) {
+                                    View entry = ((FrameLayout) content).findViewWithTag(TAG_CRASH_REPORT_BUTTON);
+                                    if (entry != null) ((FrameLayout) content).removeView(entry);
+                                }
+                            } catch (Throwable ignored) { }
+                        }
+                    })
+                    .setNegativeButton("Tutup", null)
+                    .show();
+        } catch (Throwable ignored) { }
     }
 
     private static GradientDrawable buttonBackground() {

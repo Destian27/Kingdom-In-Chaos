@@ -1,0 +1,4 @@
+Kingdom In Chaos DTP source update: v17.7 Crash Guard
+Date: 2026-11-27
+Base: v17.6 Google Auth
+Scope: dtp/src/com/destian/dtp (CrashReporter, DtpApp, GameOnlineOverlay) + tests

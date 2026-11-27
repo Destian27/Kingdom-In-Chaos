@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Admin Kingdom In Chaos DTP — v16 Cave Boss</title>
+<title>Admin Kingdom In Chaos DTP — v17 Event Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{--blue:#1d4ed8;--blue-d:#1e3a8a;--blue-l:#eff6ff;--line:#cfdcf5;--ink:#0f1f45;--mute:#5b6b8f;--red:#b42318;--ok:#067647}
@@ -819,8 +819,7 @@ function collectEventStoreItems() {
     const order = val("sort_order").value.trim();
     if (!/^\d{1,19}$/.test(price)) throw new Error(`Harga item #${i+1} harus bilangan bulat non-negatif.`);
     if (!/^\d{1,6}$/.test(order)) throw new Error(`Urutan item #${i+1} tidak valid.`);
-    if (nativeId && (!/^-?\d+$/.test(nativeId) || Number(nativeId) < -2147483648 || Number(nativeId) > 2147483647)) throw new Error(`ID native item #${i+1} harus bilangan 32-bit.`);
-    if (Number(price) > 2147483647) throw new Error(`Harga item #${i+1} maksimal 2.147.483.647.`);
+    if (nativeId && !/^-?\d+$/.test(nativeId)) throw new Error(`ID native item #${i+1} harus bilangan bulat.`);
     return {
       item_key: val("item_key").value.trim(), item_name: val("item_name").value.trim(),
       description: val("description").value.trim(), image_url: val("image_url").value.trim(),
@@ -870,7 +869,7 @@ admin$("btnEventStoreSave").onclick = async () => {
     const reason = requiredReason("eventStoreReason");
     if (!confirm(`Simpan Event Shop ${config.enabled ? "AKTIF" : "NONAKTIF"} dengan ${items.length} item?`)) return;
     await gameAdminRequest("save_event_store", {config, items, reason});
-    status.textContent = "Event Shop tersimpan. Perangkat yang tersambung menerima perubahan melalui Supabase Realtime; polling 1 detik tetap menjadi cadangan.";
+    status.textContent = "Event Shop berhasil disimpan. APK akan membaca status dan katalog server maksimal sekitar 15 detik setelah polling berjalan.";
     await loadEventStoreAdmin();
   } catch (e) { status.textContent = e.message; }
   finally { btn.disabled = false; }
@@ -884,7 +883,7 @@ admin$("btnSaveEventEyes").onclick = () => withAdminButton("btnSaveEventEyes", "
   if (Number(value) > 2147483647) throw new Error("Mata Event maksimal 2.147.483.647 karena batas native game.");
   const reason = requiredReason("eventEyesReason");
   await gameAdminRequest("update_economy", {target_user_id: currentUserId, fields: {event_eyes: value}, reason});
-  alert("Mata Event berhasil diperbarui di server. Pemain yang online menerima notifikasi Realtime; bridge native akan menerapkan revisi pada build game yang mendukungnya. Coins, Crystals, dan Goblin Coins tidak ikut diubah.");
+  alert("Mata Event berhasil diperbarui. Saldo ini hanya untuk Event Shop dan tidak mengubah Coins/Crystals/Goblin Coins native.");
   await loadUserDetail(currentUserId); await loadUsers();
 });
 
