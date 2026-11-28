@@ -1,18 +1,15 @@
-// v17.14.17: tambah aksi get_cave_boss & get_event_store agar perintah admin (Boss Gua / Event Shop) sampai ke pemain login Google langsung.
-// v17.14.16: Daftar = Nama Pengguna + Kata Sandi (4-16, disimpan sebagai hash PBKDF2 di tabel terpisah).
-// v17.14.9: Android OAuth client ID (com.destian.kingdominchaosdtp + SHA-1 dtp-fixed.keystore) dipasang sebagai default.
+// v1.0.7: LOGIN GOOGLE DIHAPUS TOTAL. Pemain masuk dengan Nama Pengguna + Kata Sandi (hash PBKDF2 di tabel
+// game_google_player_credentials). Setelah register/login server memberi token sesi bertanda tangan HMAC-SHA256
+// yang dikirim game sebagai "Authorization: Bearer <token>". Nama function tetap `google-player` agar URL di APK sama.
+// Rahasia penanda tangan token: secret function PLAYER_SESSION_SECRET (opsional); bila kosong dipakai turunan dari SUPABASE_SERVICE_ROLE_KEY.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-// Public Web OAuth client ID: safe to expose as an audience identifier.
-// It is used only to validate Google ID tokens (aud claim).
-const GOOGLE_WEB_OAUTH_CLIENT_ID = Deno.env.get("GOOGLE_WEB_OAUTH_CLIENT_ID") ??
-  "709171564273-tgg9tklkjsp02tovhganpdr3cqspnc2r.apps.googleusercontent.com";
-// Optional Android OAuth client ID. Set this separately to the client created
-// for package com.destian.kingdominchaosdtp + the release signing SHA-1.
-const GOOGLE_ANDROID_OAUTH_CLIENT_ID = Deno.env.get("GOOGLE_ANDROID_OAUTH_CLIENT_ID") ??
-  "709171564273-sk6tcg5nk2tk13lghb1hb4sc1he3c7me.apps.googleusercontent.com";
+const SESSION_SECRET = Deno.env.get("PLAYER_SESSION_SECRET") ?? SUPABASE_SERVICE_ROLE_KEY;
+const SESSION_TTL_SECONDS = 180 * 24 * 60 * 60; // 180 hari
+const MAX_FAILED_LOGINS = 5;
+const LOCK_MINUTES = 5;
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
@@ -32,73 +29,76 @@ const service = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
-function googleIdentityFromClaims(claims: Record<string, unknown>) {
-  const verified = claims.email_verified === true || claims.email_verified === "true";
-  if (!claims.sub || !claims.email || !verified) {
-    throw Object.assign(new Error("Email Google harus sudah terverifikasi."), { status: 403 });
-  }
+// Identitas pemain yang dipakai semua aksi. `sub` hanyalah kunci internal tabel (akun baru: "local:<uuid>").
+type Identity = { sub: string; email: string; email_verified: boolean; name: string; picture: string; player_uuid: string };
+
+function identityFromPlayer(p: Record<string, any>): Identity {
   return {
-    sub: String(claims.sub),
-    email: String(claims.email).trim().toLowerCase(),
+    sub: String(p.google_sub),
+    email: String(p.email),
     email_verified: true,
-    name: String(claims.name ?? claims.given_name ?? "Pemain Google").slice(0, 120),
-    picture: String(claims.picture ?? "").slice(0, 2048),
+    name: String(p.nickname ?? p.google_name ?? "Pemain"),
+    picture: String(p.avatar_url ?? ""),
+    player_uuid: String(p.player_uuid),
   };
 }
 
-async function verifyGoogleIdToken(token: string) {
-  if (!GOOGLE_WEB_OAUTH_CLIENT_ID) {
-    throw Object.assign(new Error("Google Web OAuth Client ID belum dikonfigurasi di server."), { status: 503 });
-  }
-  const infoUrl = new URL("https://oauth2.googleapis.com/tokeninfo");
-  infoUrl.searchParams.set("id_token", token);
-  const response = await fetch(infoUrl);
-  if (!response.ok) throw Object.assign(new Error("Google ID token tidak valid atau kedaluwarsa."), { status: 401 });
-  const claims = await response.json() as Record<string, unknown>;
-  const issuer = String(claims.iss ?? "");
-  const expiry = Number(claims.exp ?? 0);
-  if (String(claims.aud ?? "") !== GOOGLE_WEB_OAUTH_CLIENT_ID ||
-      !["accounts.google.com", "https://accounts.google.com"].includes(issuer) ||
-      !Number.isFinite(expiry) || expiry <= Math.floor(Date.now() / 1000)) {
-    throw Object.assign(new Error("Token Google bukan untuk aplikasi Kingdom In Chaos DTP atau sudah kedaluwarsa."), { status: 401 });
-  }
-  return googleIdentityFromClaims(claims);
+// ---------------- token sesi (HMAC-SHA256) ----------------
+const encoder = new TextEncoder();
+function b64url(bytes: Uint8Array): string {
+  let s = "";
+  for (const b of bytes) s += String.fromCharCode(b);
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+function b64urlDecode(text: string): Uint8Array {
+  const padded = text.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((text.length + 3) % 4);
+  const raw = atob(padded);
+  const out = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+  return out;
+}
+async function hmacSign(data: string): Promise<string> {
+  const key = await crypto.subtle.importKey("raw", encoder.encode("kic-player-session:" + SESSION_SECRET),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return b64url(new Uint8Array(await crypto.subtle.sign("HMAC", key, encoder.encode(data))));
+}
+function safeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+async function issueSessionToken(playerUuid: string): Promise<string> {
+  const payload = b64url(encoder.encode(JSON.stringify({
+    u: playerUuid, e: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS, v: 1,
+  })));
+  return `kic1.${payload}.${await hmacSign("kic1." + payload)}`;
 }
 
-async function verifyGoogleAccessToken(request: Request) {
+async function verifySession(request: Request): Promise<Identity> {
   const header = request.headers.get("Authorization") ?? "";
   const match = header.match(/^Bearer\s+(.+)$/i);
-  if (!match) throw Object.assign(new Error("Login Google diperlukan."), { status: 401 });
-  const token = match[1].trim();
-  if (token.length < 30 || token.length > 8192) throw Object.assign(new Error("Token Google tidak valid."), { status: 401 });
-
-  // Accept an ID token issued for the configured Web OAuth client. The client
-  // secret is deliberately not required for ID-token verification.
-  if (/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) return await verifyGoogleIdToken(token);
-
-  // Current Android build obtains a Google access token from Google Play
-  // Services. Google userinfo validates it and returns the verified identity.
-  const response = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!response.ok) throw Object.assign(new Error("Sesi Google tidak valid atau sudah kedaluwarsa. Silakan login ulang."), { status: 401 });
-  const user = await response.json() as Record<string, unknown>;
-  const identity = googleIdentityFromClaims(user);
-
-  // Pin access tokens to the Android client only when that Android OAuth ID
-  // is configured. Do not compare Android access tokens to the Web client ID.
-  if (GOOGLE_ANDROID_OAUTH_CLIENT_ID) {
-    const infoUrl = new URL("https://oauth2.googleapis.com/tokeninfo");
-    infoUrl.searchParams.set("access_token", token);
-    const infoResponse = await fetch(infoUrl);
-    if (!infoResponse.ok) throw Object.assign(new Error("Tidak dapat memverifikasi aplikasi Google."), { status: 401 });
-    const info = await infoResponse.json() as Record<string, unknown>;
-    const issuedTo = String(info.issued_to ?? info.aud ?? "");
-    if (!issuedTo || issuedTo !== GOOGLE_ANDROID_OAUTH_CLIENT_ID) {
-      throw Object.assign(new Error("Token Google bukan untuk aplikasi Kingdom In Chaos DTP."), { status: 401 });
-    }
+  if (!match) throw Object.assign(new Error("Silakan masuk terlebih dahulu."), { status: 401 });
+  const parts = match[1].trim().split(".");
+  if (parts.length !== 3 || parts[0] !== "kic1" || parts[1].length > 512) {
+    throw Object.assign(new Error("Sesi tidak valid. Silakan masuk kembali."), { status: 401 });
   }
-  return identity;
+  const expected = await hmacSign("kic1." + parts[1]);
+  if (!safeEqual(expected, parts[2])) throw Object.assign(new Error("Sesi tidak valid. Silakan masuk kembali."), { status: 401 });
+  let claims: { u?: unknown; e?: unknown };
+  try { claims = JSON.parse(new TextDecoder().decode(b64urlDecode(parts[1]))); }
+  catch (_) { throw Object.assign(new Error("Sesi tidak valid. Silakan masuk kembali."), { status: 401 }); }
+  if (typeof claims.u !== "string" || typeof claims.e !== "number" || claims.e <= Math.floor(Date.now() / 1000)) {
+    throw Object.assign(new Error("Sesi sudah berakhir. Silakan masuk kembali."), { status: 401 });
+  }
+  const { data, error } = await service.from("game_google_players")
+    .select("player_uuid,google_sub,email,nickname,google_name,avatar_url,profile_completed")
+    .eq("player_uuid", claims.u).maybeSingle();
+  if (error) throw new Error("Pemeriksaan akun pemain gagal.");
+  if (!data || !(data as any).profile_completed) {
+    throw Object.assign(new Error("Akun tidak ditemukan. Silakan masuk kembali."), { status: 401 });
+  }
+  return identityFromPlayer(data as Record<string, any>);
 }
 
 async function requireData<T = unknown>(query: PromiseLike<{ data: T | null; error: { message: string } | null }>): Promise<T> {
@@ -107,73 +107,125 @@ async function requireData<T = unknown>(query: PromiseLike<{ data: T | null; err
   return data as T;
 }
 
-async function bootstrap(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>) {
-  const profile = await requireData<any>(service.from("game_google_players").upsert({
-    google_sub: identity.sub,
-    email: identity.email,
-    email_verified: true,
-    google_name: identity.name,
-    avatar_url: identity.picture,
-    last_seen_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }, { onConflict: "google_sub" }).select("*").single());
+async function loadWallet(playerUuid: string) {
   const economy = await requireData<any>(service.from("game_google_player_economy").upsert({
-    player_uuid: profile.player_uuid,
+    player_uuid: playerUuid,
   }, { onConflict: "player_uuid", ignoreDuplicates: true }).select("*").maybeSingle());
-  const wallet = economy || await requireData<any>(service.from("game_google_player_economy").select("*").eq("player_uuid", profile.player_uuid).single());
-  return { profile, economy: wallet };
+  return economy || await requireData<any>(service.from("game_google_player_economy").select("*").eq("player_uuid", playerUuid).single());
+}
+
+// Profil + saldo akun yang sedang masuk (token sesi sudah diverifikasi).
+async function bootstrap(identity: Identity) {
+  const profile = await requireData<any>(service.from("game_google_players")
+    .update({ last_seen_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .eq("player_uuid", identity.player_uuid).select("*").single());
+  return { profile, economy: await loadWallet(identity.player_uuid) };
 }
 
 const PASSWORD_ITERATIONS = 100_000;
 function toHex(bytes: Uint8Array) { return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join(""); }
+function fromHex(hex: string) {
+  const out = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+  return out;
+}
 async function hashPassword(password: string, salt: Uint8Array, iterations = PASSWORD_ITERATIONS) {
-  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+  const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations }, key, 256);
   return toHex(new Uint8Array(bits));
 }
 
-async function completeProfile(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>, body: Record<string, unknown>) {
+function readCredentials(body: Record<string, unknown>) {
   const nickname = typeof body.nickname === "string" ? body.nickname.trim() : "";
   if (nickname.length < 3 || nickname.length > 32) throw new Error("Nama pengguna harus terdiri dari 3–32 karakter.");
   if (!/^[\p{L}\p{N} _.-]+$/u.test(nickname)) throw new Error("Nama pengguna hanya boleh memakai huruf, angka, spasi, titik, garis bawah, atau tanda hubung.");
   const password = typeof body.password === "string" ? body.password : "";
   if (password.length < 4 || password.length > 16) throw new Error("Kata sandi harus 4–16 karakter.");
+  return { nickname, password };
+}
+const escapeLike = (text: string) => text.replace(/[\\%_]/g, "\\$&");
 
-  const current = await requireData<any>(service.from("game_google_players").select("*").eq("google_sub", identity.sub).single());
-  if (current.profile_completed) throw new Error("Akun ini sudah terdaftar.");
-
+// Daftar akun baru: nama pengguna unik (tanpa membedakan huruf besar/kecil) + kata sandi.
+async function registerPlayer(body: Record<string, unknown>) {
+  const { nickname, password } = readCredentials(body);
   const taken = await requireData<any>(service.from("game_google_players").select("player_uuid")
-    .ilike("nickname", nickname.replace(/[\\%_]/g, "\\$&")).neq("player_uuid", current.player_uuid).maybeSingle());
+    .ilike("nickname", escapeLike(nickname)).maybeSingle());
   if (taken) throw new Error("Nama pengguna sudah dipakai. Pilih nama lain.");
 
-  // Kata sandi tidak pernah disimpan polos: hanya hash PBKDF2-SHA256 + salt acak, di tabel khusus service_role.
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const hash = await hashPassword(password, salt);
-  await requireData<any>(service.from("game_google_player_credentials").upsert({
-    player_uuid: current.player_uuid,
-    password_hash: hash,
-    password_salt: toHex(salt),
-    password_iterations: PASSWORD_ITERATIONS,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: "player_uuid" }).select("player_uuid").single());
-
-  let profile: any;
+  const uid = crypto.randomUUID();
+  let player: any;
   try {
-    profile = await requireData<any>(service.from("game_google_players").update({
+    player = await requireData<any>(service.from("game_google_players").insert({
+      google_sub: `local:${uid}`,
+      email: `pemain-${uid}@akun.dtp.local`,
+      email_verified: true,
+      google_name: nickname,
+      avatar_url: "",
       nickname,
       profile_completed: true,
-      updated_at: new Date().toISOString(),
-    }).eq("player_uuid", current.player_uuid).eq("profile_completed", false).select("*").single());
+      last_seen_at: new Date().toISOString(),
+    }).select("*").single());
   } catch (e) {
     if (/duplicate key|nickname_ci_uq/i.test((e as Error).message)) throw new Error("Nama pengguna sudah dipakai. Pilih nama lain.");
     throw e;
   }
-  const economy = await requireData<any>(service.from("game_google_player_economy").select("*").eq("player_uuid", current.player_uuid).single());
-  return { profile, economy };
+  try {
+    // Kata sandi tidak pernah disimpan polos: hanya hash PBKDF2-SHA256 + salt acak, di tabel khusus service_role.
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    await requireData<any>(service.from("game_google_player_credentials").insert({
+      player_uuid: player.player_uuid,
+      password_hash: await hashPassword(password, salt),
+      password_salt: toHex(salt),
+      password_iterations: PASSWORD_ITERATIONS,
+    }).select("player_uuid").single());
+  } catch (e) {
+    await service.from("game_google_players").delete().eq("player_uuid", player.player_uuid);
+    throw e;
+  }
+  const economy = await loadWallet(player.player_uuid);
+  return { player, result: { token: await issueSessionToken(player.player_uuid), profile: player, economy } };
+}
+
+// Masuk: nama pengguna + kata sandi. Pesan salah dibuat sama agar nama pengguna tidak bisa ditebak.
+async function loginPlayer(body: Record<string, unknown>) {
+  const nickname = typeof body.nickname === "string" ? body.nickname.trim() : "";
+  const password = typeof body.password === "string" ? body.password : "";
+  if (nickname.length < 3 || nickname.length > 32 || password.length < 4 || password.length > 16) {
+    throw Object.assign(new Error("Nama pengguna atau kata sandi salah."), { status: 401 });
+  }
+  const wrong = () => Object.assign(new Error("Nama pengguna atau kata sandi salah."), { status: 401 });
+  const player = await requireData<any>(service.from("game_google_players").select("*")
+    .ilike("nickname", escapeLike(nickname)).eq("profile_completed", true).maybeSingle());
+  if (!player) {
+    await hashPassword(password, new Uint8Array(16)); // samakan waktu respons
+    throw wrong();
+  }
+  const cred = await requireData<any>(service.from("game_google_player_credentials").select("*")
+    .eq("player_uuid", player.player_uuid).maybeSingle());
+  if (!cred) throw wrong();
+  if (cred.locked_until && Date.parse(cred.locked_until) > Date.now()) {
+    throw Object.assign(new Error(`Terlalu banyak percobaan salah. Coba lagi dalam ${LOCK_MINUTES} menit.`), { status: 429 });
+  }
+  const hash = await hashPassword(password, fromHex(String(cred.password_salt)), Number(cred.password_iterations) || PASSWORD_ITERATIONS);
+  if (!safeEqual(hash, String(cred.password_hash))) {
+    const failed = Number(cred.failed_attempts ?? 0) + 1;
+    const lock = failed >= MAX_FAILED_LOGINS;
+    await service.from("game_google_player_credentials").update({
+      failed_attempts: lock ? 0 : failed,
+      locked_until: lock ? new Date(Date.now() + LOCK_MINUTES * 60_000).toISOString() : null,
+    }).eq("player_uuid", player.player_uuid);
+    throw wrong();
+  }
+  if (cred.failed_attempts || cred.locked_until) {
+    await service.from("game_google_player_credentials").update({ failed_attempts: 0, locked_until: null })
+      .eq("player_uuid", player.player_uuid);
+  }
+  const economy = await loadWallet(player.player_uuid);
+  return { player, result: { token: await issueSessionToken(player.player_uuid), profile: player, economy } };
 }
 
 
-async function getPlayerInbox(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>) {
+async function getPlayerInbox(identity: Identity) {
   const player = await requireData<any>(service.from("game_google_players")
     .select("player_uuid,email").eq("google_sub", identity.sub).single());
   const messages = await requireData<any[]>(service.from("game_google_player_mail")
@@ -183,7 +235,7 @@ async function getPlayerInbox(identity: Awaited<ReturnType<typeof verifyGoogleAc
   return { messages };
 }
 
-async function claimPlayerMail(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>, body: Record<string, unknown>) {
+async function claimPlayerMail(identity: Identity, body: Record<string, unknown>) {
   const mailId = typeof body.mail_id === "string" ? body.mail_id.trim() : "";
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(mailId)) {
     throw new Error("ID surat tidak valid.");
@@ -194,7 +246,7 @@ async function claimPlayerMail(identity: Awaited<ReturnType<typeof verifyGoogleA
   }));
 }
 
-async function syncNativeWallet(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>, body: Record<string, unknown>) {
+async function syncNativeWallet(identity: Identity, body: Record<string, unknown>) {
   const integer = (key: string, max = 2147483647) => {
     const value = Number(body[key]);
     if (!Number.isSafeInteger(value) || value < 0 || value > max) throw new Error(`Saldo native ${key} tidak valid.`);
@@ -236,7 +288,7 @@ async function syncNativeWallet(identity: Awaited<ReturnType<typeof verifyGoogle
 // v17.14.20: hadiah admin masuk otomatis. Layar Surat dihapus di v17.14.19, jadi server sendiri mengklaim
 // surat berhadiah milik pemain (kredit ke saldo server lewat RPC yang sama), lalu mengembalikan SEMUA klaim
 // (surat + kode hadiah) agar APK memasukkannya ke saldo native game. APK menjaga anti-ganda lewat claim_id.
-async function pullRewards(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>) {
+async function pullRewards(identity: Identity) {
   const player = await requireData<any>(service.from("game_google_players")
     .select("player_uuid,email").eq("google_sub", identity.sub).single());
 
@@ -278,7 +330,7 @@ async function pullRewards(identity: Awaited<ReturnType<typeof verifyGoogleAcces
 }
 
 // v17.14.21: pastikan jawaban redeem_code SELALU membawa { claim: { claim_id, code, rewards } }.
-async function ensureClaimPayload(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>, code: string, redeemed: any) {
+async function ensureClaimPayload(identity: Identity, code: string, redeemed: any) {
   const base = isObject(redeemed) ? redeemed : {};
   const existing = (base as any).claim;
   if (isObject(existing) && isObject((existing as any).rewards) && (existing as any).claim_id) return base;
@@ -296,14 +348,13 @@ async function ensureClaimPayload(identity: Awaited<ReturnType<typeof verifyGoog
   return { ...(base as Record<string, unknown>), claim: { claim_id: (claimRow as any).claim_id, code, rewards } };
 }
 
-async function notifyGoogleAdminDashboard(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>, resource: string) {
+async function notifyAdminDashboard(identity: Identity, resource: string) {
   const { data: player, error } = await service.from("game_google_players")
     .select("player_uuid,email").eq("google_sub", identity.sub).maybeSingle();
   if (error || !player) return false;
   const now = new Date().toISOString();
-  // Refresh the Google identity fields on every verified request. The foreground
-  // native-wallet heartbeat runs every 10 seconds, so a changed Google profile
-  // photo/name/email is copied to the admin dashboard without requiring a relogin.
+  // Perbarui last_seen pada setiap permintaan bersesi. Detak jantung saldo native tiap 10 detik
+  // membuat dashboard admin selalu melihat status pemain terbaru.
   const { error: profileRefreshError } = await service.from("game_google_players").update({
     email: identity.email,
     email_verified: identity.email_verified,
@@ -312,7 +363,7 @@ async function notifyGoogleAdminDashboard(identity: Awaited<ReturnType<typeof ve
     last_seen_at: now,
     updated_at: now,
   }).eq("player_uuid", player.player_uuid);
-  if (profileRefreshError) console.warn("Google profile refresh failed:", profileRefreshError.message);
+  if (profileRefreshError) console.warn("Player profile refresh failed:", profileRefreshError.message);
   const activityActions: Record<string, string> = {
     bootstrap: "google_login", complete_profile: "profile_completed",
     buy_meat: "meat_purchased", consume_meat: "meat_consumed",
@@ -334,27 +385,27 @@ async function notifyGoogleAdminDashboard(identity: Awaited<ReturnType<typeof ve
       payload: { player_uuid: player.player_uuid, resource, updated_at: now },
     })) === "ok";
   } catch (error) {
-    console.warn("Google player admin broadcast failed:", error);
+    console.warn("Player admin broadcast failed:", error);
     return false;
   } finally {
     try { await service.removeChannel(channel); } catch (_) { }
   }
 }
 
-// ---------------- v17.14.17: jalur baca Boss Gua & Event Shop untuk pemain Google ----------------
+// ---------------- v17.14.17: jalur baca Boss Gua & Event Shop untuk pemain ----------------
 // Sebelumnya game memanggil RPC lewat sesi Supabase Auth lama. Sesi itu tidak ada lagi setelah
-// login Google langsung, sehingga perintah admin tidak pernah terbaca game. Aksi di bawah hanya
-// BACA (tidak mengubah apa pun) dan sengaja tidak memicu notifyGoogleAdminDashboard supaya polling
+// sesi Supabase Auth, sehingga perintah admin tidak pernah terbaca game. Aksi di bawah hanya
+// BACA (tidak mengubah apa pun) dan sengaja tidak memicu notifyAdminDashboard supaya polling
 // berkala dari game tidak membanjiri tabel aktivitas / broadcast admin.
-async function requireKnownPlayer(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>) {
+async function requireKnownPlayer(identity: Identity) {
   const { data, error } = await service.from("game_google_players")
     .select("player_uuid").eq("google_sub", identity.sub).maybeSingle();
   if (error) throw new Error("Pemeriksaan akun pemain gagal.");
-  if (!data) throw Object.assign(new Error("Akun Google belum terdaftar sebagai pemain. Login ulang lewat tombol ONLINE."), { status: 403 });
+  if (!data) throw Object.assign(new Error("Akun belum terdaftar sebagai pemain. Masuk ulang lewat tombol LOGIN di game."), { status: 403 });
   return data as { player_uuid: string };
 }
 
-async function getCaveBossForPlayer(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>) {
+async function getCaveBossForPlayer(identity: Identity) {
   await requireKnownPlayer(identity);
   // get_active_cave_boss() tidak bergantung pada auth.uid() dan sudah di-grant ke service_role.
   const { data, error } = await service.rpc("get_active_cave_boss");
@@ -365,7 +416,7 @@ async function getCaveBossForPlayer(identity: Awaited<ReturnType<typeof verifyGo
   return data ?? { active: false };
 }
 
-async function getEventStoreForPlayer(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>) {
+async function getEventStoreForPlayer(identity: Identity) {
   const player = await requireKnownPlayer(identity);
   const { data, error } = await service.rpc("game_google_active_event_store", { p_player_uuid: player.player_uuid });
   if (error) {
@@ -380,18 +431,24 @@ Deno.serve(async (request: Request) => {
   if (request.method !== "POST") return fail("Method not allowed", 405);
   try {
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error("Konfigurasi server database belum lengkap.");
-    const identity = await verifyGoogleAccessToken(request);
     const body = await request.json().catch(() => ({}));
     if (!isObject(body)) return fail("Request body tidak valid.");
     const action = String(body.action ?? "");
+
+    // Aksi tanpa sesi: daftar & masuk. Hasilnya berisi token sesi untuk permintaan berikutnya.
+    if (action === "register" || action === "login") {
+      const done = action === "register" ? await registerPlayer(body) : await loginPlayer(body);
+      await notifyAdminDashboard(identityFromPlayer(done.player), action === "register" ? "complete_profile" : "bootstrap");
+      return json({ ok: true, data: done.result });
+    }
+
+    const identity = await verifySession(request);
     let data: unknown;
     // v17.14.17: aksi baca-saja tidak memperbarui last_seen / tidak membroadcast ke dashboard.
     let readOnlyPoll = false;
 
     if (action === "bootstrap") {
       data = await bootstrap(identity);
-    } else if (action === "complete_profile") {
-      data = await completeProfile(identity, body);
     } else if (action === "get_state") {
       data = await requireData<any>(service.rpc("game_google_player_state", { p_google_sub: identity.sub }));
     } else if (action === "buy_meat") {
@@ -439,7 +496,7 @@ Deno.serve(async (request: Request) => {
     }
     // Every authenticated player request updates last-seen and invalidates the admin snapshot.
     // The dashboard also polls as a fallback if the broadcast is temporarily missed.
-    if (!readOnlyPoll) await notifyGoogleAdminDashboard(identity, action);
+    if (!readOnlyPoll) await notifyAdminDashboard(identity, action);
     return json({ ok: true, data });
   } catch (error) {
     const e = error as Error & { status?: number };

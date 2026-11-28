@@ -213,8 +213,8 @@ public final class GameEventStoreActivity extends Activity {
                     if (backend.hasSession()) {
                         state = backend.getActiveEventStore();
                     } else {
-                        // v17.14.17: pemain login Google langsung -> ambil katalog lewat Edge Function google-player.
-                        GooglePlayerBackend google = new GooglePlayerBackend(getApplicationContext());
+                        // v17.14.17: pemain yang sudah masuk -> ambil katalog lewat Edge Function google-player.
+                        PlayerBackend google = new PlayerBackend(getApplicationContext());
                         if (!google.hasAccount()) throw new IllegalStateException("Login melalui tombol ONLINE di game terlebih dahulu.");
                         state = google.getEventStore();
                     }

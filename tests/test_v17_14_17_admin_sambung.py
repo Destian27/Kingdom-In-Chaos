@@ -18,8 +18,8 @@ def test_sql_wrapper_event_store_tanpa_auth_uid():
 def test_google_player_aksi_baca_saja():
     ts = read("supabase/functions/google-player/index.ts")
     assert 'action === "get_cave_boss"' in ts and 'action === "get_event_store"' in ts
-    assert "if (!readOnlyPoll) await notifyGoogleAdminDashboard" in ts
-    assert ts == read("kingdom-in-chaos-dtp-google-player-function-v17_14_20.ts")
+    assert "if (!readOnlyPoll) await notifyAdminDashboard" in ts
+    assert ts == read("kingdom-in-chaos-dtp-player-function-v1_0_7.ts")
 
 
 def test_game_admin_log_lengkap_dan_maintenance():
@@ -31,7 +31,7 @@ def test_game_admin_log_lengkap_dan_maintenance():
 
 
 def test_java_fallback_google():
-    assert "getCaveBoss()" in read("dtp/src/com/destian/dtp/GooglePlayerBackend.java")
+    assert "getCaveBoss()" in read("dtp/src/com/destian/dtp/PlayerBackend.java")
     app = read("dtp/src/com/destian/dtp/DtpApp.java")
     assert "google.getCaveBoss()" in app and "google.getEventStore()" in app
     assert "cacheEventStoreState(new JSONObject());\n                    }" not in app.split("refreshEventStoreAsync")[1][:900]

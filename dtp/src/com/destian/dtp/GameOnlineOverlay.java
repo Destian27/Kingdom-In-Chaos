@@ -28,7 +28,7 @@ import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-/** Game account entry overlay. It opens direct Google sign-in before online account tools. */
+/** Game overlay: tombol Akun (Ganti Akun / Keluar). Masuk/Daftar memakai dialog bawaan game. */
 public final class GameOnlineOverlay {
     private static final String TAG_ACCOUNT_BUTTON = "com.destian.dtp.GAME_ACCOUNT_BUTTON";
     private static final String TAG_MAIL_BUTTON = "com.destian.dtp.GAME_MAIL_BUTTON";
@@ -51,9 +51,10 @@ public final class GameOnlineOverlay {
 
             // v17.14.8: tombol GOOGLE, SURAT, dan BARTER dihapus (sudah ada di dalam game).
             removeLegacyButtons(root);
-            if (root.findViewWithTag(TAG_HOTSPOTS) == null) {
-                root.addView(new Hotspots(activity), new FrameLayout.LayoutParams(-1, -1));
-            }
+            // v1.0.8: dialog Masuk/Daftar BAWAAN game dipakai penuh (tersambung lewat LocalAuthServer);
+            // tidak ada lagi area sentuh yang menimpa avatar/LOGIN. Setelah masuk muncul tombol Akun.
+            addAccountChip(activity, root);
+            AccountSession.showPendingHint(activity);
 
             Button eventButton = (Button) root.findViewWithTag(TAG_EVENT_STORE_BUTTON);
             if (eventButton == null) {
@@ -90,82 +91,8 @@ public final class GameOnlineOverlay {
 
 
     /**
-     * v17.14.8: area sentuh tak terlihat di atas tombol bawaan game.
-     * Tombol LOGIN (kiri atas) membuka pemilih akun Google, atau dialog akun bila sudah login.
-     * v17.14.19: Hub Online, Surat, dan Daging Misi DIHAPUS.
-     * v17.14.20: dialog KODE HADIAH asli game ("Masukkan kode promo" + Oke) dikembalikan; kodenya
-     * diklaim ke server DTP lewat hook native (handlePromoCode), bukan halaman terpisah.
-     * v17.14.18: area Bakat DIHAPUS agar tombol Bakat asli game (menu kanan) berfungsi lagi.
-     * Sentuhan di luar area tidak dikonsumsi sehingga game tetap menerimanya.
-     * Koordinat relatif terhadap tinggi layar.
-     */
-    private static final class Hotspots extends View {
-        private final Activity activity;
-        private int downZone = -1;
-
-        Hotspots(Activity activity) {
-            super(activity);
-            this.activity = activity;
-            setTag(TAG_HOTSPOTS);
-        }
-
-        /** 0 = LOGIN, 2 = avatar/nama panggilan, -1 = di luar area / diteruskan ke game (1 = Bakat, 3 = Kode Hadiah: tidak dipakai). */
-        private int zoneAt(float x, float y) {
-            float h = getHeight(), w = getWidth();
-            if (h <= 0 || w <= 0) return -1;
-            // v17.14.21: area sentuh ini menempel di SEMUA layar game, jadi setelah login ia menelan sentuhan
-            // di halaman berikutnya (dialog Akun Google muncul alih-alih tombol game yang diklik). Setelah
-            // login, semua sentuhan diteruskan ke game: avatar, nama panggilan, dan halaman lain berfungsi asli.
-            // Area LOGIN/avatar hanya aktif selama pemain BELUM login Google.
-            try {
-                if (new GooglePlayerBackend(activity.getApplicationContext()).hasAccount()) return -1;
-            } catch (RuntimeException ignored) { }
-            // v17.14.20: tombol "Kode Hadiah" asli game (pojok kiri bawah Toko) harus sampai ke game agar
-            // dialog "Masukkan kode promo" asli terbuka. Area ini TIDAK dikonsumsi (return -1) dan dicek
-            // lebih dulu karena sebagian bertumpuk dengan kotak avatar. Kodenya dikirim ke server DTP lewat
-            // hook native UIMallLayer::onInputPromoCode (lihat handlePromoCode).
-            if (x >= 0.15f * h && x <= 0.46f * h && y >= 0.92f * h && y <= 1.0f * h) return -1;
-            // LOGIN: kiri 0.020H, atas 0.138H, lebar 0.264H, tinggi 0.107H
-            if (x >= 0.020f * h && x <= 0.284f * h && y >= 0.138f * h && y <= 0.245f * h) return 0;
-            // v17.14.10: kotak avatar + nama panggilan (kiri bawah beranda) -> Google lebih dulu,
-            // lalu layar Daftar (nama saja). Dialog Masuk/Daftar bawaan game tidak lagi terbuka.
-            if (x >= 0.085f * h && x <= 0.68f * h && y >= 0.80f * h && y <= 0.975f * h) {
-                return 2;
-            }
-            return -1;
-        }
-
-        @Override public boolean onTouchEvent(MotionEvent e) {
-            switch (e.getActionMasked()) {
-                case MotionEvent.ACTION_DOWN:
-                    downZone = zoneAt(e.getX(), e.getY());
-                    return downZone >= 0;
-                case MotionEvent.ACTION_UP:
-                    int zone = downZone;
-                    downZone = -1;
-                    if (zone >= 0 && zone == zoneAt(e.getX(), e.getY())) open(zone);
-                    return zone >= 0;
-                case MotionEvent.ACTION_CANCEL:
-                    downZone = -1;
-                    return false;
-                default:
-                    return downZone >= 0;
-            }
-        }
-
-        private void open(int zone) {
-            try {
-                GooglePlayerBackend backend = new GooglePlayerBackend(activity.getApplicationContext());
-                if (backend.hasAccount()) showAccountDialog(activity, backend);
-                else activity.startActivity(new Intent(activity, GameAuthActivity.class));
-            } catch (RuntimeException ignored) { }
-        }
-    }
-
-
-    /**
      * v17.14.20: kode dari dialog Kode Hadiah asli game. Dipanggil dari hook native (thread GL).
-     * Klaim ke server (butuh login Google), lalu hadiah dimasukkan ke saldo native lewat jurnal
+     * Klaim ke server (butuh login), lalu hadiah dimasukkan ke saldo native lewat jurnal
      * anti-ganda yang sama dengan surat/kode sebelumnya.
      */
     public static void handlePromoCode(final String rawCode) {
@@ -180,10 +107,9 @@ public final class GameOnlineOverlay {
                         Toast.makeText(activity, "Kode harus 4–40 karakter (huruf, angka, atau -).", Toast.LENGTH_LONG).show();
                         return;
                     }
-                    final GooglePlayerBackend backend = new GooglePlayerBackend(activity.getApplicationContext());
+                    final PlayerBackend backend = new PlayerBackend(activity.getApplicationContext());
                     if (!backend.hasAccount()) {
-                        Toast.makeText(activity, "Login Google dulu untuk memakai Kode Hadiah.", Toast.LENGTH_LONG).show();
-                        activity.startActivity(new Intent(activity, GameAuthActivity.class));
+                        Toast.makeText(activity, "Masuk dulu untuk memakai Kode Hadiah: ketuk kotak avatar di beranda, atau pilih Akun > Ganti Akun.", Toast.LENGTH_LONG).show();
                         return;
                     }
                     Toast.makeText(activity, "Memeriksa kode hadiah...", Toast.LENGTH_SHORT).show();
@@ -234,7 +160,7 @@ public final class GameOnlineOverlay {
                 NativeGameRuntimeSync.reconcileClaimedMail(activity);
                 showPromoDialog(activity, "Kode diterima server, tetapi data hadiah tidak ikut dikirim. "
                         + "Hadiah sedang ditarik ulang otomatis; bila saldo belum bertambah dalam 30 detik, "
-                        + "pasang Edge Function google-player v17.14.21.");
+                        + "pasang Edge Function google-player v1.0.7 (kode server terbaru).");
                 return;
             }
             final Context app = activity.getApplicationContext();
@@ -278,24 +204,84 @@ public final class GameOnlineOverlay {
         } catch (Throwable ignored) { }
     }
 
-    /** Dialog akun kecil pengganti Hub Online: menampilkan akun Google aktif dan tombol keluar. */
-    private static void showAccountDialog(final Activity activity, final GooglePlayerBackend backend) {
-        String name = backend.getSavedAccountName();
+    /** v1.0.8: tombol Akun (hanya saat sudah masuk) di bawah ikon "!" kiri atas. */
+    private static void addAccountChip(final Activity activity, FrameLayout root) {
+        try {
+            View existing = root.findViewWithTag(TAG_ACCOUNT_BUTTON);
+            boolean signedIn = AccountSession.hasAnyAccount(activity);
+            if (!signedIn) {
+                if (existing != null) root.removeView(existing);
+                return;
+            }
+            PlayerBackend backend = new PlayerBackend(activity.getApplicationContext());
+            String name = backend.getSavedAccountName();
+            String label = "Akun" + (name == null || name.isEmpty() ? "" : ": " + (name.length() > 10 ? name.substring(0, 10) + "…" : name));
+            if (existing instanceof Button) {
+                ((Button) existing).setText(label);
+                existing.bringToFront();
+                return;
+            }
+            Button chip = new Button(activity);
+            chip.setTag(TAG_ACCOUNT_BUTTON);
+            chip.setText(label);
+            chip.setTextSize(11f);
+            chip.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            chip.setAllCaps(false);
+            chip.setTextColor(Color.WHITE);
+            chip.setPadding(dp(activity, 10), 0, dp(activity, 10), 0);
+            chip.setBackground(buttonBackground());
+            chip.setAlpha(0.92f);
+            chip.setContentDescription("Buka menu akun: ganti akun atau keluar");
+            chip.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View view) { showAccountDialog(activity); }
+            });
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT, dp(activity, 30), Gravity.TOP | Gravity.LEFT);
+            params.topMargin = dp(activity, 146);
+            params.leftMargin = dp(activity, 8);
+            root.addView(chip, params);
+            chip.bringToFront();
+        } catch (Throwable ignored) { }
+    }
+
+    /** Dipanggil LocalAuthServer setelah Masuk/Daftar berhasil (thread mana pun). */
+    public static void refreshAccountChip() {
+        WeakReference<Activity> ref = activeActivity;
+        final Activity activity = ref == null ? null : ref.get();
+        if (activity == null || activity.isFinishing()) return;
+        activity.runOnUiThread(new Runnable() {
+            @Override public void run() {
+                try {
+                    View content = activity.findViewById(android.R.id.content);
+                    if (content instanceof FrameLayout) addAccountChip(activity, (FrameLayout) content);
+                } catch (Throwable ignored) { }
+            }
+        });
+    }
+
+    /** Dialog akun: akun aktif + Ganti Akun + Keluar. Keduanya membersihkan akun lalu memulai ulang game. */
+    private static void showAccountDialog(final Activity activity) {
+        String name = new PlayerBackend(activity.getApplicationContext()).getSavedAccountName();
         new AlertDialog.Builder(activity)
-                .setTitle("Akun Google")
-                .setMessage("Masuk sebagai:\n" + (name == null || name.isEmpty() ? "-" : name))
+                .setTitle("Akun")
+                .setMessage("Masuk sebagai:\n" + (name == null || name.isEmpty() ? "-" : name)
+                        + "\n\nGanti Akun dan Keluar akan memulai ulang game.")
                 .setPositiveButton("Tutup", null)
-                .setNegativeButton("Keluar Google", new DialogInterface.OnClickListener() {
+                .setNeutralButton("Ganti Akun", new DialogInterface.OnClickListener() {
                     @Override public void onClick(DialogInterface dialog, int which) {
-                        backend.clearAccount();
-                        Toast.makeText(activity, "Sudah keluar dari akun Google.", Toast.LENGTH_SHORT).show();
+                        AccountSession.signOutAndRestart(activity, true);
+                    }
+                })
+                .setNegativeButton("Keluar", new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface dialog, int which) {
+                        AccountSession.signOutAndRestart(activity, false);
                     }
                 })
                 .show();
     }
 
     private static void removeLegacyButtons(FrameLayout root) {
-        String[] tags = {TAG_ACCOUNT_BUTTON, TAG_MAIL_BUTTON, TAG_BARTER_BUTTON};
+        String[] tags = {TAG_HOTSPOTS, TAG_MAIL_BUTTON, TAG_BARTER_BUTTON};
         for (String tag : tags) {
             View old = root.findViewWithTag(tag);
             if (old != null) root.removeView(old);

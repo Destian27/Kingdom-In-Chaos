@@ -44,11 +44,6 @@ public final class SupabaseGameBackend {
     private static final String PREFS = "kic_supabase_session_v1";
     private static final String ACCESS = "access_token";
     private static final String REFRESH = "refresh_token";
-    public static final String GOOGLE_REDIRECT_URI = "kingdominchaosdtp://auth";
-    private static final String OAUTH_PREFS = "kic_google_oauth_pending_v1";
-    private static final String OAUTH_VERIFIER = "code_verifier";
-    private static final String OAUTH_STATE = "state";
-    private static final String OAUTH_CREATED_AT = "created_at_ms";
     private static final int TIMEOUT_MS = 15000;
 
     private final SharedPreferences prefs;
@@ -59,83 +54,7 @@ public final class SupabaseGameBackend {
     }
 
 
-    /**
-     * Starts Supabase Google OAuth using Authorization Code + PKCE.
-     * The Android app receives the callback at kingdominchaosdtp://auth.
-     * Add this URI to Supabase Auth > URL Configuration > Redirect URLs.
-     */
-    public String beginGoogleOAuth() throws IOException {
-        try {
-            byte[] random = new byte[32];
-            SecureRandom secureRandom = new SecureRandom();
-            secureRandom.nextBytes(random);
-            String verifier = Base64.encodeToString(random,
-                    Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING);
-            byte[] challengeBytes = MessageDigest.getInstance("SHA-256")
-                    .digest(verifier.getBytes(StandardCharsets.US_ASCII));
-            String challenge = Base64.encodeToString(challengeBytes,
-                    Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING);
-            byte[] stateBytes = new byte[24];
-            secureRandom.nextBytes(stateBytes);
-            String state = Base64.encodeToString(stateBytes,
-                    Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING);
-
-            prefs.edit()
-                    .putString(OAUTH_VERIFIER, verifier)
-                    .putString(OAUTH_STATE, state)
-                    .putLong(OAUTH_CREATED_AT, System.currentTimeMillis())
-                    .apply();
-
-            Uri authUri = Uri.parse(BASE_URL + "/auth/v1/authorize").buildUpon()
-                    .appendQueryParameter("provider", "google")
-                    .appendQueryParameter("redirect_to", GOOGLE_REDIRECT_URI)
-                    .appendQueryParameter("code_challenge", challenge)
-                    .appendQueryParameter("code_challenge_method", "s256")
-                    .appendQueryParameter("state", state)
-                    .build();
-            return authUri.toString();
-        } catch (Exception e) {
-            throw new IOException("Tidak dapat menyiapkan login Google (PKCE).", e);
-        }
-    }
-
-    /** Exchanges the one-time Supabase OAuth authorization code and stores encrypted tokens. */
-    public JSONObject completeGoogleOAuth(String authCode, String returnedState) throws IOException {
-        requireText(authCode, "authorization code");
-        String verifier = prefs.getString(OAUTH_VERIFIER, null);
-        String expectedState = prefs.getString(OAUTH_STATE, null);
-        long createdAt = prefs.getLong(OAUTH_CREATED_AT, 0L);
-        if (isBlank(verifier) || isBlank(expectedState) || createdAt <= 0
-                || System.currentTimeMillis() - createdAt > 10L * 60L * 1000L) {
-            clearGoogleOAuthPending();
-            throw new IOException("Sesi login Google sudah kedaluwarsa. Silakan mulai login lagi.");
-        }
-        if (isBlank(returnedState) || !expectedState.equals(returnedState)) {
-            clearGoogleOAuthPending();
-            throw new IOException("Verifikasi keamanan login gagal (state tidak cocok). Coba login lagi.");
-        }
-        JSONObject payload = new JSONObject();
-        try {
-            payload.put("auth_code", authCode.trim());
-            payload.put("code_verifier", verifier);
-        } catch (JSONException e) {
-            throw new IOException("Tidak dapat menyiapkan pertukaran kode login.", e);
-        }
-
-        JSONObject result = request("/auth/v1/token?grant_type=pkce",
-                "POST", payload, null, false);
-        storeSession(result);
-        clearGoogleOAuthPending();
-        return result;
-    }
-
-    public void clearGoogleOAuthPending() {
-        prefs.edit()
-                .remove(OAUTH_VERIFIER)
-                .remove(OAUTH_STATE)
-                .remove(OAUTH_CREATED_AT)
-                .apply();
-    }
+    // v1.0.7: login Google (OAuth/PKCE) dihapus total; pemain masuk lewat nama pengguna + kata sandi (PlayerBackend).
 
     public JSONObject refreshSession() throws IOException {
         String refresh = readSecret(REFRESH);

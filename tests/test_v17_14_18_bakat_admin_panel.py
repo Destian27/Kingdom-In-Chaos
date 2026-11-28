@@ -11,7 +11,7 @@ def test_bakat_button_is_not_hijacked():
     overlay = read("dtp/src/com/destian/dtp/GameOnlineOverlay.java")
     assert "return 1;" not in overlay
     assert "0.352f" not in overlay
-    assert "return 0;" in overlay and "return 2;" in overlay
+    assert "Hotspots" not in overlay  # v1.0.8: tidak ada area sentuh yang menimpa tombol game
 
 
 def test_admin_has_separate_pages_and_player_table():

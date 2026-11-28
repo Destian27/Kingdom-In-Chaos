@@ -33,7 +33,7 @@ def test_redeemed_rewards_are_queued_for_native_wallet_and_recovered():
     assert "queueCodeClaim" in read(SRC / "GameOnlineOverlay.java")
     sync = read(SRC / "NativeGameRuntimeSync.java")
     assert "static boolean queueCodeClaim" in sync and "getCodeClaims()" in sync
-    assert "get_code_claims" in read(SRC / "GooglePlayerBackend.java")
+    assert "get_code_claims" in read(SRC / "PlayerBackend.java")
 
 
 def test_sql_redeem_credits_event_eyes_and_returns_claim():

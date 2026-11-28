@@ -39,7 +39,7 @@ final class NativeGameRuntimeSync {
     /** Capture actual native values on Cocos GL thread and report a read-only snapshot to admin. */
     static void syncGoogleWallet(final Activity activity) {
         if (activity == null || activity.isFinishing()) return;
-        final GooglePlayerBackend backend = new GooglePlayerBackend(activity.getApplicationContext());
+        final PlayerBackend backend = new PlayerBackend(activity.getApplicationContext());
         if (!backend.hasAccount() || googleWalletSyncRunning) return;
         final GLSurfaceView gl = findGameSurface(activity);
         if (gl == null) return;
@@ -160,7 +160,7 @@ final class NativeGameRuntimeSync {
      */
     static void reconcileClaimedMail(final Activity activity) {
         if (activity == null || activity.isFinishing()) return;
-        final GooglePlayerBackend backend = new GooglePlayerBackend(activity.getApplicationContext());
+        final PlayerBackend backend = new PlayerBackend(activity.getApplicationContext());
         if (!backend.hasAccount() || mailReconcileRunning) {
             applyPendingMailRewards(activity);
             return;

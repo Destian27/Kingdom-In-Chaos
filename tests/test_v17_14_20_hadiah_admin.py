@@ -26,13 +26,8 @@ def test_native_promo_dialog_is_hooked_and_forwarded_to_java():
 def test_kode_hadiah_button_is_passed_through_to_original_dialog():
     overlay = read(SRC / "GameOnlineOverlay.java")
     assert "return 3;" not in overlay and "zone == 3" not in overlay
-    m = re.search(r"x >= ([0-9.]+)f \* h && x <= ([0-9.]+)f \* h && y >= ([0-9.]+)f \* h && y <= ([0-9.]+)f \* h\) return -1;", overlay)
-    assert m
-    x0, x1, y0, y1 = map(float, m.groups())
-    # tombol asli (screenshot 2340x1080): x 0.27-0.43H, y 0.93-1.0H
-    assert x0 <= 0.27 and x1 >= 0.43 and y0 <= 0.93 and y1 >= 0.99
-    # dicek sebelum kotak avatar yang bertumpuk dengannya
-    assert overlay.index("return -1;") < overlay.index("return 2;")
+    # v1.0.8: tanpa Hotspots, semua sentuhan (termasuk tombol Kode Hadiah) langsung sampai ke game.
+    assert "Hotspots" not in overlay
 
 
 def test_admin_rewards_are_pulled_and_applied_automatically():
@@ -40,7 +35,7 @@ def test_admin_rewards_are_pulled_and_applied_automatically():
     assert 'action === "pull_rewards"' in player_ts
     assert 'game_google_claim_player_mail' in player_ts.split("async function pullRewards")[1][:1800]
     assert 'source: "mail"' in player_ts and 'source: "code"' in player_ts
-    backend = read(SRC / "GooglePlayerBackend.java")
+    backend = read(SRC / "PlayerBackend.java")
     assert '"pull_rewards"' in backend
     sync = read(SRC / "NativeGameRuntimeSync.java")
     assert "backend.pullRewards()" in sync and "queueCodeClaim(appCtx" in sync
@@ -66,6 +61,5 @@ def test_admin_panel_no_longer_tells_admin_to_wait_for_player_claim():
     assert read(ROOT / "admin.html") == html
     admin_ts = read(ROOT / "kingdom-in-chaos-dtp-game-admin-function-v17_14_20.ts")
     assert 'delivery: "auto"' in admin_ts
-    for fn in ("google-player", "game-admin"):
-        name = "google-player-function" if fn == "google-player" else "game-admin-function"
-        assert read(ROOT / f"supabase/functions/{fn}/index.ts") == read(ROOT / f"kingdom-in-chaos-dtp-{name}-v17_14_20.ts")
+    assert read(ROOT / "supabase/functions/google-player/index.ts") == read(ROOT / "kingdom-in-chaos-dtp-player-function-v1_0_7.ts")
+    assert read(ROOT / "supabase/functions/game-admin/index.ts") == read(ROOT / "kingdom-in-chaos-dtp-game-admin-function-v17_14_20.ts")

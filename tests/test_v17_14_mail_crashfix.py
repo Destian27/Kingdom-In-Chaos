@@ -60,7 +60,7 @@ def test_admin_realtime_broadcast_plus_poll_fallback_refreshes_player_and_mail_t
     assert 'google-admin-dashboard' in html
     assert 'google_player_changed' in html
     assert '}, 15000)' in html
-    assert 'notifyGoogleAdminDashboard(identity, action)' in edge
+    assert 'notifyAdminDashboard(identity, action)' in edge
     assert 'publishRealtimeBroadcast("google-admin-dashboard", "google_player_changed"' in admin
     assert 'last_seen_at' in admin
 
@@ -68,9 +68,9 @@ def test_admin_realtime_broadcast_plus_poll_fallback_refreshes_player_and_mail_t
 def test_version_and_package_are_bumped_for_v17_14_2():
     yml = read('kingdom-in-chaos-decompiled/apktool.yml')
     build = read('build_dtp.py')
-    assert 'versionCode: 106' in yml
-    assert 'versionName: 1.0.6' in yml
-    assert 'KingdomInChaosDTP-v1.0.6.apk' in build
+    assert 'versionCode: 108' in yml
+    assert 'versionName: 1.0.8' in yml
+    assert 'KingdomInChaosDTP-v1.0.8.apk' in build
 
 
 

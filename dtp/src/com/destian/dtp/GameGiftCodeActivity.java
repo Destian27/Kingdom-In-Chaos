@@ -11,16 +11,16 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
-/** Player-side reward-code redemption page backed by a server-verified Google identity. */
+/** Player-side reward-code redemption page backed by a server-verified player session. */
 public final class GameGiftCodeActivity extends Activity {
-    private GooglePlayerBackend backend;
+    private PlayerBackend backend;
     private EditText codeInput;
     private TextView status;
     private Button redeemButton;
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
-        backend = new GooglePlayerBackend(this);
+        backend = new PlayerBackend(this);
         LinearLayout page = new LinearLayout(this);
         page.setOrientation(LinearLayout.VERTICAL);
         page.setPadding(dp(20), dp(22), dp(20), dp(22));

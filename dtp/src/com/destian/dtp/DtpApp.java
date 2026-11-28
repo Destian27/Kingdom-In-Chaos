@@ -22,7 +22,7 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
     private static volatile DtpApp instance;
     private static final long POLL_MS = 2000;
     private static final long EVENT_STORE_POLL_MS = 1000L;
-    // v17.14.17: jalur Google memanggil Edge Function, jadi dibatasi agar poll 1 detik Event Shop
+    // v17.14.17: jalur pemain memanggil Edge Function, jadi dibatasi agar poll 1 detik Event Shop
     // tidak menjadi 1 request/detik ke server. Perubahan admin tetap terbaca dalam <= 10 detik.
     private static final long GOOGLE_ADMIN_MIN_INTERVAL_MS = 10000L;
     private volatile long googleCaveBossLastMs;
@@ -97,10 +97,13 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
     public void onCreate() {
         super.onCreate();
         instance = this;
-        // v17.13: player login is direct Google Auth. Drop obsolete Supabase
-        // player sessions/PKCE state so the old password/OAuth path cannot resume.
+        // v1.0.7: login pemain = nama pengguna + kata sandi. Buang sesi Supabase/OAuth dan sesi akun Google lama
+        // supaya jalur lama tidak bisa dilanjutkan; pemain masuk lagi dengan nama pengguna + kata sandi.
         getSharedPreferences("kic_supabase_session_v1", MODE_PRIVATE).edit().clear().apply();
         getSharedPreferences("kic_google_oauth_pending_v1", MODE_PRIVATE).edit().clear().apply();
+        getSharedPreferences("kic_google_player_v1", MODE_PRIVATE).edit().clear().apply();
+        // v1.0.8: jembatan Masuk/Daftar bawaan game (127.0.0.1:7391) harus aktif sebelum game dibuka.
+        LocalAuthServer.start(this);
         CrashReporter.onAppStart(this, new CrashReporter.ReportListener() {
             @Override public void onReportReady() {
                 final Activity active = foregroundActivity;
@@ -340,9 +343,9 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
                     if (backend.hasSession()) {
                         cacheCaveBossState(backend.getActiveCaveBoss());
                     } else {
-                        // v17.14.17: pemain login Google langsung tidak punya sesi Supabase -> baca lewat Edge Function.
+                        // v17.14.17: pemain tidak punya sesi Supabase -> baca lewat Edge Function.
                         // Tanpa ini perintah Boss Gua dari admin tidak pernah sampai ke game.
-                        GooglePlayerBackend google = new GooglePlayerBackend(getApplicationContext());
+                        PlayerBackend google = new PlayerBackend(getApplicationContext());
                         long now = System.currentTimeMillis();
                         if (google.hasAccount() && now - googleCaveBossLastMs >= GOOGLE_ADMIN_MIN_INTERVAL_MS) {
                             googleCaveBossLastMs = now;
@@ -393,8 +396,8 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
                         cacheEventStoreState(backend.getActiveEventStore());
                     } else {
                         // v17.14.17: sebelumnya di sini cache dikosongkan ({}) sehingga Event Shop dari admin
-                        // tidak pernah tampil untuk pemain Google. Kini dibaca lewat Edge Function (dibatasi interval).
-                        GooglePlayerBackend google = new GooglePlayerBackend(getApplicationContext());
+                        // tidak pernah tampil untuk pemain. Kini dibaca lewat Edge Function (dibatasi interval).
+                        PlayerBackend google = new PlayerBackend(getApplicationContext());
                         long now = System.currentTimeMillis();
                         if (google.hasAccount()) {
                             if (now - googleEventStoreLastMs >= GOOGLE_ADMIN_MIN_INTERVAL_MS) {

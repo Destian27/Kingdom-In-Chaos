@@ -19,8 +19,8 @@ def test_native_food_recovery_is_patched_to_five_minutes():
 def test_version_and_build_output_are_17_14_2():
     yml = (ROOT / "kingdom-in-chaos-decompiled/apktool.yml").read_text()
     build = (ROOT / "build_dtp.py").read_text()
-    assert "versionName: 1.0.6" in yml
-    assert "versionCode: 106" in yml
-    assert "KingdomInChaosDTP-v1.0.6.apk" in build
+    assert "versionName: 1.0.8" in yml
+    assert "versionCode: 108" in yml
+    assert "KingdomInChaosDTP-v1.0.8.apk" in build
 
 

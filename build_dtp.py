@@ -14,7 +14,7 @@ APKTOOL_JAR = os.environ.get("APKTOOL_JAR", os.path.join(TOOLS, "apktool.jar"))
 KEYSTORE = os.environ.get("KEYSTORE_PATH", os.path.join(TOOLS, "release.keystore"))
 KS_PASS = os.environ.get("KEYSTORE_PASS", "android123")
 KS_ALIAS = os.environ.get("KEYSTORE_ALIAS", "kingdomchaosdtp")
-OUTPUT_APK = os.path.join(ROOT, "KingdomInChaosDTP-v1.0.6.apk")
+OUTPUT_APK = os.path.join(ROOT, "KingdomInChaosDTP-v1.0.8.apk")
 MIN_API = "24"
 NDK_VERSION = os.environ.get("ANDROID_NDK_VERSION", "27.2.12479018")
 IS_WIN = os.name == "nt"
@@ -116,6 +116,14 @@ def patch_ui_polish():
     run([sys.executable, patcher])
 
 
+def patch_local_auth():
+    # v1.0.8: login/daftar/ubah-akun bawaan game -> server lokal 127.0.0.1:7391 (LocalAuthServer).
+    patcher = os.path.join(TOOLS, "patch_v1_0_8_local_auth.py")
+    if not os.path.isfile(patcher):
+        sys.exit("Script patch login lokal tidak ditemukan: " + patcher)
+    run([sys.executable, patcher])
+
+
 def compile_native_bridge():
     ndk = ndk_root()
     host = "windows-x86_64" if IS_WIN else ("darwin-arm64" if sys.platform == "darwin" and os.uname().machine == "arm64" else "darwin-x86_64" if sys.platform == "darwin" else "linux-x86_64")
@@ -187,6 +195,7 @@ def main():
     patch_dm_labels()
     patch_total_recharge()
     patch_ui_polish()
+    patch_local_auth()
     compile_native_bridge()
     dex = compile_dex()
 

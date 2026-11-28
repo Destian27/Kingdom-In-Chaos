@@ -36,16 +36,15 @@ def test_tombol_overlay_dihapus():
     assert '"GOOGLE"' not in overlay
 
 
-def test_pemilih_akun_google_muncul_langsung():
-    auth = read_text("dtp/src/com/destian/dtp/GameAuthActivity.java")
-    assert "if (state == null) chooseGoogleAccount();" in auth
+def test_layar_masuk_daftar_tanpa_google():
+    srv = read_text("dtp/src/com/destian/dtp/LocalAuthServer.java")
+    assert "chooseGoogleAccount" not in srv and "backend.login(user, pass)" in srv
     overlay = read_text("dtp/src/com/destian/dtp/GameOnlineOverlay.java")
-    assert "class Hotspots extends View" in overlay and "GameAuthActivity.class" in overlay
+    assert "class Hotspots" not in overlay and "GameAuthActivity" not in overlay
     assert "promptGoogleLoginOnce" not in read_text("dtp/src/com/destian/dtp/DtpApp.java")
 
 
 def test_versi_17_14_8():
     yml = read_text("kingdom-in-chaos-decompiled/apktool.yml")
-    assert "versionName: 1.0.6" in yml and "versionCode: 106" in yml
-    assert "KingdomInChaosDTP-v1.0.6.apk" in read_text("build_dtp.py")
-    assert "KingdomInChaosDTP-v1.0.6.apk" in read_text(".github/workflows/build-apk.yml")
+    assert "versionName: 1.0.8" in yml and "versionCode: 108" in yml
+    assert "KingdomInChaosDTP-v1.0.8.apk" in read_text("build_dtp.py")
