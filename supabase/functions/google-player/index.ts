@@ -205,7 +205,7 @@ async function syncNativeWallet(identity: Awaited<ReturnType<typeof verifyGoogle
   const goblinCoins = integer("goblin_coins");
   const meat = integer("meat", 24);
   const player = await requireData<any>(service.from("game_google_players")
-    .select("player_uuid,email").eq("google_sub", identity.sub).single());
+    .select("player_uuid,email,last_seen_at").eq("google_sub", identity.sub).single());
   const prior = await requireData<any>(service.from("game_google_player_native_wallets")
     .select("coins,crystals,goblin_coins,meat").eq("player_uuid", player.player_uuid).maybeSingle());
   const changed = !prior || prior.coins !== coins || prior.crystals !== crystals || prior.goblin_coins !== goblinCoins || prior.meat !== meat;
@@ -226,7 +226,11 @@ async function syncNativeWallet(identity: Awaited<ReturnType<typeof verifyGoogle
     });
     if (error) console.warn("Native wallet activity log failed:", error.message);
   }
-  return { native_wallet: snapshot, authoritative: false };
+  // v17.14.21: APK melapor tiap 2 detik. Dashboard admin hanya dibangunkan bila saldo berubah, atau sebagai
+  // denyut jantung tiap 10 detik (memperbarui last_seen), supaya tidak membanjiri broadcast/tabel.
+  const lastSeen = Date.parse(player.last_seen_at ?? "") || 0;
+  const notify = changed || !prior || Date.now() - lastSeen >= 10000;
+  return { native_wallet: snapshot, authoritative: false, changed, notify };
 }
 
 // v17.14.20: hadiah admin masuk otomatis. Layar Surat dihapus di v17.14.19, jadi server sendiri mengklaim
@@ -271,6 +275,25 @@ async function pullRewards(identity: Awaited<ReturnType<typeof verifyGoogleAcces
     ...codes.map((c) => ({ claim_id: c.claim_id, source: "code", rewards: c.reward_applied, claimed_at: c.claimed_at })),
   ];
   return { claims, auto_claimed: autoClaimed, failed };
+}
+
+// v17.14.21: pastikan jawaban redeem_code SELALU membawa { claim: { claim_id, code, rewards } }.
+async function ensureClaimPayload(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>, code: string, redeemed: any) {
+  const base = isObject(redeemed) ? redeemed : {};
+  const existing = (base as any).claim;
+  if (isObject(existing) && isObject((existing as any).rewards) && (existing as any).claim_id) return base;
+  const { data: player } = await service.from("game_google_players")
+    .select("player_uuid").eq("google_sub", identity.sub).maybeSingle();
+  const { data: codeRow } = await service.from("game_reward_codes")
+    .select("code_id,reward_config").eq("code", code).maybeSingle();
+  if (!player || !codeRow) return base;
+  const { data: claimRow } = await service.from("game_reward_code_claims")
+    .select("claim_id,reward_applied").eq("player_uuid", (player as any).player_uuid)
+    .eq("code_id", (codeRow as any).code_id).maybeSingle();
+  if (!claimRow) return base;
+  const rewards = isObject((claimRow as any).reward_applied) && Object.keys((claimRow as any).reward_applied).length > 0
+    ? (claimRow as any).reward_applied : (codeRow as any).reward_config;
+  return { ...(base as Record<string, unknown>), claim: { claim_id: (claimRow as any).claim_id, code, rewards } };
 }
 
 async function notifyGoogleAdminDashboard(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>, resource: string) {
@@ -380,7 +403,10 @@ Deno.serve(async (request: Request) => {
     } else if (action === "redeem_code") {
       const code = typeof body.code === "string" ? body.code.trim().toUpperCase() : "";
       if (!/^[A-Z0-9-]{4,40}$/.test(code)) throw new Error("Format kode hadiah tidak valid.");
-      data = await requireData<any>(service.rpc("game_google_redeem_reward_code", { p_google_sub: identity.sub, p_code: code }));
+      const redeemed = await requireData<any>(service.rpc("game_google_redeem_reward_code", { p_google_sub: identity.sub, p_code: code }));
+      // v17.14.21: APK memasukkan hadiah ke saldo game dari objek `claim`. Bila SQL di Supabase masih versi lama
+      // (RPC tidak mengembalikan `claim`), ambil klaim yang baru saja dibuat agar hadiah tetap masuk ke game.
+      data = await ensureClaimPayload(identity, code, redeemed);
     } else if (action === "get_code_claims") {
       // v17.14.19: klaim kode hadiah terbaru yang hadiahnya harus masuk ke saldo native (pemulihan).
       const player = await requireData<any>(service.from("game_google_players")
@@ -401,6 +427,7 @@ Deno.serve(async (request: Request) => {
       data = await claimPlayerMail(identity, body);
     } else if (action === "sync_native_wallet") {
       data = await syncNativeWallet(identity, body);
+      readOnlyPoll = !(data as { notify?: boolean }).notify;
     } else if (action === "get_cave_boss") {
       data = await getCaveBossForPlayer(identity);
       readOnlyPoll = true;

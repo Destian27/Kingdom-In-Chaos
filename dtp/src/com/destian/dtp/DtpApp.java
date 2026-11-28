@@ -70,10 +70,11 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
             if (active == null || kicking) return;
             if (foregroundActivity == active) {
                 NativeGameRuntimeSync.syncGoogleWallet(active);
-                // v17.14.20: hadiah admin masuk otomatis (sekitar tiap 20 detik) tanpa layar Surat.
-                if ((++rewardPullTick % 2) == 0) NativeGameRuntimeSync.reconcileClaimedMail(active);
+                // v17.14.20: hadiah admin masuk otomatis tanpa layar Surat; v17.14.21: tiap 10 detik.
+                if ((++rewardPullTick % 5) == 0) NativeGameRuntimeSync.reconcileClaimedMail(active);
             }
-            h.postDelayed(this, 10000L);
+            // v17.14.21: saldo game (Koin, Kristal, dst.) dilaporkan ke admin tiap 2 detik.
+            h.postDelayed(this, 2000L);
         }
     };
 

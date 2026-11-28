@@ -113,6 +113,13 @@ public final class GameOnlineOverlay {
         private int zoneAt(float x, float y) {
             float h = getHeight(), w = getWidth();
             if (h <= 0 || w <= 0) return -1;
+            // v17.14.21: area sentuh ini menempel di SEMUA layar game, jadi setelah login ia menelan sentuhan
+            // di halaman berikutnya (dialog Akun Google muncul alih-alih tombol game yang diklik). Setelah
+            // login, semua sentuhan diteruskan ke game: avatar, nama panggilan, dan halaman lain berfungsi asli.
+            // Area LOGIN/avatar hanya aktif selama pemain BELUM login Google.
+            try {
+                if (new GooglePlayerBackend(activity.getApplicationContext()).hasAccount()) return -1;
+            } catch (RuntimeException ignored) { }
             // v17.14.20: tombol "Kode Hadiah" asli game (pojok kiri bawah Toko) harus sampai ke game agar
             // dialog "Masukkan kode promo" asli terbuka. Area ini TIDAK dikonsumsi (return -1) dan dicek
             // lebih dulu karena sebagian bertumpuk dengan kotak avatar. Kodenya dikirim ke server DTP lewat
@@ -122,7 +129,9 @@ public final class GameOnlineOverlay {
             if (x >= 0.020f * h && x <= 0.284f * h && y >= 0.138f * h && y <= 0.245f * h) return 0;
             // v17.14.10: kotak avatar + nama panggilan (kiri bawah beranda) -> Google lebih dulu,
             // lalu layar Daftar (nama saja). Dialog Masuk/Daftar bawaan game tidak lagi terbuka.
-            if (x >= 0.085f * h && x <= 0.68f * h && y >= 0.80f * h && y <= 0.975f * h) return 2;
+            if (x >= 0.085f * h && x <= 0.68f * h && y >= 0.80f * h && y <= 0.975f * h) {
+                return 2;
+            }
             return -1;
         }
 
@@ -195,24 +204,77 @@ public final class GameOnlineOverlay {
         });
     }
 
-    private static void showPromoResult(Activity activity, JSONObject data, Exception error) {
+    private static void showPromoDialog(Activity activity, String message) {
+        if (activity == null || activity.isFinishing()) return;
+        try {
+            new AlertDialog.Builder(activity).setTitle("Kode Hadiah")
+                    .setMessage(message).setPositiveButton("Oke", null).show();
+        } catch (Throwable ignored) { }
+    }
+
+    /**
+     * v17.14.21: dialog hasil TIDAK lagi bilang "berhasil" sebelum hadiah benar-benar masuk saldo game.
+     * Urutan: server klaim -> hadiah masuk jurnal -> diterapkan ke libgame.so di thread GL -> jurnal
+     * ditandai "applied" -> baru dialog sukses. Bila belum masuk dalam ~15 detik, pesan menjelaskan
+     * status asli (hadiah tetap tersimpan aman dan dicoba lagi otomatis) beserta kode hasil native.
+     */
+    private static void showPromoResult(final Activity activity, JSONObject data, Exception error) {
         if (activity == null || activity.isFinishing()) return;
         try {
             if (error != null) {
-                new AlertDialog.Builder(activity).setTitle("Kode Hadiah")
-                        .setMessage("Kode tidak dapat diklaim: " + error.getMessage())
-                        .setPositiveButton("Tutup", null).show();
+                showPromoDialog(activity, "Kode tidak dapat diklaim: " + error.getMessage());
                 return;
             }
             JSONObject claim = data == null ? null : data.optJSONObject("claim");
             JSONObject rewards = claim == null ? null : claim.optJSONObject("rewards");
-            if (claim != null && rewards != null) {
-                NativeGameRuntimeSync.queueCodeClaim(activity.getApplicationContext(), claim.optString("claim_id", ""), rewards);
-                NativeGameRuntimeSync.applyPendingMailRewards(activity);
+            final String claimId = claim == null ? "" : claim.optString("claim_id", "");
+            final String summary = GameGiftCodeActivity.describeRewards(rewards);
+            if (claim == null || rewards == null || claimId.isEmpty()) {
+                // Server lama: kode dipakai di server tetapi data hadiah tidak dikembalikan. Tarik ulang dari server.
+                NativeGameRuntimeSync.reconcileClaimedMail(activity);
+                showPromoDialog(activity, "Kode diterima server, tetapi data hadiah tidak ikut dikirim. "
+                        + "Hadiah sedang ditarik ulang otomatis; bila saldo belum bertambah dalam 30 detik, "
+                        + "pasang Edge Function google-player v17.14.21.");
+                return;
             }
-            new AlertDialog.Builder(activity).setTitle("Kode Hadiah")
-                    .setMessage("Kode berhasil diklaim!\n" + GameGiftCodeActivity.describeRewards(rewards))
-                    .setPositiveButton("Oke", null).show();
+            final Context app = activity.getApplicationContext();
+            if (!NativeGameRuntimeSync.hasNativeReward(rewards)) {
+                // Hanya Mata Event: tersimpan di akun (Event Shop), tidak ada saldo native yang berubah.
+                showPromoDialog(activity, "Kode berhasil diklaim!\n" + summary
+                        + "\nMata Event dipakai di Event Shop.");
+                return;
+            }
+            NativeGameRuntimeSync.queueCodeClaim(app, claimId, rewards);
+            NativeGameRuntimeSync.applyPendingMailRewards(activity);
+            Toast.makeText(activity, "Memasukkan hadiah ke game...", Toast.LENGTH_SHORT).show();
+            final android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
+            final long startedAt = System.currentTimeMillis();
+            final boolean[] pushedAgain = {false};
+            handler.postDelayed(new Runnable() {
+                @Override public void run() {
+                    if (activity.isFinishing()) return;
+                    String state = NativeGameRuntimeSync.claimState(app, claimId);
+                    if ("applied".equals(state)) {
+                        showPromoDialog(activity, "Kode berhasil diklaim!\n" + summary
+                                + "\nHadiah sudah masuk ke saldo game.");
+                        return;
+                    }
+                    if (System.currentTimeMillis() - startedAt > 15000L) {
+                        String last = NativeGameRuntimeSync.lastNativeResult(app);
+                        showPromoDialog(activity, "Kode sudah diklaim di server dan hadiah tersimpan aman, "
+                                + "tetapi belum masuk ke saldo game.\n" + summary
+                                + "\nAkan dicoba lagi otomatis; buka ulang layar Toko bila perlu."
+                                + (last == null || last.isEmpty() ? "" : "\nStatus: " + last));
+                        return;
+                    }
+                    // Satu dorongan ulang di ~6 detik bila belum masuk (jadwal retry bawaan tiap 5 detik tetap jalan).
+                    if (!pushedAgain[0] && System.currentTimeMillis() - startedAt > 6000L) {
+                        pushedAgain[0] = true;
+                        NativeGameRuntimeSync.applyPendingMailRewards(activity);
+                    }
+                    handler.postDelayed(this, 1500L);
+                }
+            }, 1500L);
         } catch (Throwable ignored) { }
     }
 

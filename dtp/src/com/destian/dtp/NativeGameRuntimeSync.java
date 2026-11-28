@@ -7,6 +7,8 @@ import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 
 import org.json.JSONObject;
 
@@ -119,6 +121,30 @@ final class NativeGameRuntimeSync {
             pseudoMail.put("reward_config", rewards);
             return queueClaimedMail(context, pseudoMail);
         } catch (Exception ignored) { return false; }
+    }
+
+    /** v17.14.21: status jurnal sebuah klaim: "applied" (sudah masuk saldo game), "pending" (menunggu) atau "none". */
+    static String claimState(Context context, String claimId) {
+        if (context == null || claimId == null) return "none";
+        SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        String id = claimId.trim().toLowerCase(java.util.Locale.US);
+        if (prefs.contains(MAIL_APPLIED_PREFIX + id)) return "applied";
+        if (prefs.contains(MAIL_PENDING_PREFIX + id)) return "pending";
+        return "none";
+    }
+
+    /** v17.14.21: apakah hadiah ini punya bagian yang harus masuk ke saldo native (Koin/Kristal/Goblin/Daging). */
+    static boolean hasNativeReward(JSONObject rewards) {
+        if (rewards == null) return false;
+        return safeReward(rewards, "coins") > 0 || safeReward(rewards, "crystals") > 0
+                || safeReward(rewards, "goblin_coins") > 0 || safeReward(rewards, "meat") > 0;
+    }
+
+    /** v17.14.21: hasil terakhir percobaan memasukkan hadiah ke libgame.so (untuk diagnosis di layar). */
+    static String lastNativeResult(Context context) {
+        if (context == null) return "";
+        return context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .getString("native_mail_last_result", "");
     }
 
     private static int safeReward(JSONObject rewards, String key) {
@@ -424,7 +450,27 @@ final class NativeGameRuntimeSync {
         }, RETRY_MS);
     }
 
+    /** v17.14.21: cadangan bila refleksi mGLSurfaceView gagal: cari GLSurfaceView di pohon view activity. */
+    private static GLSurfaceView findSurfaceInTree(View view) {
+        if (view instanceof GLSurfaceView) return (GLSurfaceView) view;
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                GLSurfaceView found = findSurfaceInTree(group.getChildAt(i));
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
     private static GLSurfaceView findGameSurface(Activity activity) {
+        GLSurfaceView viaField = findGameSurfaceByField(activity);
+        if (viaField != null) return viaField;
+        try { return findSurfaceInTree(activity.getWindow().getDecorView()); }
+        catch (RuntimeException ignored) { return null; }
+    }
+
+    private static GLSurfaceView findGameSurfaceByField(Activity activity) {
         Class<?> type = activity.getClass();
         while (type != null) {
             try {
