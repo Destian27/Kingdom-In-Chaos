@@ -92,8 +92,9 @@ public final class GameOnlineOverlay {
     /**
      * v17.14.8: area sentuh tak terlihat di atas tombol bawaan game.
      * Tombol LOGIN (kiri atas) membuka pemilih akun Google, atau dialog akun bila sudah login.
-     * v17.14.19: Hub Online, Surat, dan Daging Misi DIHAPUS. Tombol KODE HADIAH asli game (kiri bawah
-     * layar Toko) kini langsung membuka halaman klaim kode.
+     * v17.14.19: Hub Online, Surat, dan Daging Misi DIHAPUS.
+     * v17.14.20: dialog KODE HADIAH asli game ("Masukkan kode promo" + Oke) dikembalikan; kodenya
+     * diklaim ke server DTP lewat hook native (handlePromoCode), bukan halaman terpisah.
      * v17.14.18: area Bakat DIHAPUS agar tombol Bakat asli game (menu kanan) berfungsi lagi.
      * Sentuhan di luar area tidak dikonsumsi sehingga game tetap menerimanya.
      * Koordinat relatif terhadap tinggi layar.
@@ -108,13 +109,15 @@ public final class GameOnlineOverlay {
             setTag(TAG_HOTSPOTS);
         }
 
-        /** 0 = LOGIN, 2 = avatar/nama panggilan, 3 = Kode Hadiah, -1 = di luar area (1 = Bakat, tidak dipakai). */
+        /** 0 = LOGIN, 2 = avatar/nama panggilan, -1 = di luar area / diteruskan ke game (1 = Bakat, 3 = Kode Hadiah: tidak dipakai). */
         private int zoneAt(float x, float y) {
             float h = getHeight(), w = getWidth();
             if (h <= 0 || w <= 0) return -1;
-            // v17.14.19: tombol "Kode Hadiah" asli game (pojok kiri bawah Toko). Dicek lebih dulu
-            // dari kotak avatar karena sebagian areanya bertumpuk.
-            if (x >= 0.15f * h && x <= 0.37f * h && y >= 0.92f * h && y <= 1.0f * h) return 3;
+            // v17.14.20: tombol "Kode Hadiah" asli game (pojok kiri bawah Toko) harus sampai ke game agar
+            // dialog "Masukkan kode promo" asli terbuka. Area ini TIDAK dikonsumsi (return -1) dan dicek
+            // lebih dulu karena sebagian bertumpuk dengan kotak avatar. Kodenya dikirim ke server DTP lewat
+            // hook native UIMallLayer::onInputPromoCode (lihat handlePromoCode).
+            if (x >= 0.15f * h && x <= 0.46f * h && y >= 0.92f * h && y <= 1.0f * h) return -1;
             // LOGIN: kiri 0.020H, atas 0.138H, lebar 0.264H, tinggi 0.107H
             if (x >= 0.020f * h && x <= 0.284f * h && y >= 0.138f * h && y <= 0.245f * h) return 0;
             // v17.14.10: kotak avatar + nama panggilan (kiri bawah beranda) -> Google lebih dulu,
@@ -144,20 +147,73 @@ public final class GameOnlineOverlay {
         private void open(int zone) {
             try {
                 GooglePlayerBackend backend = new GooglePlayerBackend(activity.getApplicationContext());
-                if (zone == 3) {
-                    // Kode Hadiah: butuh akun Google; belum login -> pemilih akun dulu.
-                    if (backend.hasAccount()) {
-                        activity.startActivity(new Intent(activity, GameGiftCodeActivity.class));
-                    } else {
-                        Toast.makeText(activity, "Login Google dulu untuk memakai Kode Hadiah.", Toast.LENGTH_LONG).show();
-                        activity.startActivity(new Intent(activity, GameAuthActivity.class));
-                    }
-                    return;
-                }
                 if (backend.hasAccount()) showAccountDialog(activity, backend);
                 else activity.startActivity(new Intent(activity, GameAuthActivity.class));
             } catch (RuntimeException ignored) { }
         }
+    }
+
+
+    /**
+     * v17.14.20: kode dari dialog Kode Hadiah asli game. Dipanggil dari hook native (thread GL).
+     * Klaim ke server (butuh login Google), lalu hadiah dimasukkan ke saldo native lewat jurnal
+     * anti-ganda yang sama dengan surat/kode sebelumnya.
+     */
+    public static void handlePromoCode(final String rawCode) {
+        WeakReference<Activity> ref = activeActivity;
+        final Activity activity = ref == null ? null : ref.get();
+        if (activity == null || activity.isFinishing()) return;
+        final String code = rawCode == null ? "" : rawCode.trim().toUpperCase(Locale.ROOT);
+        activity.runOnUiThread(new Runnable() {
+            @Override public void run() {
+                try {
+                    if (!code.matches("[A-Z0-9-]{4,40}")) {
+                        Toast.makeText(activity, "Kode harus 4–40 karakter (huruf, angka, atau -).", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    final GooglePlayerBackend backend = new GooglePlayerBackend(activity.getApplicationContext());
+                    if (!backend.hasAccount()) {
+                        Toast.makeText(activity, "Login Google dulu untuk memakai Kode Hadiah.", Toast.LENGTH_LONG).show();
+                        activity.startActivity(new Intent(activity, GameAuthActivity.class));
+                        return;
+                    }
+                    Toast.makeText(activity, "Memeriksa kode hadiah...", Toast.LENGTH_SHORT).show();
+                    Thread worker = new Thread(new Runnable() {
+                        @Override public void run() {
+                            JSONObject data = null; Exception failure = null;
+                            try { data = backend.redeemGiftCode(code); } catch (Exception e) { failure = e; }
+                            final JSONObject result = data; final Exception error = failure;
+                            activity.runOnUiThread(new Runnable() {
+                                @Override public void run() { showPromoResult(activity, result, error); }
+                            });
+                        }
+                    }, "kic-redeem-promo-dialog");
+                    worker.setDaemon(true);
+                    worker.start();
+                } catch (Throwable ignored) { }
+            }
+        });
+    }
+
+    private static void showPromoResult(Activity activity, JSONObject data, Exception error) {
+        if (activity == null || activity.isFinishing()) return;
+        try {
+            if (error != null) {
+                new AlertDialog.Builder(activity).setTitle("Kode Hadiah")
+                        .setMessage("Kode tidak dapat diklaim: " + error.getMessage())
+                        .setPositiveButton("Tutup", null).show();
+                return;
+            }
+            JSONObject claim = data == null ? null : data.optJSONObject("claim");
+            JSONObject rewards = claim == null ? null : claim.optJSONObject("rewards");
+            if (claim != null && rewards != null) {
+                NativeGameRuntimeSync.queueCodeClaim(activity.getApplicationContext(), claim.optString("claim_id", ""), rewards);
+                NativeGameRuntimeSync.applyPendingMailRewards(activity);
+            }
+            new AlertDialog.Builder(activity).setTitle("Kode Hadiah")
+                    .setMessage("Kode berhasil diklaim!\n" + GameGiftCodeActivity.describeRewards(rewards))
+                    .setPositiveButton("Oke", null).show();
+        } catch (Throwable ignored) { }
     }
 
     /** Dialog akun kecil pengganti Hub Online: menampilkan akun Google aktif dan tombol keluar. */

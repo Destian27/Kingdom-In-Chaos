@@ -62,11 +62,17 @@ public class DtpApp extends Application implements Application.ActivityLifecycle
         }
     };
 
+    private int rewardPullTick;
+
     private final Runnable googleWalletSyncPoll = new Runnable() {
         @Override public void run() {
             final Activity active = game;
             if (active == null || kicking) return;
-            if (foregroundActivity == active) NativeGameRuntimeSync.syncGoogleWallet(active);
+            if (foregroundActivity == active) {
+                NativeGameRuntimeSync.syncGoogleWallet(active);
+                // v17.14.20: hadiah admin masuk otomatis (sekitar tiap 20 detik) tanpa layar Surat.
+                if ((++rewardPullTick % 2) == 0) NativeGameRuntimeSync.reconcileClaimedMail(active);
+            }
             h.postDelayed(this, 10000L);
         }
     };

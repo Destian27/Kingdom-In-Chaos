@@ -103,6 +103,14 @@ public final class GooglePlayerBackend {
         return requestSavedAccount("get_code_claims", new JSONObject());
     }
 
+    /**
+     * v17.14.20: hadiah dari admin (surat/hadiah langsung) diklaim otomatis oleh server, lalu daftar
+     * semua klaim (surat + kode hadiah) dikembalikan agar APK memasukkannya ke saldo native.
+     */
+    public JSONObject pullRewards() throws IOException {
+        return requestSavedAccount("pull_rewards", new JSONObject());
+    }
+
     /** Uploads a read-only observation of the current native game wallet. */
     public JSONObject syncNativeWallet(int coins, int crystals, int goblinCoins, int meat) throws IOException {
         JSONObject body = new JSONObject();

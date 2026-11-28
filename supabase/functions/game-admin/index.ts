@@ -396,7 +396,7 @@ async function listGooglePlayers() {
     if (!ids.length) continue;
     const [wallets, nativeWallets] = await Promise.all([
       requireData<any[]>(service.from("game_google_player_economy")
-        .select("player_uuid, coins, crystals, goblin_coins, meat, meat_last_regen_at, energy, stamina, player_level, player_xp, updated_at")
+        .select("player_uuid, coins, crystals, goblin_coins, event_eyes, meat, meat_last_regen_at, energy, stamina, player_level, player_xp, updated_at")
         .in("player_uuid", ids)),
       requireData<any[]>(service.from("game_google_player_native_wallets")
         .select("player_uuid, coins, crystals, goblin_coins, meat, client_observed_at, server_received_at")
@@ -567,8 +567,11 @@ async function sendPlayerMail(adminId: string, adminName: string, body: Record<s
     player_uuid: player.player_uuid, resource: "mail_sent", updated_at: new Date().toISOString(),
   });
   await publishRealtimeBroadcast(`google-player-${player.player_uuid}`, "mail_received", { mail_id: mail.mail_id });
+  // v17.14.20: hadiah TIDAK dikreditkan saat surat dibuat, tetapi diklaim otomatis oleh server saat game
+  // pemain online (pull_rewards, sekitar tiap 20 detik) lalu langsung masuk saldo game. delivery="auto".
   return { mail, player: { player_uuid: player.player_uuid, player_id: player.player_id, nickname: player.nickname },
-    wallet_credited: false, realtime: { broadcast_sent: broadcastSent } };
+    wallet_credited: false, delivery: "auto", has_reward: Object.keys(rewards).length > 0,
+    realtime: { broadcast_sent: broadcastSent } };
 }
 
 // ---------------- v17.14.17: pencatatan perintah admin yang konsisten ----------------

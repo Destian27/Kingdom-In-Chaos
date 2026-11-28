@@ -27,5 +27,5 @@ def test_game_admin_provisions_service_admin():
     ts = read("supabase/functions/game-admin/index.ts")
     assert "provisionServiceAdmin" in ts
     assert 'role: "super_admin"' in ts
-    assert ts == read("kingdom-in-chaos-dtp-game-admin-function-v17_14_19.ts")
-    assert read("admin.html") == read("kingdom-in-chaos-dtp-admin-v17_14_19.html")
+    assert ts == read("kingdom-in-chaos-dtp-game-admin-function-v17_14_20.ts")
+    assert read("admin.html") == read("kingdom-in-chaos-dtp-admin-v17_14_20.html")

@@ -32,6 +32,8 @@ JavaVM* g_vm = nullptr;
 jclass g_bridgeClass = nullptr;
 jmethodID g_onCrystalsEarned = nullptr;
 jmethodID g_onBarterResult = nullptr;
+jmethodID g_onPromoCode = nullptr;
+bool g_promoHookInstalled = false;
 
 OnPaidOK g_onPaidOK = nullptr;
 GetPriceManager g_getPriceManager = nullptr;
@@ -250,6 +252,35 @@ void dtpIncreaseCrystalHook(int amount, int source, bool playSound) {
     notifyCrystalsEarned(amount);
 }
 
+
+// v17.14.20: dialog "Kode Hadiah" asli game (UIMallLayer::onInputPromoCode) memanggil server promo
+// bawaan yang sudah mati. Fungsi itu diganti: kode dikirim ke Java (server Supabase milik DTP).
+// Hanya karakter A-Z, a-z, 0-9 dan '-' yang diteruskan, maksimal 40 karakter.
+void notifyPromoCode(const char* raw) {
+    if (!raw || !g_vm || !g_bridgeClass || !g_onPromoCode) return;
+    char clean[48];
+    size_t n = 0;
+    for (size_t i = 0; raw[i] != '\0' && i < 256 && n < 40; ++i) {
+        const char c = raw[i];
+        if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '-') clean[n++] = c;
+    }
+    clean[n] = '\0';
+    bool attached = false;
+    JNIEnv* env = currentEnv(&attached);
+    if (!env) return;
+    jstring value = env->NewStringUTF(clean);
+    if (value) {
+        env->CallStaticVoidMethod(g_bridgeClass, g_onPromoCode, value);
+        env->DeleteLocalRef(value);
+    }
+    if (env->ExceptionCheck()) env->ExceptionClear();
+    if (attached) g_vm->DetachCurrentThread();
+}
+
+void dtpPromoCodeHook(void* /*self*/, const char* code) {
+    notifyPromoCode(code);
+}
+
 struct OfferCost {
     bool usesCoins;
     int amount;
@@ -364,6 +395,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
         g_onCrystalsEarned = env->GetStaticMethodID(g_bridgeClass, "onCrystalsEarned", "(I)V");
         if (env->ExceptionCheck()) env->ExceptionClear();
         g_onBarterResult = env->GetStaticMethodID(g_bridgeClass, "onBarterResult", "(II)V");
+        if (env->ExceptionCheck()) env->ExceptionClear();
+        g_onPromoCode = env->GetStaticMethodID(g_bridgeClass, "onPromoCodeEntered", "(Ljava/lang/String;)V");
         if (env->ExceptionCheck()) env->ExceptionClear();
     }
     return JNI_VERSION_1_6;
@@ -513,8 +546,16 @@ Java_com_destian_dtp_NativeGameRuntimeBridge_installEconomyHooksNative(JNIEnv* e
     if (!patchThumbJump(pay, reinterpret_cast<void*>(&dtpPricePayHook))) {
         return result(env, "PRICE_HOOK_FAILED|real_money_path_remains_blocked");
     }
+    // v17.14.20: dialog Kode Hadiah asli. Tidak fatal bila gagal (dialog lama tetap berjalan).
+    if (!g_promoHookInstalled && g_onPromoCode) {
+        void* promo = symbol(game, "_ZN11UIMallLayer16onInputPromoCodeEPKc");
+        if (promo && patchThumbJump(promo, reinterpret_cast<void*>(&dtpPromoCodeHook))) {
+            g_promoHookInstalled = true;
+        }
+    }
     g_hooksInstalled = true;
-    return result(env, "OK|native_barter_and_dm_progress_active");
+    return result(env, g_promoHookInstalled ? "OK|native_barter_dm_progress_and_promo_active"
+                                            : "OK|native_barter_and_dm_progress_active");
 }
 
 extern "C" JNIEXPORT jstring JNICALL

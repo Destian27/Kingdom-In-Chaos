@@ -196,7 +196,7 @@ body.dark{background:radial-gradient(1200px 600px at 20% -10%,#1d2f66 0,#0b1226 
   </div>
 </section>
   <section class="page hide" id="page-pemain">
-    <div class="safeNote">Dashboard memakai sesi admin utama. Admin tidak dapat mengubah saldo pemain secara langsung. Koin, Kristal, Koin Goblin, dan Mata Event hanya bertambah setelah pemain mengklaim Surat atau kode hadiah yang valid.</div>
+    <div class="safeNote">Dashboard memakai sesi admin utama. Hadiah (Koin, Kristal, Koin Goblin, Mata Event, Daging) dikirim lewat tombol Kirim Surat dan masuk OTOMATIS ke saldo game pemain begitu game pemain terbuka dan online (sekitar 20 detik) — pemain tidak perlu menekan Klaim. Kode hadiah dimasukkan pemain lewat tombol Kode Hadiah di Toko.</div>
     <div class="card" id="googlePlayersAdminCard">
       <p class="sectionTitle">Semua Pemain — Google Auth</p>
       <p class="mini">Daftar otomatis dari akun Google terverifikasi. Tidak perlu mencari pemain satu per satu. Email, avatar Google, ID pemain, nickname, Koin, DM, dan daging ditampilkan di sini.</p>
@@ -229,13 +229,14 @@ body.dark{background:radial-gradient(1200px 600px at 20% -10%,#1d2f66 0,#0b1226 
     </div></section>
   <section class="page hide" id="page-surat"><div class="card" id="playerMailAdminCard">
       <p class="sectionTitle">Surat Hadiah Pemain</p>
-      <p class="mini">Kirim hadiah melalui Kotak Surat dalam game. Email Google hanya dipakai untuk menemukan pemain tujuan; tidak ada email yang dikirim. Saldo baru bertambah setelah pemain menekan Klaim.</p>
+      <p class="mini">Kirim hadiah ke pemain. Email Google hanya dipakai untuk menemukan pemain tujuan; tidak ada email yang dikirim. Hadiah masuk otomatis ke saldo game saat game pemain online (sekitar 20 detik); bila game sedang tertutup, hadiah masuk saat game dibuka lagi. Surat tanpa hadiah hanya tercatat.</p>
       <div class="dataGrid">
         <div><label for="mailRecipientEmail">Email akun Google pemain</label><input id="mailRecipientEmail" type="email" maxlength="254" placeholder="pemain@gmail.com"></div>
         <div><label for="mailExpiresAt">Kedaluwarsa (opsional)</label><input id="mailExpiresAt" type="datetime-local"></div>
         <div><label for="mailSubject">Judul surat</label><input id="mailSubject" maxlength="100" value="Hadiah dari Admin"></div>
         <div><label for="mailCoins">Hadiah Koin</label><input id="mailCoins" type="number" min="0" value="0"></div>
-        <div><label for="mailDM">Hadiah DM</label><input id="mailDM" type="number" min="0" value="0"></div>
+        <div><label for="mailEyes">Mata Event</label><input id="mailEyes" type="number" min="0" value="0"></div>
+        <div><label for="mailDM">Hadiah Kristal</label><input id="mailDM" type="number" min="0" value="0"></div>
         <div><label for="mailGoblin">Goblin Coins</label><input id="mailGoblin" type="number" min="0" value="0"></div>
         <div><label for="mailMeat">Hadiah Daging (maks. 24)</label><input id="mailMeat" type="number" min="0" max="24" value="0"></div>
       </div>
@@ -245,7 +246,7 @@ body.dark{background:radial-gradient(1200px 600px at 20% -10%,#1d2f66 0,#0b1226 
       <div class="bossActionMsg" id="playerMailStatus" role="status"></div>
       <div class="detailBlock"><p class="sectionTitle">Riwayat Surat</p>
         <div class="toolbar"><button class="ghost" id="btnPlayerMailRefresh">Muat ulang Surat</button></div>
-        <div class="tableWrap"><table style="min-width:850px"><thead><tr><th>Penerima</th><th>Judul</th><th>Hadiah</th><th>Dikirim</th><th>Klaim</th></tr></thead><tbody id="playerMailRows"><tr><td colspan="5">Belum dimuat.</td></tr></tbody></table></div>
+        <div class="tableWrap"><table style="min-width:850px"><thead><tr><th>Penerima</th><th>Judul</th><th>Hadiah</th><th>Dikirim</th><th>Status</th></tr></thead><tbody id="playerMailRows"><tr><td colspan="5">Belum dimuat.</td></tr></tbody></table></div>
       </div>
     </div></section>
   <section class="page hide" id="page-aktivitas"><div class="card" id="googleActivityAdminCard">
@@ -809,8 +810,8 @@ async function loadPlayerMail() {
     const mails = await gameAdminRequest("list_player_mail");
     rows.innerHTML = mails.length ? mails.map(m => {
       const r = m.reward_config || {};
-      const reward = `Koin ${r.coins||0} • DM ${r.crystals||0} • Goblin ${r.goblin_coins||0} • Daging ${r.meat||0}`;
-      return `<tr><td>${escapeHtml(m.recipient_email)}</td><td>${escapeHtml(m.subject)}</td><td>${escapeHtml(reward)}</td><td>${escapeHtml(formatDate(m.created_at))}</td><td>${m.claimed_at ? "Sudah diklaim<br>"+escapeHtml(formatDate(m.claimed_at)) : "Menunggu klaim"}</td></tr>`;
+      const reward = `Mata Event ${r.event_eyes||0} • Kristal ${r.crystals||0} • Koin ${r.coins||0} • Goblin ${r.goblin_coins||0} • Daging ${r.meat||0}`;
+      return `<tr><td>${escapeHtml(m.recipient_email)}</td><td>${escapeHtml(m.subject)}</td><td>${escapeHtml(reward)}</td><td>${escapeHtml(formatDate(m.created_at))}</td><td>${m.claimed_at ? "Sudah masuk<br>"+escapeHtml(formatDate(m.claimed_at)) : (Object.values(r).some(v => Number(v) > 0) ? "Menunggu pemain online" : "Tanpa hadiah")}</td></tr>`;
     }).join("") : `<tr><td colspan="5">Belum ada Surat terkirim.</td></tr>`;
   } catch (e) { rows.innerHTML = `<tr><td colspan="5">${escapeHtml(e.message)}</td></tr>`; }
 }
@@ -821,6 +822,7 @@ admin$("btnSendPlayerMail").onclick = async () => {
   try {
     const reward = {
       coins: Number(admin$("mailCoins").value || 0),
+      event_eyes: Number(admin$("mailEyes").value || 0),
       crystals: Number(admin$("mailDM").value || 0),
       goblin_coins: Number(admin$("mailGoblin").value || 0),
       meat: Number(admin$("mailMeat").value || 0)
@@ -831,7 +833,9 @@ admin$("btnSendPlayerMail").onclick = async () => {
       message: admin$("mailMessage").value.trim(), reward_config: reward,
       expires_at: localDateTimeToIso("mailExpiresAt"), reason: admin$("mailReason").value.trim()
     });
-    status.textContent = `Surat berhasil dikirim ke kotak surat ${data.player.nickname || data.player.player_id}. Hadiah belum masuk saldo; pemain harus menekan Klaim.`;
+    status.textContent = data.has_reward
+      ? `Hadiah untuk ${data.player.nickname || data.player.player_id} terkirim. Masuk otomatis ke saldo game saat game pemain online (sekitar 20 detik).`
+      : `Surat untuk ${data.player.nickname || data.player.player_id} tercatat (tanpa hadiah).`;
     admin$("mailMessage").value = ""; admin$("mailReason").value = "";
     await Promise.all([loadPlayerMail(), loadGooglePlayers()]);
     refreshActivityQuietly();

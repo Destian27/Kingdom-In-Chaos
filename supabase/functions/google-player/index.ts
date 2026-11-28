@@ -229,6 +229,50 @@ async function syncNativeWallet(identity: Awaited<ReturnType<typeof verifyGoogle
   return { native_wallet: snapshot, authoritative: false };
 }
 
+// v17.14.20: hadiah admin masuk otomatis. Layar Surat dihapus di v17.14.19, jadi server sendiri mengklaim
+// surat berhadiah milik pemain (kredit ke saldo server lewat RPC yang sama), lalu mengembalikan SEMUA klaim
+// (surat + kode hadiah) agar APK memasukkannya ke saldo native game. APK menjaga anti-ganda lewat claim_id.
+async function pullRewards(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>) {
+  const player = await requireData<any>(service.from("game_google_players")
+    .select("player_uuid,email").eq("google_sub", identity.sub).single());
+
+  const pending = await requireData<any[]>(service.from("game_google_player_mail")
+    .select("mail_id,reward_config,expires_at").eq("player_uuid", player.player_uuid)
+    .is("claimed_at", null).order("created_at", { ascending: true }).limit(25));
+  let autoClaimed = 0;
+  const failed: string[] = [];
+  for (const mail of pending) {
+    if (mail.expires_at && Date.parse(mail.expires_at) <= Date.now()) continue;
+    const reward = isObject(mail.reward_config) ? mail.reward_config : {};
+    if (!Object.values(reward).some((v) => Number(v) > 0)) continue; // surat tanpa hadiah: tidak perlu klaim
+    try {
+      await requireData<any>(service.rpc("game_google_claim_player_mail", {
+        p_google_sub: identity.sub, p_mail_id: mail.mail_id,
+      }));
+      autoClaimed++;
+      const { error } = await service.from("game_google_activity").insert({
+        actor_type: "player", player_uuid: player.player_uuid, actor_email: identity.email,
+        action: "mail_claimed", details: { mail_id: mail.mail_id, reward_config: reward, auto: true },
+      });
+      if (error) console.warn("Auto-claim activity log failed:", error.message);
+    } catch (error) {
+      failed.push(`${mail.mail_id}: ${(error as Error).message}`);
+    }
+  }
+
+  const mails = await requireData<any[]>(service.from("game_google_player_mail")
+    .select("mail_id,reward_config,claim_result,claimed_at").eq("player_uuid", player.player_uuid)
+    .not("claimed_at", "is", null).order("claimed_at", { ascending: false }).limit(100));
+  const codes = await requireData<any[]>(service.from("game_reward_code_claims")
+    .select("claim_id,reward_applied,claimed_at").eq("player_uuid", player.player_uuid)
+    .eq("native_credit", true).order("claimed_at", { ascending: false }).limit(100));
+  const claims = [
+    ...mails.map((m) => ({ claim_id: m.mail_id, source: "mail", rewards: m.claim_result ?? m.reward_config, claimed_at: m.claimed_at })),
+    ...codes.map((c) => ({ claim_id: c.claim_id, source: "code", rewards: c.reward_applied, claimed_at: c.claimed_at })),
+  ];
+  return { claims, auto_claimed: autoClaimed, failed };
+}
+
 async function notifyGoogleAdminDashboard(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>, resource: string) {
   const { data: player, error } = await service.from("game_google_players")
     .select("player_uuid,email").eq("google_sub", identity.sub).maybeSingle();
@@ -346,6 +390,11 @@ Deno.serve(async (request: Request) => {
         .eq("native_credit", true).order("claimed_at", { ascending: false }).limit(100));
       data = { claims };
       readOnlyPoll = true;
+    } else if (action === "pull_rewards") {
+      const pulled = await pullRewards(identity);
+      data = pulled;
+      // Hanya memicu dashboard admin bila ada surat yang baru diklaim; polling kosong tetap senyap.
+      readOnlyPoll = pulled.auto_claimed === 0;
     } else if (action === "get_mail") {
       data = await getPlayerInbox(identity);
     } else if (action === "claim_mail") {

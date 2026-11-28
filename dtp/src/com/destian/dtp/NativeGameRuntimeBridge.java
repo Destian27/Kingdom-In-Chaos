@@ -140,6 +140,14 @@ public final class NativeGameRuntimeBridge {
         GameOnlineOverlay.notifyBarterResult(offerId, status);
     }
 
+    /**
+     * v17.14.20: dipanggil dari hook native saat pemain menekan "Oke" di dialog Kode Hadiah asli game.
+     * Berjalan di thread GL; pekerjaan jaringan dan UI dipindah ke GameOnlineOverlay.
+     */
+    static void onPromoCodeEntered(String code) {
+        try { GameOnlineOverlay.handlePromoCode(code); } catch (Throwable ignored) { }
+    }
+
     public static long getLifetimeDmEarned(Context context) {
         if (context == null) return 0L;
         return context.getApplicationContext()

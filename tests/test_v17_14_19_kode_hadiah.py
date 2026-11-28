@@ -20,22 +20,17 @@ def test_hub_mail_meat_screens_are_removed_everywhere():
     assert "GameGiftCodeActivity" in read(ROOT / "kingdom-in-chaos-decompiled/AndroidManifest.xml")
 
 
-def test_game_kode_hadiah_button_opens_gift_code_screen_directly():
+def test_game_kode_hadiah_button_opens_original_dialog_since_v17_14_20():
+    # v17.14.20 mengembalikan dialog asli game; kodenya diklaim lewat hook native (lihat test_v17_14_20).
     overlay = read(SRC / "GameOnlineOverlay.java")
-    assert "return 3;" in overlay
-    assert "GameGiftCodeActivity.class" in overlay
-    # zona Kode Hadiah harus dicek sebelum kotak avatar yang bertumpuk dengannya
-    assert overlay.index("return 3;") < overlay.index("return 2;")
-    # bawah-kiri layar Toko: tombol asli ada di sekitar x 0.18-0.34H, y 0.93-1.0H
-    m = re.search(r"x >= ([0-9.]+)f \* h && x <= ([0-9.]+)f \* h && y >= ([0-9.]+)f \* h && y <= ([0-9.]+)f \* h\) return 3;", overlay)
-    assert m
-    x0, x1, y0, y1 = map(float, m.groups())
-    assert x0 <= 0.176 and x1 >= 0.343 and y0 <= 0.93 and y1 >= 0.99
+    assert "return 3;" not in overlay
+    assert "handlePromoCode" in overlay
 
 
 def test_redeemed_rewards_are_queued_for_native_wallet_and_recovered():
     gift = read(SRC / "GameGiftCodeActivity.java")
     assert "queueCodeClaim" in gift and '"claim"' in gift
+    assert "queueCodeClaim" in read(SRC / "GameOnlineOverlay.java")
     sync = read(SRC / "NativeGameRuntimeSync.java")
     assert "static boolean queueCodeClaim" in sync and "getCodeClaims()" in sync
     assert "get_code_claims" in read(SRC / "GooglePlayerBackend.java")

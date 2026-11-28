@@ -143,28 +143,43 @@ final class NativeGameRuntimeSync {
         Thread worker = new Thread(new Runnable() {
             @Override public void run() {
                 try {
-                    JSONObject inbox = backend.getInbox();
-                    JSONArray messages = inbox.optJSONArray("messages");
-                    if (messages != null) {
-                        for (int i = 0; i < messages.length(); i++) {
-                            JSONObject mail = messages.optJSONObject(i);
-                            if (mail == null) continue;
-                            String claimedAt = mail.optString("claimed_at", "");
-                            if (!claimedAt.isEmpty() && !"null".equals(claimedAt)) {
-                                queueClaimedMail(activity.getApplicationContext(), mail);
+                    Context appCtx = activity.getApplicationContext();
+                    boolean pulled = false;
+                    try {
+                        // v17.14.20: server mengklaim surat admin otomatis lalu mengembalikan semua klaim.
+                        JSONObject pull = backend.pullRewards();
+                        JSONArray claims = pull == null ? null : pull.optJSONArray("claims");
+                        if (claims != null) {
+                            for (int i = 0; i < claims.length(); i++) {
+                                JSONObject claim = claims.optJSONObject(i);
+                                if (claim == null) continue;
+                                queueCodeClaim(appCtx, claim.optString("claim_id", ""), claim.optJSONObject("rewards"));
                             }
                         }
+                        pulled = true;
+                    } catch (Exception pullError) {
+                        Log.w(TAG, "pull_rewards belum tersedia, memakai jalur lama: " + pullError.getMessage());
                     }
-                    // v17.14.19: pulihkan juga hadiah kode hadiah yang sudah diklaim di server
-                    // tetapi belum sempat masuk ke saldo native (aplikasi tertutup di tengah jalan).
-                    JSONObject claims = backend.getCodeClaims();
-                    JSONArray list = claims == null ? null : claims.optJSONArray("claims");
-                    if (list != null) {
-                        for (int i = 0; i < list.length(); i++) {
-                            JSONObject claim = list.optJSONObject(i);
-                            if (claim == null) continue;
-                            queueCodeClaim(activity.getApplicationContext(),
-                                    claim.optString("claim_id", ""), claim.optJSONObject("reward_applied"));
+                    if (!pulled) {
+                        // Cadangan bila Edge Function google-player lama masih terpasang.
+                        JSONObject inbox = backend.getInbox();
+                        JSONArray messages = inbox.optJSONArray("messages");
+                        if (messages != null) {
+                            for (int i = 0; i < messages.length(); i++) {
+                                JSONObject mail = messages.optJSONObject(i);
+                                if (mail == null) continue;
+                                String claimedAt = mail.optString("claimed_at", "");
+                                if (!claimedAt.isEmpty() && !"null".equals(claimedAt)) queueClaimedMail(appCtx, mail);
+                            }
+                        }
+                        JSONObject claims = backend.getCodeClaims();
+                        JSONArray list = claims == null ? null : claims.optJSONArray("claims");
+                        if (list != null) {
+                            for (int i = 0; i < list.length(); i++) {
+                                JSONObject claim = list.optJSONObject(i);
+                                if (claim == null) continue;
+                                queueCodeClaim(appCtx, claim.optString("claim_id", ""), claim.optJSONObject("reward_applied"));
+                            }
                         }
                     }
                 } catch (Exception error) {

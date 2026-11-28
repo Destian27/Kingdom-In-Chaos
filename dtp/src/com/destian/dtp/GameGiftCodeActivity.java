@@ -65,7 +65,7 @@ public final class GameGiftCodeActivity extends Activity {
         }, "kic-redeem-gift-code").start();
     }
 
-    private static String describeRewards(JSONObject r) {
+    static String describeRewards(JSONObject r) {
         if (r == null) return "Hadiah masuk ke akun.";
         StringBuilder out = new StringBuilder("Hadiah:");
         appendReward(out, "Mata Event", r.optLong("event_eyes", 0));
