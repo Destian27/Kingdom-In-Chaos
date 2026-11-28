@@ -51,6 +51,15 @@ jobs:
           python3 -m pip install --quiet pillow
           python3 build_dtp.py
 
+      - name: Tampilkan tanda tangan APK (untuk cek konflik instal)
+        run: |
+          BT="$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)"
+          {
+            echo '### Tanda tangan APK'
+            "$BT/apksigner" verify --print-certs KingdomInChaosDTP-v1.0.6.apk | grep -E "SHA-256|Verifies" || true
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          "$BT/aapt2" dump badging KingdomInChaosDTP-v1.0.6.apk | grep -E "^package|sdkVersion|native-code" | tee -a "$GITHUB_STEP_SUMMARY"
+
       - uses: actions/upload-artifact@v4
         with:
           name: KingdomInChaosDTP-v1.0.6.apk
