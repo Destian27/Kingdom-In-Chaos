@@ -56,11 +56,11 @@ jobs:
           BT="$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)"
           {
             echo '### Tanda tangan APK'
-            "$BT/apksigner" verify --print-certs KingdomInChaosDTP-v1.0.8.apk | grep -E "SHA-256|Verifies" || true
+            "$BT/apksigner" verify --print-certs KingdomInChaosDTP-v1.0.9.apk | grep -E "SHA-256|Verifies" || true
           } | tee -a "$GITHUB_STEP_SUMMARY"
-          "$BT/aapt2" dump badging KingdomInChaosDTP-v1.0.8.apk | grep -E "^package|sdkVersion|native-code" | tee -a "$GITHUB_STEP_SUMMARY"
+          "$BT/aapt2" dump badging KingdomInChaosDTP-v1.0.9.apk | grep -E "^package|sdkVersion|native-code" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: KingdomInChaosDTP-v1.0.8.apk
-          path: KingdomInChaosDTP-v1.0.8.apk
+          name: KingdomInChaosDTP-v1.0.9.apk
+          path: KingdomInChaosDTP-v1.0.9.apk

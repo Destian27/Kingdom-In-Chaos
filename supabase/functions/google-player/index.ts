@@ -1,4 +1,4 @@
-// v1.0.7: LOGIN GOOGLE DIHAPUS TOTAL. Pemain masuk dengan Nama Pengguna + Kata Sandi (hash PBKDF2 di tabel
+// v1.0.9 (isi sama dengan v1.0.7 + aksi "ping" untuk cek server). v1.0.7: LOGIN GOOGLE DIHAPUS TOTAL. Pemain masuk dengan Nama Pengguna + Kata Sandi (hash PBKDF2 di tabel
 // game_google_player_credentials). Setelah register/login server memberi token sesi bertanda tangan HMAC-SHA256
 // yang dikirim game sebagai "Authorization: Bearer <token>". Nama function tetap `google-player` agar URL di APK sama.
 // Rahasia penanda tangan token: secret function PLAYER_SESSION_SECRET (opsional); bila kosong dipakai turunan dari SUPABASE_SERVICE_ROLE_KEY.
@@ -434,6 +434,19 @@ Deno.serve(async (request: Request) => {
     const body = await request.json().catch(() => ({}));
     if (!isObject(body)) return fail("Request body tidak valid.");
     const action = String(body.action ?? "");
+
+    // v1.0.9: cek kesehatan server tanpa sesi. Buka lewat tombol "Test" di Supabase atau curl; harus ok:true.
+    if (action === "ping") {
+      const checks: Record<string, string> = {};
+      for (const table of ["game_google_players", "game_google_player_credentials", "game_google_player_economy", "game_google_player_mail"]) {
+        const { error } = await service.from(table).select("*", { head: true, count: "exact" }).limit(1);
+        checks[table] = error ? `GAGAL: ${error.message}` : "ok";
+      }
+      const { error: colError } = await service.from("game_google_player_credentials").select("failed_attempts,locked_until").limit(1);
+      checks["credentials.failed_attempts/locked_until"] = colError ? `GAGAL: ${colError.message}` : "ok";
+      const allOk = Object.values(checks).every((v) => v === "ok");
+      return json({ ok: allOk, data: { version: "1.0.9-password", login: "nama pengguna + kata sandi", checks } }, allOk ? 200 : 500);
+    }
 
     // Aksi tanpa sesi: daftar & masuk. Hasilnya berisi token sesi untuk permintaan berikutnya.
     if (action === "register" || action === "login") {

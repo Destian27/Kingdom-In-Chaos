@@ -37,7 +37,7 @@ def test_backend_stores_only_session_token_never_password():
 
 def test_server_function_password_login_and_session_token():
     ts = read("supabase/functions/google-player/index.ts")
-    assert ts == read("kingdom-in-chaos-dtp-player-function-v1_0_7.ts")
+    assert ts == read("kingdom-in-chaos-dtp-player-function-v1_0_9.ts")
     for needed in ('action === "register" || action === "login"', "verifySession(request)", "issueSessionToken",
                    "PBKDF2", "MAX_FAILED_LOGINS", "failed_attempts", 'google_sub: `local:${uid}`'):
         assert needed in ts, needed
@@ -49,4 +49,4 @@ def test_sql_adds_lock_columns_and_version():
     sql = read("kingdom-in-chaos-dtp-SQL-v1_0_7-login-password.sql")
     assert "failed_attempts" in sql and "locked_until" in sql and "game_google_player_credentials" in sql
     yml = read("kingdom-in-chaos-decompiled/apktool.yml")
-    assert "versionName: 1.0.8" in yml and "versionCode: 108" in yml
+    assert "versionName: 1.0.9" in yml and "versionCode: 109" in yml

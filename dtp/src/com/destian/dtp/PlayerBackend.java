@@ -204,6 +204,12 @@ public final class PlayerBackend {
                 if (detail.isEmpty()) detail = json.optString("message", "");
                 if (detail.isEmpty()) detail = json.optString("msg", "");
                 if (detail.isEmpty()) detail = "Permintaan server pemain gagal.";
+                // v1.0.9: function google-player di Supabase masih versi Google lama (belum diganti v1.0.9).
+                String lower = detail.toLowerCase(java.util.Locale.ROOT);
+                if (lower.contains("google id token") || lower.contains("google web oauth")
+                        || lower.contains("aksi pemain tidak dikenal")) {
+                    detail = "Server belum diperbarui: ganti kode function google-player di Supabase dengan versi v1.0.9, lalu coba lagi.";
+                }
                 throw new IOException("[HTTP " + status + "] " + detail);
             }
             JSONObject data = json.optJSONObject("data");
