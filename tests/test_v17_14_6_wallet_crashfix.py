@@ -63,6 +63,6 @@ def test_layar_maintenance_menampilkan_detail_error():
 
 def test_versi_17_14_6():
     yml = read_text("kingdom-in-chaos-decompiled/apktool.yml")
-    assert "versionName: 17.14.8" in yml and "versionCode: 16" in yml
-    assert "KingdomInChaosDTP-v17.14.8-price-barter-crashfix.apk" in read_text("build_dtp.py")
-    assert "KingdomInChaosDTP-v17.14.8-price-barter-crashfix.apk" in read_text(".github/workflows/build-apk.yml")
+    assert "versionName: 1.0.6" in yml and "versionCode: 106" in yml
+    assert "KingdomInChaosDTP-v1.0.6.apk" in read_text("build_dtp.py")
+    assert "KingdomInChaosDTP-v1.0.6.apk" in read_text(".github/workflows/build-apk.yml")

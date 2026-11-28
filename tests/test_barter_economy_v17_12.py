@@ -110,7 +110,7 @@ def test_build_script_patches_both_abis_and_compiles_thumb_bridge():
     assert "patch_native_barter()" in build
     assert "patch_barter_native.py" in build
     assert '"-mthumb"' in build
-    assert '"KingdomInChaosDTP-v17.14.8-price-barter-crashfix.apk"' in build
+    assert '"KingdomInChaosDTP-v1.0.6.apk"' in build
     assert '"armeabi", "armeabi-v7a"' in patcher
 
 

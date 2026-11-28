@@ -1,5 +1,5 @@
 version: 2.10.0
-apkFileName: KingdomInChaosDTP-v17.14.5-ui-polish.apk
+apkFileName: KingdomInChaosDTP-v1.0.6.apk
 isFrameworkApk: false
 usesFramework:
   ids:
@@ -12,8 +12,8 @@ packageInfo:
   forcedPackageId: 127
   renameManifestPackage: null
 versionInfo:
-  versionCode: 16
-  versionName: 17.14.8
+  versionCode: 106
+  versionName: 1.0.6
 resourcesAreCompressed: false
 sharedLibrary: false
 sparseResources: false

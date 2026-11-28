@@ -61,10 +61,10 @@ def test_overlay_auto_shows_full_report_and_keeps_small_reopen_icon():
 
 def test_android_package_version_is_v17_14_2_google_mail_crashfix():
     source = read("kingdom-in-chaos-decompiled/apktool.yml")
-    assert "versionCode: 16" in source
-    assert "versionName: 17.14.8" in source
+    assert "versionCode: 106" in source
+    assert "versionName: 1.0.6" in source
     build = read("build_dtp.py")
-    assert "KingdomInChaosDTP-v17.14.8-price-barter-crashfix.apk" in build
+    assert "KingdomInChaosDTP-v1.0.6.apk" in build
 
 
 def test_maintenance_gate_and_realtime_fix_remain_intact():

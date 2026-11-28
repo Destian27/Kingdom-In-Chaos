@@ -68,9 +68,9 @@ def test_admin_realtime_broadcast_plus_poll_fallback_refreshes_player_and_mail_t
 def test_version_and_package_are_bumped_for_v17_14_2():
     yml = read('kingdom-in-chaos-decompiled/apktool.yml')
     build = read('build_dtp.py')
-    assert 'versionCode: 16' in yml
-    assert 'versionName: 17.14.8' in yml
-    assert 'KingdomInChaosDTP-v17.14.8-price-barter-crashfix.apk' in build
+    assert 'versionCode: 106' in yml
+    assert 'versionName: 1.0.6' in yml
+    assert 'KingdomInChaosDTP-v1.0.6.apk' in build
 
 
 
