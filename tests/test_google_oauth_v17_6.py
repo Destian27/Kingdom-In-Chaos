@@ -21,7 +21,7 @@ def test_google_player_phase_two_has_nickname_and_server_player_id():
     edge = read("supabase/functions/google-player/index.ts")
     sql = read("supabase/migrations/202611270001_google_players_rewards_meat.sql")
     assert "Daftar" in activity
-    assert "Nama Panggilan" in activity
+    assert "Nama Pengguna" in activity
     assert "player_id" in activity
     assert "complete_profile" in edge
     assert "profile_completed" in edge

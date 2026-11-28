@@ -203,8 +203,11 @@ th{background:var(--blue-l);color:var(--blue-d);white-space:nowrap}
 
     <div class="card" id="googleActivityAdminCard">
       <p class="sectionTitle">Aktivitas Admin & Pemain</p>
-      <p class="mini">Riwayat login/profil, klaim Surat, kode hadiah, pembelian daging, dan tindakan admin. Pembaruan instan memakai Broadcast dengan refresh berkala sebagai cadangan.</p>
-      <div class="toolbar"><button class="ghost" id="btnGoogleActivityRefresh">Muat ulang aktivitas</button><span class="mini" id="googleActivityStatus">Belum dimuat.</span></div>
+      <p class="mini">Riwayat login/profil, klaim Surat, kode hadiah, pembelian daging, serta SEMUA perintah admin (Surat, kode hadiah, Boss Gua, Event Shop, maintenance) lengkap dengan alasannya. Pembaruan instan memakai Broadcast dengan refresh berkala sebagai cadangan.</p>
+      <div class="toolbar"><button class="ghost" id="btnGoogleActivityRefresh">Muat ulang aktivitas</button>
+        <select id="activityActorFilter" aria-label="Filter pelaku"><option value="">Semua pelaku</option><option value="admin">Admin saja</option><option value="player">Pemain saja</option></select>
+        <input id="activitySearch" type="search" placeholder="Cari email / pemain / aktivitas" aria-label="Cari aktivitas" style="max-width:240px">
+        <span class="mini" id="googleActivityStatus">Belum dimuat.</span></div>
       <div class="tableWrap"><table style="min-width:850px"><thead><tr><th>Waktu</th><th>Pelaku</th><th>Email</th><th>Pemain</th><th>Aktivitas</th><th>Detail</th></tr></thead><tbody id="googleActivityRows"><tr><td colspan="6">Belum dimuat.</td></tr></tbody></table></div>
     </div>
 
@@ -377,6 +380,7 @@ $("btnSave").onclick = async () => {
   try {
     fill(await call("save", { is_active: active, title: $("title").value, message: $("msg").value, end_at: endIso }));
     msg.style.color = "var(--ok)"; msg.textContent = "Tersimpan. Game membaca perubahan dalam sekitar 2 detik.";
+    if (typeof adminDashboardStarted !== "undefined" && adminDashboardStarted) refreshActivityQuietly();
   } catch (e) { msg.textContent = e.message; }
   busy(false);
 };
@@ -407,6 +411,7 @@ async function shift(sign) {
     fill(await call("save", row));
     msg.style.color = "var(--ok)";
     msg.textContent = (sign > 0 ? "Waktu ditambah " : "Waktu dikurangi ") + dur(t) + ". Game membaca perubahan dalam sekitar 2 detik.";
+    if (typeof adminDashboardStarted !== "undefined" && adminDashboardStarted) refreshActivityQuietly();
   } catch (e) { msg.textContent = e.message; }
   finally { busy(false); }
 }
@@ -602,10 +607,65 @@ async function loadRewardCodes() {
       const reason = prompt(`Alasan ${enabled ? "mengaktifkan" : "menonaktifkan"} kode (minimal 4 karakter):`);
       if (!reason || reason.trim().length < 4) return;
       btn.disabled = true;
-      try { await gameAdminRequest("set_reward_code_enabled", {code_id:btn.getAttribute("data-id"), enabled, reason:reason.trim()}); await loadRewardCodes(); }
+      try { await gameAdminRequest("set_reward_code_enabled", {code_id:btn.getAttribute("data-id"), enabled, reason:reason.trim()}); await loadRewardCodes(); refreshActivityQuietly(); }
       catch(e) { admin$("rewardCodeStatus").textContent = e.message; btn.disabled = false; }
     });
   } catch (e) { rows.innerHTML = `<tr><td colspan="6">${escapeHtml(e.message)}</td></tr>`; }
+}
+// v17.14.17: label Indonesia untuk kode aktivitas. Kode yang belum terdaftar tetap tampil apa adanya.
+const ACTIVITY_LABELS = {
+  google_login: "Pemain login Google", profile_completed: "Pemain menyelesaikan pendaftaran",
+  meat_purchased: "Pemain membeli daging", meat_consumed: "Pemain memakai daging",
+  reward_code_claimed: "Pemain menukar kode hadiah", mail_claimed: "Pemain mengklaim Surat",
+  native_wallet_observed: "Saldo game berubah (terpantau)",
+  mail_sent: "Admin mengirim Surat", reward_code_created: "Admin membuat kode hadiah",
+  reward_code_enabled: "Admin mengaktifkan kode hadiah", reward_code_disabled: "Admin menonaktifkan kode hadiah",
+  admin_save_cave_boss_schedule: "Admin menyimpan jadwal Boss Gua", admin_trigger_cave_boss_now: "Admin memanggil Boss Gua sekarang",
+  admin_clear_cave_boss_override: "Admin menghentikan override Boss Gua", admin_save_event_store: "Admin menyimpan Event Shop",
+  maintenance_on: "Admin mengaktifkan maintenance", maintenance_off: "Admin menonaktifkan maintenance"
+};
+const DETAIL_LABELS = {
+  reason: "Alasan", subject: "Judul", recipient_email: "Penerima", code: "Kode", max_uses: "Maks. klaim",
+  coins: "Koin", crystals: "DM", goblin_coins: "Goblin", meat: "Daging", boss_id: "ID Boss", boss_name: "Nama Boss",
+  difficulty: "Kesulitan", hp_multiplier: "Pengali HP", duration_minutes: "Durasi (menit)", slot_aktif: "Slot aktif",
+  total_slot: "Total slot", title: "Judul", enabled: "Aktif", recurrence: "Pengulangan", item_count: "Jumlah item",
+  message: "Pesan", end_at: "Selesai", mail_id: "ID Surat", source_action: "Sumber"
+};
+function formatActivityDetail(details) {
+  if (!details || typeof details !== "object") return "-";
+  const parts = [];
+  const walk = (obj, prefix) => {
+    for (const [k, v] of Object.entries(obj)) {
+      if (v === "" || v === null || v === undefined || k === "completed") continue;
+      if (v && typeof v === "object" && !Array.isArray(v)) { walk(v, prefix); continue; }
+      let shown = Array.isArray(v) ? v.join(", ") : v === true ? "ya" : v === false ? "tidak" : String(v);
+      if (k === "end_at") shown = formatDate(v);
+      parts.push((DETAIL_LABELS[k] || k) + ": " + shown);
+    }
+  };
+  walk(details, "");
+  return parts.length ? parts.join(" • ") : "-";
+}
+let activityItemsCache = [];
+function renderGoogleActivity() {
+  const rows = admin$("googleActivityRows");
+  const status = admin$("googleActivityStatus");
+  if (!rows || !status) return;
+  const actorFilter = (admin$("activityActorFilter") || {}).value || "";
+  const needle = ((admin$("activitySearch") || {}).value || "").trim().toLowerCase();
+  const items = activityItemsCache.filter(a => {
+    if (actorFilter && a.actor_type !== actorFilter) return false;
+    if (!needle) return true;
+    const hay = [a.actor_email, a.player?.nickname, a.player?.player_id, a.action, ACTIVITY_LABELS[a.action], formatActivityDetail(a.details)].join(" ").toLowerCase();
+    return hay.includes(needle);
+  });
+  status.textContent = `${items.length.toLocaleString("id-ID")} dari ${activityItemsCache.length.toLocaleString("id-ID")} aktivitas terbaru`;
+  rows.innerHTML = items.length ? items.map(a => {
+    const actor = a.actor_type === "admin" ? "Admin" : "Pemain";
+    const who = a.player?.nickname || a.player?.player_id || "-";
+    const label = ACTIVITY_LABELS[a.action] || a.action || "-";
+    return `<tr><td>${escapeHtml(formatDate(a.created_at))}</td><td>${actor}</td><td>${escapeHtml(a.actor_email || "-")}</td><td>${escapeHtml(who)}</td><td title="${escapeHtml(a.action || "")}">${escapeHtml(label)}</td><td title="${escapeHtml(JSON.stringify(a.details || {}))}">${escapeHtml(formatActivityDetail(a.details))}</td></tr>`;
+  }).join("") : `<tr><td colspan="6">${activityItemsCache.length ? "Tidak ada aktivitas yang cocok dengan filter." : "Belum ada aktivitas tercatat."}</td></tr>`;
 }
 async function loadGoogleActivity() {
   const rows = admin$("googleActivityRows");
@@ -614,19 +674,17 @@ async function loadGoogleActivity() {
   status.textContent = "Memuat aktivitas...";
   try {
     const result = await gameAdminRequest("list_google_activity");
-    const items = Array.isArray(result.activities) ? result.activities : [];
-    status.textContent = `${items.length.toLocaleString("id-ID")} aktivitas terbaru`;
-    rows.innerHTML = items.length ? items.map(a => {
-      const actor = a.actor_type === "admin" ? "Admin" : "Pemain";
-      const who = a.player?.nickname || a.player?.player_id || "-";
-      const detail = JSON.stringify(a.details || {});
-      return `<tr><td>${escapeHtml(formatDate(a.created_at))}</td><td>${actor}</td><td>${escapeHtml(a.actor_email || "-")}</td><td>${escapeHtml(who)}</td><td>${escapeHtml(a.action || "-")}</td><td>${escapeHtml(detail)}</td></tr>`;
-    }).join("") : `<tr><td colspan="6">Belum ada aktivitas tercatat.</td></tr>`;
+    activityItemsCache = Array.isArray(result.activities) ? result.activities : [];
+    renderGoogleActivity();
   } catch (e) {
     status.textContent = e.message;
     rows.innerHTML = `<tr><td colspan="6">${escapeHtml(e.message)}</td></tr>`;
   }
 }
+// Perintah admin berhasil -> feed aktivitas ikut segar (cadangan bila broadcast terlewat).
+const refreshActivityQuietly = () => { if (creds) loadGoogleActivity().catch(() => {}); };
+admin$("activityActorFilter").onchange = renderGoogleActivity;
+admin$("activitySearch").oninput = renderGoogleActivity;
 admin$("btnGoogleActivityRefresh").onclick = loadGoogleActivity;
 
 admin$("btnGooglePlayersRefresh").onclick = loadGooglePlayers;
@@ -651,6 +709,7 @@ admin$("btnCreateRewardCode").onclick = async () => {
     try { await navigator.clipboard.writeText(data.code); status.textContent += " Kode juga sudah disalin."; } catch {}
     admin$("rewardCodeValue").value = ""; admin$("rewardCodeReason").value = "";
     await loadRewardCodes();
+    refreshActivityQuietly();
   } catch(e) { status.textContent = e.message; }
   finally { btn.disabled = false; }
 };
@@ -691,6 +750,7 @@ admin$("btnSendPlayerMail").onclick = async () => {
     status.textContent = `Surat berhasil dikirim ke kotak surat ${data.player.nickname || data.player.player_id}. Hadiah belum masuk saldo; pemain harus menekan Klaim.`;
     admin$("mailMessage").value = ""; admin$("mailReason").value = "";
     await Promise.all([loadPlayerMail(), loadGooglePlayers()]);
+    refreshActivityQuietly();
   } catch (e) { status.textContent = e.message; }
   finally { btn.disabled = false; }
 };
@@ -801,8 +861,9 @@ admin$("btnCaveBossSaveSchedule").onclick = async () => {
     const hours = collectCaveBossHours();
     if (!confirm("Simpan konfigurasi seluruh 24 slot Boss Gua? Slot yang tidak diaktifkan akan tetap nonaktif.")) return;
     await gameAdminRequest("save_cave_boss_schedule", {hours, reason});
-    showCaveBossStatus("Berhasil menyimpan 24 slot di Supabase. Gameplay akan mengikuti jadwal setelah versi game membaca RPC get_active_cave_boss().", true, "caveBossScheduleMsg");
+    showCaveBossStatus("Berhasil menyimpan 24 slot di Supabase. Game membaca jadwal ini dari server dalam kisaran 15 detik (login Google langsung).", true, "caveBossScheduleMsg");
     await loadCaveBossAdmin();
+    refreshActivityQuietly();
   } catch (e) { showCaveBossStatus(e.message, false, "caveBossScheduleMsg"); }
   finally { btn.disabled = false; }
 };
@@ -821,8 +882,9 @@ admin$("btnCaveBossTrigger").onclick = async () => {
     };
     if (!confirm(`Panggil Boss ${payload.boss_name || payload.boss_id} sekarang selama ${payload.duration_minutes} menit? Override aktif akan menggantikan boss dari jadwal.`)) return;
     await gameAdminRequest("trigger_cave_boss_now", payload);
-    showCaveBossStatus("Override Boss berhasil disimpan. Pastikan klien Mode Gua membaca RPC agar perubahan terlihat di dalam game.", true, "caveBossManualMsg");
+    showCaveBossStatus("Override Boss berhasil disimpan. Game membaca override ini dari server dalam kisaran 15 detik.", true, "caveBossManualMsg");
     await loadCaveBossAdmin();
+    refreshActivityQuietly();
   } catch (e) { showCaveBossStatus(e.message, false, "caveBossManualMsg"); }
   finally { btn.disabled = false; }
 };
@@ -836,6 +898,7 @@ admin$("btnCaveBossClear").onclick = async () => {
     await gameAdminRequest("clear_cave_boss_override", {reason});
     showCaveBossStatus("Override dihentikan. Jadwal otomatis kembali menjadi sumber Boss.", true, "caveBossManualMsg");
     await loadCaveBossAdmin();
+    refreshActivityQuietly();
   } catch (e) { showCaveBossStatus(e.message, false, "caveBossManualMsg"); }
   finally { btn.disabled = false; }
 };
@@ -945,8 +1008,9 @@ admin$("btnEventStoreSave").onclick = async () => {
     const reason = requiredReason("eventStoreReason");
     if (!confirm(`Simpan Event Shop ${config.enabled ? "AKTIF" : "NONAKTIF"} dengan ${items.length} item?`)) return;
     await gameAdminRequest("save_event_store", {config, items, reason});
-    status.textContent = "Event Shop berhasil disimpan. APK akan membaca status dan katalog server maksimal sekitar 15 detik setelah polling berjalan.";
+    status.textContent = "Event Shop berhasil disimpan. Game membaca status dan katalog dari server dalam kisaran 10 detik.";
     await loadEventStoreAdmin();
+    refreshActivityQuietly();
   } catch (e) { status.textContent = e.message; }
   finally { btn.disabled = false; }
 };

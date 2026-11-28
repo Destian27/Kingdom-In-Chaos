@@ -1,3 +1,6 @@
+// v17.14.17: tambah aksi get_cave_boss & get_event_store agar perintah admin (Boss Gua / Event Shop) sampai ke pemain login Google langsung.
+// v17.14.16: Daftar = Nama Pengguna + Kata Sandi (4-16, disimpan sebagai hash PBKDF2 di tabel terpisah).
+// v17.14.9: Android OAuth client ID (com.destian.kingdominchaosdtp + SHA-1 dtp-fixed.keystore) dipasang sebagai default.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
@@ -121,18 +124,50 @@ async function bootstrap(identity: Awaited<ReturnType<typeof verifyGoogleAccessT
   return { profile, economy: wallet };
 }
 
+const PASSWORD_ITERATIONS = 100_000;
+function toHex(bytes: Uint8Array) { return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join(""); }
+async function hashPassword(password: string, salt: Uint8Array, iterations = PASSWORD_ITERATIONS) {
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations }, key, 256);
+  return toHex(new Uint8Array(bits));
+}
+
 async function completeProfile(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>, body: Record<string, unknown>) {
   const nickname = typeof body.nickname === "string" ? body.nickname.trim() : "";
-  if (nickname.length < 3 || nickname.length > 32) throw new Error("Nickname harus terdiri dari 3–32 karakter.");
-  if (!/^[\p{L}\p{N} _.-]+$/u.test(nickname)) throw new Error("Nickname hanya boleh memakai huruf, angka, spasi, titik, garis bawah, atau tanda hubung.");
+  if (nickname.length < 3 || nickname.length > 32) throw new Error("Nama pengguna harus terdiri dari 3–32 karakter.");
+  if (!/^[\p{L}\p{N} _.-]+$/u.test(nickname)) throw new Error("Nama pengguna hanya boleh memakai huruf, angka, spasi, titik, garis bawah, atau tanda hubung.");
+  const password = typeof body.password === "string" ? body.password : "";
+  if (password.length < 4 || password.length > 16) throw new Error("Kata sandi harus 4–16 karakter.");
 
   const current = await requireData<any>(service.from("game_google_players").select("*").eq("google_sub", identity.sub).single());
-  if (current.profile_completed) throw new Error("Profil akun ini sudah pernah diselesaikan.");
-  const profile = await requireData<any>(service.from("game_google_players").update({
-    nickname,
-    profile_completed: true,
+  if (current.profile_completed) throw new Error("Akun ini sudah terdaftar.");
+
+  const taken = await requireData<any>(service.from("game_google_players").select("player_uuid")
+    .ilike("nickname", nickname.replace(/[\\%_]/g, "\\$&")).neq("player_uuid", current.player_uuid).maybeSingle());
+  if (taken) throw new Error("Nama pengguna sudah dipakai. Pilih nama lain.");
+
+  // Kata sandi tidak pernah disimpan polos: hanya hash PBKDF2-SHA256 + salt acak, di tabel khusus service_role.
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const hash = await hashPassword(password, salt);
+  await requireData<any>(service.from("game_google_player_credentials").upsert({
+    player_uuid: current.player_uuid,
+    password_hash: hash,
+    password_salt: toHex(salt),
+    password_iterations: PASSWORD_ITERATIONS,
     updated_at: new Date().toISOString(),
-  }).eq("player_uuid", current.player_uuid).eq("profile_completed", false).select("*").single());
+  }, { onConflict: "player_uuid" }).select("player_uuid").single());
+
+  let profile: any;
+  try {
+    profile = await requireData<any>(service.from("game_google_players").update({
+      nickname,
+      profile_completed: true,
+      updated_at: new Date().toISOString(),
+    }).eq("player_uuid", current.player_uuid).eq("profile_completed", false).select("*").single());
+  } catch (e) {
+    if (/duplicate key|nickname_ci_uq/i.test((e as Error).message)) throw new Error("Nama pengguna sudah dipakai. Pilih nama lain.");
+    throw e;
+  }
   const economy = await requireData<any>(service.from("game_google_player_economy").select("*").eq("player_uuid", current.player_uuid).single());
   return { profile, economy };
 }
@@ -239,6 +274,40 @@ async function notifyGoogleAdminDashboard(identity: Awaited<ReturnType<typeof ve
   }
 }
 
+// ---------------- v17.14.17: jalur baca Boss Gua & Event Shop untuk pemain Google ----------------
+// Sebelumnya game memanggil RPC lewat sesi Supabase Auth lama. Sesi itu tidak ada lagi setelah
+// login Google langsung, sehingga perintah admin tidak pernah terbaca game. Aksi di bawah hanya
+// BACA (tidak mengubah apa pun) dan sengaja tidak memicu notifyGoogleAdminDashboard supaya polling
+// berkala dari game tidak membanjiri tabel aktivitas / broadcast admin.
+async function requireKnownPlayer(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>) {
+  const { data, error } = await service.from("game_google_players")
+    .select("player_uuid").eq("google_sub", identity.sub).maybeSingle();
+  if (error) throw new Error("Pemeriksaan akun pemain gagal.");
+  if (!data) throw Object.assign(new Error("Akun Google belum terdaftar sebagai pemain. Login ulang lewat tombol ONLINE."), { status: 403 });
+  return data as { player_uuid: string };
+}
+
+async function getCaveBossForPlayer(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>) {
+  await requireKnownPlayer(identity);
+  // get_active_cave_boss() tidak bergantung pada auth.uid() dan sudah di-grant ke service_role.
+  const { data, error } = await service.rpc("get_active_cave_boss");
+  if (error) {
+    console.error("get_active_cave_boss failed:", error.message);
+    throw new Error("Data Boss Gua belum tersedia di server. Jalankan SQL v16 di Supabase.");
+  }
+  return data ?? { active: false };
+}
+
+async function getEventStoreForPlayer(identity: Awaited<ReturnType<typeof verifyGoogleAccessToken>>) {
+  const player = await requireKnownPlayer(identity);
+  const { data, error } = await service.rpc("game_google_active_event_store", { p_player_uuid: player.player_uuid });
+  if (error) {
+    console.error("game_google_active_event_store failed:", error.message);
+    throw new Error("Data Event Shop belum tersedia di server. Jalankan SQL v17.14.17 di Supabase.");
+  }
+  return data ?? { active: false, items: [] };
+}
+
 Deno.serve(async (request: Request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (request.method !== "POST") return fail("Method not allowed", 405);
@@ -249,6 +318,8 @@ Deno.serve(async (request: Request) => {
     if (!isObject(body)) return fail("Request body tidak valid.");
     const action = String(body.action ?? "");
     let data: unknown;
+    // v17.14.17: aksi baca-saja tidak memperbarui last_seen / tidak membroadcast ke dashboard.
+    let readOnlyPoll = false;
 
     if (action === "bootstrap") {
       data = await bootstrap(identity);
@@ -272,12 +343,18 @@ Deno.serve(async (request: Request) => {
       data = await claimPlayerMail(identity, body);
     } else if (action === "sync_native_wallet") {
       data = await syncNativeWallet(identity, body);
+    } else if (action === "get_cave_boss") {
+      data = await getCaveBossForPlayer(identity);
+      readOnlyPoll = true;
+    } else if (action === "get_event_store") {
+      data = await getEventStoreForPlayer(identity);
+      readOnlyPoll = true;
     } else {
       return fail("Aksi pemain tidak dikenal.", 404);
     }
     // Every authenticated player request updates last-seen and invalidates the admin snapshot.
     // The dashboard also polls as a fallback if the broadcast is temporarily missed.
-    await notifyGoogleAdminDashboard(identity, action);
+    if (!readOnlyPoll) await notifyGoogleAdminDashboard(identity, action);
     return json({ ok: true, data });
   } catch (error) {
     const e = error as Error & { status?: number };

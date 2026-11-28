@@ -65,9 +65,13 @@ public final class GooglePlayerBackend {
         return result;
     }
 
-    public JSONObject completeProfile(String nickname) throws IOException {
+    /** Daftar: nama pengguna + kata sandi (4-16). Server menyimpan kata sandi hanya sebagai hash. */
+    public JSONObject completeProfile(String nickname, String password) throws IOException {
         JSONObject body = new JSONObject();
-        try { body.put("nickname", nickname == null ? "" : nickname.trim()); }
+        try {
+            body.put("nickname", nickname == null ? "" : nickname.trim());
+            body.put("password", password == null ? "" : password);
+        }
         catch (JSONException e) { throw new IOException("Tidak dapat menyiapkan profil pemain.", e); }
         return requestSavedAccount("complete_profile", body);
     }
@@ -111,6 +115,19 @@ public final class GooglePlayerBackend {
     /** Read the authenticated Google player's in-game mailbox. */
     public JSONObject getInbox() throws IOException {
         return requestSavedAccount("get_mail", new JSONObject());
+    }
+
+    /**
+     * v17.14.17: Boss Gua aktif dari server. Login Google langsung tidak punya sesi Supabase Auth,
+     * jadi SupabaseGameBackend.getActiveCaveBoss() tidak bisa dipakai; jalur ini lewat Edge Function.
+     */
+    public JSONObject getCaveBoss() throws IOException {
+        return requestSavedAccount("get_cave_boss", new JSONObject());
+    }
+
+    /** v17.14.17: katalog + jadwal Event Shop dari server untuk pemain Google (termasuk saldo Event Eyes). */
+    public JSONObject getEventStore() throws IOException {
+        return requestSavedAccount("get_event_store", new JSONObject());
     }
 
     /** Claim a single mail item. The server atomically credits the wallet once. */
@@ -226,9 +243,18 @@ public final class GooglePlayerBackend {
             int status = connection.getResponseCode();
             InputStream stream = status >= 200 && status < 300 ? connection.getInputStream() : connection.getErrorStream();
             String response = readAll(stream);
-            JSONObject json = new JSONObject(response);
+            JSONObject json;
+            try { json = new JSONObject(response); }
+            catch (JSONException notJson) {
+                throw new IOException("Server pemain membalas HTTP " + status + " (bukan JSON).", notJson);
+            }
             if (status < 200 || status >= 300 || json.optBoolean("ok", true) == false) {
-                throw new IOException(json.optString("error", "Permintaan server pemain gagal."));
+                // v17.14.16: tampilkan pesan asli. Gateway Supabase memakai "message"/"msg", function memakai "error".
+                String detail = json.optString("error", "");
+                if (detail.isEmpty()) detail = json.optString("message", "");
+                if (detail.isEmpty()) detail = json.optString("msg", "");
+                if (detail.isEmpty()) detail = "Permintaan server pemain gagal.";
+                throw new IOException("[HTTP " + status + "] " + detail);
             }
             JSONObject data = json.optJSONObject("data");
             return data == null ? json : data;

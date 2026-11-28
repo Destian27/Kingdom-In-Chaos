@@ -1,3 +1,5 @@
+// v17.14.8: tidak ada perubahan perilaku dibanding v17.14.2. Hadiah admin diklaim dari tombol Bakat -> Hub Online di game.
+// v17.14.17: log perintah admin lengkap (alasan + detail), broadcast ke dashboard, dan riwayat maintenance ikut tampil di feed aktivitas.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
@@ -435,7 +437,28 @@ async function listGoogleActivity() {
       .select("player_uuid,player_id,email,nickname,avatar_url,game_avatar_id").in("player_uuid", batch));
     for (const player of players) playerMap.set(player.player_uuid, player);
   }
-  return { activities: activities.map((a: any) => ({ ...a, player: a.player_uuid ? playerMap.get(a.player_uuid) ?? null : null })) };
+  const rows: any[] = activities.map((a: any) => ({ ...a, player: a.player_uuid ? playerMap.get(a.player_uuid) ?? null : null }));
+
+  // v17.14.17: perintah maintenance dikirim lewat Edge Function lain (maintenance-admin) dan tidak
+  // masuk game_google_activity. Riwayatnya sudah dicatat di app_maintenance_log, jadi digabung di sini
+  // (hanya dibaca) supaya SEMUA perintah admin terlihat dalam satu feed. Kalau tabel belum ada, abaikan.
+  try {
+    const { data: maint, error: maintError } = await service.from("app_maintenance_log")
+      .select("id,created_at,is_active,title,message,end_at").order("created_at", { ascending: false }).limit(60);
+    if (!maintError && Array.isArray(maint)) {
+      for (const m of maint) {
+        rows.push({
+          activity_id: `maint-${m.id}`, actor_type: "admin", player_uuid: null, admin_user_id: null,
+          actor_email: "Admin (maintenance)", action: m.is_active ? "maintenance_on" : "maintenance_off",
+          details: { title: m.title ?? "", message: m.message ?? "", end_at: m.end_at ?? null },
+          created_at: m.created_at, player: null,
+        });
+      }
+    }
+  } catch (e) { console.warn("Riwayat maintenance tidak dapat digabung:", (e as Error).message); }
+
+  rows.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  return { activities: rows.slice(0, 300) };
 }
 
 async function recordAdminActivity(
@@ -494,6 +517,38 @@ async function sendPlayerMail(adminId: string, adminName: string, body: Record<s
     wallet_credited: false, realtime: { broadcast_sent: broadcastSent } };
 }
 
+// ---------------- v17.14.17: pencatatan perintah admin yang konsisten ----------------
+// Perintah yang mengubah apa yang dilihat pemain di game. Dicatat dengan alasan + ringkasan,
+// lalu dashboard diberi broadcast agar semua tab admin menampilkan aktivitasnya seketika.
+const COMMAND_ACTIVITY_ACTIONS = new Set([
+  "save_cave_boss_schedule", "trigger_cave_boss_now", "clear_cave_boss_override", "save_event_store",
+]);
+// Dua aksi ini sudah mencatat aktivitasnya sendiri; di sini hanya perlu broadcast.
+const BROADCAST_ONLY_ACTIONS = new Set(["create_reward_code", "set_reward_code_enabled"]);
+
+function describeAdminCommand(action: string, body: Record<string, unknown>): Record<string, unknown> {
+  const details: Record<string, unknown> = {
+    reason: typeof body.reason === "string" ? body.reason.trim().slice(0, 500) : "",
+  };
+  if (action === "save_cave_boss_schedule" && Array.isArray(body.hours)) {
+    details.slot_aktif = (body.hours as unknown[]).filter((h) => isObject(h) && h.enabled === true).length;
+    details.total_slot = (body.hours as unknown[]).length;
+  } else if (action === "trigger_cave_boss_now") {
+    details.boss_id = String(body.boss_id ?? "");
+    details.boss_name = String(body.boss_name ?? "");
+    details.difficulty = String(body.difficulty ?? "");
+    details.hp_multiplier = Number(body.hp_multiplier ?? 1);
+    details.duration_minutes = Number(body.duration_minutes ?? 0);
+  } else if (action === "save_event_store") {
+    const cfg = isObject(body.config) ? body.config : {};
+    details.title = String(cfg.title ?? "").slice(0, 80);
+    details.enabled = cfg.enabled === true;
+    details.recurrence = String(cfg.recurrence ?? "");
+    details.item_count = Array.isArray(body.items) ? (body.items as unknown[]).length : 0;
+  }
+  return details;
+}
+
 Deno.serve(async (request: Request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (request.method !== "POST") return fail("Gunakan POST.", 405);
@@ -519,8 +574,16 @@ Deno.serve(async (request: Request) => {
     else if (action === "whoami") {
       result = { admin: { user_id: user.id, email: user.email ?? null, role: admin.role } };
     } else return fail("Aksi admin tidak dikenal.");
-    if (["save_cave_boss_schedule", "trigger_cave_boss_now", "clear_cave_boss_override", "save_event_store"].includes(String(action))) {
-      await recordAdminActivity(user.id, String(user.email ?? "Admin"), `admin_${String(action)}`, null, { completed: true });
+    // v17.14.17: catat perintah dengan alasan/detail lengkap, lalu broadcast ke dashboard admin.
+    // Kegagalan pencatatan/broadcast tidak boleh menggagalkan perintah yang sudah tersimpan.
+    const actionName = String(action);
+    if (COMMAND_ACTIVITY_ACTIONS.has(actionName)) {
+      await recordAdminActivity(user.id, String(user.email ?? "Admin"), `admin_${actionName}`, null, describeAdminCommand(actionName, body));
+    }
+    if (COMMAND_ACTIVITY_ACTIONS.has(actionName) || BROADCAST_ONLY_ACTIONS.has(actionName)) {
+      await publishRealtimeBroadcast("google-admin-dashboard", "google_player_changed", {
+        resource: actionName, updated_at: new Date().toISOString(),
+      });
     }
     return json({ ok: true, data: result });
   } catch (error) {

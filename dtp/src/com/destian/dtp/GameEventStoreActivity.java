@@ -209,8 +209,15 @@ public final class GameEventStoreActivity extends Activity {
             @Override public void run() {
                 try {
                     SupabaseGameBackend backend = new SupabaseGameBackend(getApplicationContext());
-                    if (!backend.hasSession()) throw new IllegalStateException("Login melalui tombol ONLINE di game terlebih dahulu.");
-                    final JSONObject state = backend.getActiveEventStore();
+                    final JSONObject state;
+                    if (backend.hasSession()) {
+                        state = backend.getActiveEventStore();
+                    } else {
+                        // v17.14.17: pemain login Google langsung -> ambil katalog lewat Edge Function google-player.
+                        GooglePlayerBackend google = new GooglePlayerBackend(getApplicationContext());
+                        if (!google.hasAccount()) throw new IllegalStateException("Login melalui tombol ONLINE di game terlebih dahulu.");
+                        state = google.getEventStore();
+                    }
                     main.post(new Runnable() {
                         @Override public void run() {
                             loadBusy = false;

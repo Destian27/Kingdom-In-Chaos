@@ -1,0 +1,3 @@
+# google-player memeriksa token Google sendiri (bukan JWT Supabase), jadi gateway JWT harus dimatikan.
+[functions.google-player]
+verify_jwt = false

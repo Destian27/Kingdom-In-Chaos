@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -18,8 +19,9 @@ import android.widget.TextView;
 import org.json.JSONObject;
 
 /**
- * v17.14.10: layar "Daftar" bergaya perkamen game. Setelah Google terverifikasi pemain hanya
- * mengisi nama panggilan; ID Pemain dibuat server. Tidak ada tombol Masuk, Daftar-ganda, atau kata sandi.
+ * v17.14.16: layar "Daftar" bergaya perkamen game. Setelah Google terverifikasi dan akun belum
+ * terdaftar, pemain mengisi Nama Pengguna, Kata Sandi (4-16 karakter) dan Verifikasi Kata Sandi.
+ * ID Pemain dibuat server. Kata sandi dikirim lewat HTTPS dan disimpan server hanya sebagai hash.
  */
 public final class GameProfileSetupActivity extends Activity {
     private static final int PARCHMENT = 0xFFB88A5A;
@@ -31,6 +33,8 @@ public final class GameProfileSetupActivity extends Activity {
 
     private GooglePlayerBackend backend;
     private EditText nickname;
+    private EditText password;
+    private EditText passwordConfirm;
     private TextView status;
     private Button submit;
     private String playerId = "";
@@ -40,7 +44,7 @@ public final class GameProfileSetupActivity extends Activity {
         super.onCreate(state);
         backend = new GooglePlayerBackend(getApplicationContext());
         playerId = getIntent().getStringExtra("player_id");
-        if (playerId == null || playerId.trim().isEmpty()) playerId = "Dibuat oleh server";
+        if (playerId == null) playerId = "";
         buildUi();
     }
 
@@ -95,20 +99,21 @@ public final class GameProfileSetupActivity extends Activity {
         email.setTextSize(13); email.setTextColor(INK); email.setGravity(Gravity.CENTER);
         panel.addView(email, matchWrap());
 
-        panel.addView(label("ID Pemain", 18), labelParams(18));
-        TextView idValue = new TextView(this);
-        idValue.setText(playerId); idValue.setTextSize(18); idValue.setTextColor(Color.WHITE);
-        idValue.setTypeface(Typeface.MONOSPACE, Typeface.BOLD); idValue.setGravity(Gravity.CENTER);
-        idValue.setBackground(fieldBg()); idValue.setPadding(dp(12), dp(10), dp(12), dp(10));
-        panel.addView(idValue, labelParams(6));
-
-        panel.addView(label("Nama Panggilan", 16), labelParams(16));
+        panel.addView(label("Nama Pengguna", 16), labelParams(14));
         nickname = new EditText(this);
-        nickname.setSingleLine(true); nickname.setHint("masukkan nama panggilan");
+        nickname.setSingleLine(true); nickname.setHint("masukkan nama pengguna");
         nickname.setHintTextColor(0xFFE2D2BA); nickname.setTextColor(Color.WHITE); nickname.setTextSize(16);
         nickname.setFilters(new InputFilter[]{new InputFilter.LengthFilter(32)});
         nickname.setBackground(fieldBg()); nickname.setPadding(dp(12), dp(10), dp(12), dp(10));
         panel.addView(nickname, labelParams(6));
+
+        panel.addView(label("Kata Sandi", 16), labelParams(12));
+        password = passwordField("Harus 4–16 karakter");
+        panel.addView(password, labelParams(6));
+
+        panel.addView(label("Verifikasi Kata Sandi", 16), labelParams(12));
+        passwordConfirm = passwordField("Masukkan ulang kata sandi");
+        panel.addView(passwordConfirm, labelParams(6));
 
         status = new TextView(this);
         status.setTextColor(0xFF6E1226); status.setTextSize(13); status.setGravity(Gravity.CENTER);
@@ -140,6 +145,16 @@ public final class GameProfileSetupActivity extends Activity {
         LinearLayout.LayoutParams lp = matchWrap(); lp.topMargin = dp(topDp); return lp;
     }
 
+    private EditText passwordField(String hint) {
+        EditText field = new EditText(this);
+        field.setSingleLine(true); field.setHint(hint);
+        field.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        field.setHintTextColor(0xFFE2D2BA); field.setTextColor(Color.WHITE); field.setTextSize(16);
+        field.setFilters(new InputFilter[]{new InputFilter.LengthFilter(16)});
+        field.setBackground(fieldBg()); field.setPadding(dp(12), dp(10), dp(12), dp(10));
+        return field;
+    }
+
     private GradientDrawable fieldBg() {
         GradientDrawable g = new GradientDrawable();
         g.setColor(FIELD); g.setCornerRadius(dp(6)); g.setStroke(dp(1), PARCHMENT_EDGE);
@@ -148,20 +163,28 @@ public final class GameProfileSetupActivity extends Activity {
 
     private void saveProfile() {
         final String name = nickname.getText().toString().trim();
+        final String pass = password.getText().toString();
+        final String pass2 = passwordConfirm.getText().toString();
         if (name.length() < 3 || name.length() > 32) {
-            status.setText("Nama panggilan harus terdiri dari 3–32 karakter."); return;
+            status.setText("Nama pengguna harus terdiri dari 3–32 karakter."); return;
+        }
+        if (pass.length() < 4 || pass.length() > 16) {
+            status.setText("Kata sandi harus 4–16 karakter."); return;
+        }
+        if (!pass.equals(pass2)) {
+            status.setText("Verifikasi kata sandi tidak sama."); return;
         }
         if (saving) return;
-        saving = true; submit.setEnabled(false); status.setText("Menyimpan profil...");
+        saving = true; submit.setEnabled(false); status.setText("Mendaftarkan akun...");
         Thread worker = new Thread(new Runnable() {
             @Override public void run() {
                 JSONObject result = null; Exception failure = null;
-                try { result = backend.completeProfile(name); } catch (Exception e) { failure = e; }
+                try { result = backend.completeProfile(name, pass); } catch (Exception e) { failure = e; }
                 final JSONObject data = result; final Exception error = failure;
                 runOnUiThread(new Runnable() {
                     @Override public void run() {
                         saving = false; submit.setEnabled(true);
-                        if (error != null) { status.setText("Tidak dapat menyimpan profil: " + error.getMessage()); return; }
+                        if (error != null) { status.setText("Pendaftaran gagal: " + error.getMessage()); return; }
                         JSONObject savedProfile = data == null ? null : data.optJSONObject("profile");
                         String id = savedProfile == null ? playerId : savedProfile.optString("player_id", playerId);
                         status.setText("Berhasil terdaftar. ID Pemain: " + id);
