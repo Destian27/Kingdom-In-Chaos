@@ -1,4 +1,5 @@
 // v17.14.8: tidak ada perubahan perilaku dibanding v17.14.2. Hadiah admin diklaim dari tombol Bakat -> Hub Online di game.
+// v17.14.18: requireAdmin menyiapkan identitas super_admin otomatis bila login admin utama valid tetapi belum ada baris game_admin_users.
 // v17.14.17: log perintah admin lengkap (alasan + detail), broadcast ke dashboard, dan riwayat maintenance ikut tampil di feed aktivitas.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -103,18 +104,71 @@ async function verifyMaintenanceCredentials(value: unknown): Promise<boolean> {
   return constantTimeEqual(a, b) && constantTimeEqual(c, d);
 }
 
+const SERVICE_ADMIN_EMAIL = "admin-utama@kic-dtp.example.com";
+
+function actorLabel(user: AdminAuthUser): string {
+  const email = String(user.email ?? "");
+  if (email.toLowerCase() === SERVICE_ADMIN_EMAIL) return Deno.env.get("MAINTENANCE_ADMIN_NAME") || "Admin utama";
+  return email || "Admin";
+}
+
+async function findAuthUserByEmail(email: string) {
+  for (let page = 1; page <= 20; page++) {
+    const { data, error } = await service.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error) return null;
+    const hit = data.users.find((u) => (u.email ?? "").toLowerCase() === email);
+    if (hit) return hit;
+    if (data.users.length < 1000) break;
+  }
+  return null;
+}
+
+async function provisionServiceAdmin(pinnedId: string) {
+  let userId = pinnedId;
+  if (userId) {
+    const { data, error } = await service.auth.admin.getUserById(userId);
+    if (error || !data.user) {
+      throw Object.assign(new Error("MAINTENANCE_ADMIN_USER_ID tidak cocok dengan akun mana pun di Supabase Auth."), { status: 403 });
+    }
+  } else {
+    const configuredName = Deno.env.get("MAINTENANCE_ADMIN_NAME") ?? "admin";
+    const created = await service.auth.admin.createUser({
+      email: SERVICE_ADMIN_EMAIL,
+      password: crypto.randomUUID() + crypto.randomUUID(),
+      email_confirm: true,
+      user_metadata: { service_admin: true, display_name: configuredName },
+    });
+    if (created.data?.user) userId = created.data.user.id;
+    else {
+      const existing = await findAuthUserByEmail(SERVICE_ADMIN_EMAIL);
+      if (!existing) {
+        throw Object.assign(new Error("Gagal menyiapkan identitas admin otomatis: " + (created.error?.message ?? "tidak diketahui")), { status: 503 });
+      }
+      userId = existing.id;
+    }
+  }
+  const { data: row, error } = await service.from("game_admin_users")
+    .upsert({ user_id: userId, role: "super_admin", active: true, created_by: userId }, { onConflict: "user_id" })
+    .select("user_id, role, active").single();
+  if (error || !row) {
+    throw Object.assign(new Error("Gagal menyimpan hak super_admin otomatis. Pastikan SQL v17.14 sudah dijalankan."), { status: 503 });
+  }
+  return row;
+}
+
 async function requireAdmin(request: Request, body: Record<string, unknown>) {
   // Preferred: reuse the already authenticated first maintenance-admin session.
   if (await verifyMaintenanceCredentials(body.admin_credentials)) {
+    const pinnedId = Deno.env.get("MAINTENANCE_ADMIN_USER_ID") ?? "";
     let query = service.from("game_admin_users")
       .select("user_id, role, active")
       .eq("active", true);
-    const pinnedId = Deno.env.get("MAINTENANCE_ADMIN_USER_ID") ?? "";
     if (pinnedId) query = query.eq("user_id", pinnedId);
     else query = query.eq("role", "super_admin");
-    const { data: adminRow, error: adminError } = await query.limit(1).maybeSingle();
+    const { data: found, error: adminError } = await query.limit(1).maybeSingle();
     if (adminError) throw Object.assign(new Error("Pemeriksaan hak admin gagal. Jalankan SQL v17.14 dan pastikan admin aktif."), { status: 503 });
-    if (!adminRow) throw Object.assign(new Error("Belum ada super_admin aktif yang terhubung. Atur MAINTENANCE_ADMIN_USER_ID atau bootstrap admin di database."), { status: 403 });
+    let adminRow = found;
+    if (!adminRow) adminRow = await provisionServiceAdmin(pinnedId);
     const { data: authData, error: authError } = await service.auth.admin.getUserById(adminRow.user_id);
     if (authError || !authData.user) throw Object.assign(new Error("Identitas admin database tidak ditemukan."), { status: 403 });
     return { user: authData.user as AdminAuthUser, admin: adminRow };
@@ -562,7 +616,7 @@ Deno.serve(async (request: Request) => {
     else if (action === "list_reward_codes") result = await listRewardCodes();
     else if (action === "list_player_mail") result = await listPlayerMail();
     else if (action === "list_google_activity") result = await listGoogleActivity();
-    else if (action === "send_player_mail") result = await sendPlayerMail(user.id, String(user.email ?? "Admin"), body);
+    else if (action === "send_player_mail") result = await sendPlayerMail(user.id, actorLabel(user), body);
     else if (action === "create_reward_code") result = await createRewardCode(user.id, body);
     else if (action === "set_reward_code_enabled") result = await setRewardCodeEnabled(user.id, body);
     else if (action === "get_cave_boss_admin") result = await getCaveBossAdmin();
@@ -572,13 +626,13 @@ Deno.serve(async (request: Request) => {
     else if (action === "get_event_store_admin") result = await getEventStoreAdmin();
     else if (action === "save_event_store") result = await saveEventStore(user.id, body);
     else if (action === "whoami") {
-      result = { admin: { user_id: user.id, email: user.email ?? null, role: admin.role } };
+      result = { admin: { user_id: user.id, email: actorLabel(user), role: admin.role } };
     } else return fail("Aksi admin tidak dikenal.");
     // v17.14.17: catat perintah dengan alasan/detail lengkap, lalu broadcast ke dashboard admin.
     // Kegagalan pencatatan/broadcast tidak boleh menggagalkan perintah yang sudah tersimpan.
     const actionName = String(action);
     if (COMMAND_ACTIVITY_ACTIONS.has(actionName)) {
-      await recordAdminActivity(user.id, String(user.email ?? "Admin"), `admin_${actionName}`, null, describeAdminCommand(actionName, body));
+      await recordAdminActivity(user.id, actorLabel(user), `admin_${actionName}`, null, describeAdminCommand(actionName, body));
     }
     if (COMMAND_ACTIVITY_ACTIONS.has(actionName) || BROADCAST_ONLY_ACTIONS.has(actionName)) {
       await publishRealtimeBroadcast("google-admin-dashboard", "google_player_changed", {

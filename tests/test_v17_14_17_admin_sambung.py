@@ -27,7 +27,7 @@ def test_game_admin_log_lengkap_dan_maintenance():
     assert "describeAdminCommand(actionName, body)" in ts
     assert "app_maintenance_log" in ts and "maintenance_on" in ts
     assert '{ completed: true }' not in ts
-    assert ts == read("kingdom-in-chaos-dtp-game-admin-function-v17_14_17.ts")
+    assert ts == read("kingdom-in-chaos-dtp-game-admin-function-v17_14_18.ts")
 
 
 def test_java_fallback_google():
@@ -42,4 +42,4 @@ def test_admin_html_label_filter_refresh():
     html = read("admin.html")
     assert "ACTIVITY_LABELS" in html and "activityActorFilter" in html
     assert html.count("refreshActivityQuietly()") >= 8
-    assert html == read("kingdom-in-chaos-dtp-admin-v17_14_17.html")
+    assert html == read("kingdom-in-chaos-dtp-admin-v17_14_18.html")

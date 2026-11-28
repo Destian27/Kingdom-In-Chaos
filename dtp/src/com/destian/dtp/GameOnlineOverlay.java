@@ -91,9 +91,10 @@ public final class GameOnlineOverlay {
 
     /**
      * v17.14.8: area sentuh tak terlihat di atas tombol bawaan game.
-     * Tombol LOGIN (kiri atas) membuka pemilih akun Google; tombol Bakat (menu kanan)
-     * membuka Hub Online (Surat hadiah admin, Kode Hadiah, Daging). Sentuhan di luar area
-     * tidak dikonsumsi sehingga game tetap menerimanya. Koordinat relatif terhadap tinggi layar.
+     * Tombol LOGIN (kiri atas) membuka pemilih akun Google, atau Hub Online bila sudah login.
+     * v17.14.18: area Bakat DIHAPUS agar tombol Bakat asli game (menu kanan) berfungsi lagi.
+     * Sentuhan di luar area tidak dikonsumsi sehingga game tetap menerimanya.
+     * Koordinat relatif terhadap tinggi layar.
      */
     private static final class Hotspots extends View {
         private final Activity activity;
@@ -105,15 +106,12 @@ public final class GameOnlineOverlay {
             setTag(TAG_HOTSPOTS);
         }
 
-        /** 0 = LOGIN, 1 = Bakat, 2 = avatar/nama panggilan, -1 = di luar area. */
+        /** 0 = LOGIN, 2 = avatar/nama panggilan, -1 = di luar area (1 = Bakat, tidak dipakai lagi). */
         private int zoneAt(float x, float y) {
             float h = getHeight(), w = getWidth();
             if (h <= 0 || w <= 0) return -1;
             // LOGIN: kiri 0.020H, atas 0.138H, lebar 0.264H, tinggi 0.107H
             if (x >= 0.020f * h && x <= 0.284f * h && y >= 0.138f * h && y <= 0.245f * h) return 0;
-            // Bakat: 0.058H dari tepi kanan, lebar 0.130H, atas 0.352H, tinggi 0.139H
-            float right = w - 0.058f * h;
-            if (x >= right - 0.130f * h && x <= right && y >= 0.352f * h && y <= 0.491f * h) return 1;
             // v17.14.10: kotak avatar + nama panggilan (kiri bawah beranda) -> Google lebih dulu,
             // lalu layar Daftar (nama saja). Dialog Masuk/Daftar bawaan game tidak lagi terbuka.
             if (x >= 0.085f * h && x <= 0.68f * h && y >= 0.80f * h && y <= 0.975f * h) return 2;
