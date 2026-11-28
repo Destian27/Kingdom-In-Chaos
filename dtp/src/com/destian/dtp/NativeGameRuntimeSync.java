@@ -106,6 +106,21 @@ final class NativeGameRuntimeSync {
         return prefs.edit().putString(pendingKey, record.toString()).commit();
     }
 
+    /**
+     * v17.14.19: antrekan hadiah kode hadiah ke saldo native. Memakai jurnal yang sama dengan Surat;
+     * claim_id (UUID dari server) menjadi kunci anti-ganda sehingga satu klaim hanya dikreditkan sekali.
+     */
+    static boolean queueCodeClaim(Context context, String claimId, JSONObject rewards) {
+        if (context == null || rewards == null || claimId == null) return false;
+        try {
+            JSONObject pseudoMail = new JSONObject();
+            pseudoMail.put("mail_id", claimId.trim());
+            pseudoMail.put("created_at", "");
+            pseudoMail.put("reward_config", rewards);
+            return queueClaimedMail(context, pseudoMail);
+        } catch (Exception ignored) { return false; }
+    }
+
     private static int safeReward(JSONObject rewards, String key) {
         long value = rewards.optLong(key, 0L);
         if (value < 0L) return 0;
@@ -138,6 +153,18 @@ final class NativeGameRuntimeSync {
                             if (!claimedAt.isEmpty() && !"null".equals(claimedAt)) {
                                 queueClaimedMail(activity.getApplicationContext(), mail);
                             }
+                        }
+                    }
+                    // v17.14.19: pulihkan juga hadiah kode hadiah yang sudah diklaim di server
+                    // tetapi belum sempat masuk ke saldo native (aplikasi tertutup di tengah jalan).
+                    JSONObject claims = backend.getCodeClaims();
+                    JSONArray list = claims == null ? null : claims.optJSONArray("claims");
+                    if (list != null) {
+                        for (int i = 0; i < list.length(); i++) {
+                            JSONObject claim = list.optJSONObject(i);
+                            if (claim == null) continue;
+                            queueCodeClaim(activity.getApplicationContext(),
+                                    claim.optString("claim_id", ""), claim.optJSONObject("reward_applied"));
                         }
                     }
                 } catch (Exception error) {

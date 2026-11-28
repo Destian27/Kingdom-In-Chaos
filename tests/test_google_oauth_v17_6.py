@@ -40,15 +40,6 @@ def test_admin_google_directory_and_reward_code_controls_exist():
     assert 'action === "set_reward_code_enabled"' in edge
 
 
-def test_meat_regenerates_five_minutes_and_can_be_bought_with_dm():
-    sql = read("supabase/migrations/202611270001_google_players_rewards_meat.sql")
-    activity = read("dtp/src/com/destian/dtp/GameMeatActivity.java")
-    edge = read("supabase/functions/google-player/index.ts")
-    assert "regen_seconds integer not null default 300" in sql
-    assert "dm_per_meat integer not null default 1" in sql
-    assert "game_google_buy_meat" in sql and "game_google_consume_meat" in sql
-    assert "buyMeat(1)" in activity and "consumeMeat()" in activity
-    assert 'action === "buy_meat"' in edge and 'action === "consume_meat"' in edge
 
 
 def test_legacy_supabase_player_session_is_cleared_on_app_start():

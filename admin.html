@@ -196,7 +196,7 @@ body.dark{background:radial-gradient(1200px 600px at 20% -10%,#1d2f66 0,#0b1226 
   </div>
 </section>
   <section class="page hide" id="page-pemain">
-    <div class="safeNote">Dashboard memakai sesi admin utama. Admin tidak dapat mengubah saldo pemain secara langsung. Koin, DM, Goblin Coins, dan daging hanya bertambah setelah pemain mengklaim Surat atau kode hadiah yang valid.</div>
+    <div class="safeNote">Dashboard memakai sesi admin utama. Admin tidak dapat mengubah saldo pemain secara langsung. Koin, Kristal, Koin Goblin, dan Mata Event hanya bertambah setelah pemain mengklaim Surat atau kode hadiah yang valid.</div>
     <div class="card" id="googlePlayersAdminCard">
       <p class="sectionTitle">Semua Pemain — Google Auth</p>
       <p class="mini">Daftar otomatis dari akun Google terverifikasi. Tidak perlu mencari pemain satu per satu. Email, avatar Google, ID pemain, nickname, Koin, DM, dan daging ditampilkan di sini.</p>
@@ -208,14 +208,14 @@ body.dark{background:radial-gradient(1200px 600px at 20% -10%,#1d2f66 0,#0b1226 
   </section>
   <section class="page hide" id="page-kode"><div class="card" id="rewardCodesAdminCard">
       <p class="sectionTitle">Kode Hadiah — Buat dan Salin</p>
-      <p class="mini">Admin dapat menentukan sendiri kode, isi hadiah, jumlah klaim, serta masa berlaku. Kode yang sama hanya dapat diklaim satu kali per akun.</p>
+      <p class="mini">Admin menentukan sendiri kode dan isi hadiahnya: Mata Event, Kristal, Koin, dan Koin Goblin. Pemain memasukkan kode lewat tombol Kode Hadiah di dalam game. Kode yang sama hanya dapat diklaim satu kali per akun.</p>
       <div class="dataGrid">
         <div><label for="rewardCodeValue">Kode hadiah</label><input id="rewardCodeValue" maxlength="40" placeholder="CONTOH: DTP-HEMAT-2026" autocapitalize="characters"></div>
         <div><label for="rewardCodeMaxUses">Maksimal klaim semua pemain</label><input id="rewardCodeMaxUses" type="number" min="1" max="10000000" value="100"></div>
-        <div><label for="rewardCoins">Hadiah Koin</label><input id="rewardCoins" type="number" min="0" value="0"></div>
-        <div><label for="rewardDM">Hadiah DM (Diamond)</label><input id="rewardDM" type="number" min="0" value="0"></div>
-        <div><label for="rewardGoblin">Goblin Coins</label><input id="rewardGoblin" type="number" min="0" value="0"></div>
-        <div><label for="rewardMeat">Hadiah Daging (maks. 24)</label><input id="rewardMeat" type="number" min="0" max="24" value="0"></div>
+        <div><label for="rewardEyes">Hadiah Mata Event</label><input id="rewardEyes" type="number" min="0" max="2147483647" value="0"></div>
+        <div><label for="rewardDM">Hadiah Kristal</label><input id="rewardDM" type="number" min="0" max="2147483647" value="0"></div>
+        <div><label for="rewardCoins">Hadiah Koin</label><input id="rewardCoins" type="number" min="0" max="2147483647" value="0"></div>
+        <div><label for="rewardGoblin">Hadiah Koin Goblin</label><input id="rewardGoblin" type="number" min="0" max="2147483647" value="0"></div>
         <div><label for="rewardStartsAt">Mulai (opsional)</label><input id="rewardStartsAt" type="datetime-local"></div>
         <div><label for="rewardExpiresAt">Berakhir (opsional)</label><input id="rewardExpiresAt" type="datetime-local"></div>
       </div>
@@ -661,6 +661,13 @@ function localDateTimeToIso(id) {
   const value = admin$(id).value;
   return value ? new Date(value).toISOString() : null;
 }
+// v17.14.19: tampilkan hadiah kode dalam bahasa game (Mata Event, Kristal, Koin, Koin Goblin).
+function formatRewardConfig(r) {
+  r = r || {};
+  const parts = [["event_eyes","Mata Event"],["crystals","Kristal"],["coins","Koin"],["goblin_coins","Koin Goblin"],["meat","Daging"]]
+    .filter(([k]) => Number(r[k]) > 0).map(([k,l]) => `${l} ${Number(r[k]).toLocaleString("id-ID")}`);
+  return parts.length ? parts.join(" • ") : "-";
+}
 async function loadRewardCodes() {
   const rows = admin$("rewardCodeRows");
   rows.innerHTML = `<tr><td colspan="6">Memuat kode hadiah...</td></tr>`;
@@ -668,7 +675,7 @@ async function loadRewardCodes() {
     const codes = await gameAdminRequest("list_reward_codes");
     rows.innerHTML = codes.length ? codes.map(c => `<tr>
       <td><b>${escapeHtml(c.code)}</b><br><button type="button" class="ghost copyRewardCode" data-code="${escapeHtml(c.code)}">Salin kode</button></td>
-      <td>${escapeHtml(JSON.stringify(c.reward_config || {}))}</td>
+      <td>${escapeHtml(formatRewardConfig(c.reward_config))}</td>
       <td>${escapeHtml(c.uses_count ?? 0)} / ${escapeHtml(c.max_uses ?? 0)}</td>
       <td>${c.enabled ? "Aktif" : "Nonaktif"}</td>
       <td>${escapeHtml(formatDate(c.starts_at))}<br>${escapeHtml(formatDate(c.expires_at))}</td>
@@ -774,7 +781,7 @@ admin$("btnCreateRewardCode").onclick = async () => {
       coins: Number(admin$("rewardCoins").value || 0),
       crystals: Number(admin$("rewardDM").value || 0),
       goblin_coins: Number(admin$("rewardGoblin").value || 0),
-      meat: Number(admin$("rewardMeat").value || 0),
+      event_eyes: Number(admin$("rewardEyes").value || 0),
     };
     const data = await gameAdminRequest("create_reward_code", {
       code:admin$("rewardCodeValue").value.trim().toUpperCase(), reward_config:reward,

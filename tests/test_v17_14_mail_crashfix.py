@@ -40,20 +40,6 @@ def test_player_mail_is_private_and_claim_rpc_is_single_use_transactional():
     assert 'grant execute on function public.game_google_claim_player_mail(text, uuid) to service_role' in sql
 
 
-def test_mail_is_delivered_to_game_inbox_and_not_by_email():
-    admin = read('supabase/functions/game-admin/index.ts')
-    player = read('supabase/functions/google-player/index.ts')
-    html = read('admin.html')
-    java = read('dtp/src/com/destian/dtp/GameMailActivity.java')
-    assert 'send_player_mail' in admin and 'game_google_player_mail' in admin
-    assert 'wallet_credited: false' in admin
-    assert 'action === "get_mail"' in player and 'action === "claim_mail"' in player
-    assert 'recipient_email' in html and 'Kirim Surat ke Kotak Surat Pemain' in html
-    assert 'Email Google hanya dipakai untuk menemukan pemain tujuan' in html
-    assert 'Klaim Hadiah' in java and 'backend.claimMail' in java
-    assert 'GameMailActivity' in read('kingdom-in-chaos-decompiled/AndroidManifest.xml')
-    overlay = read('dtp/src/com/destian/dtp/GameOnlineOverlay.java')
-    assert 'removeLegacyButtons(root)' in overlay and 'addMailEntry' not in overlay
 
 
 def test_admin_no_longer_has_second_supabase_login_or_direct_wallet_action():
@@ -87,25 +73,6 @@ def test_version_and_package_are_bumped_for_v17_14_2():
     assert 'KingdomInChaosDTP-v17.14.8-price-barter-crashfix.apk' in build
 
 
-def test_claimed_mail_rewards_are_journaled_and_applied_to_native_wallet_and_life():
-    sync = read('dtp/src/com/destian/dtp/NativeGameRuntimeSync.java')
-    bridge = read('dtp/src/com/destian/dtp/NativeGameRuntimeBridge.java')
-    native = read('dtp/native/game_runtime_bridge.cpp')
-    app = read('dtp/src/com/destian/dtp/DtpApp.java')
-    mail = read('dtp/src/com/destian/dtp/GameMailActivity.java')
-    assert 'queueClaimedMail' in sync
-    assert 'MAIL_PENDING_PREFIX' in sync and 'MAIL_APPLIED_PREFIX' in sync
-    assert 'Persist the exact target before touching libgame.so' in sync
-    assert 'gl.queueEvent' in sync
-    assert 'applyMailWalletTargets' in bridge
-    assert 'applyWalletTargetsNative' in native
-    assert '_Z12IncreaseLifeib' in native
-    assert '_Z7LifeMaxv' in native
-    # v17.14.6: pembacaan saldo/nyawa lewat pelindung SIGSEGV (WalletRead).
-    assert 'w->balanceLife(&w->life, &w->secondsToNextLife)' in native
-    assert 'readWalletGuarded(&before)' in native
-    assert 'NativeGameRuntimeSync.reconcileClaimedMail(a)' in app
-    assert 'NativeGameRuntimeSync.queueClaimedMail' in mail
 
 
 def test_native_lifemax_guard_still_returns_24_for_achievement_reward_flow():

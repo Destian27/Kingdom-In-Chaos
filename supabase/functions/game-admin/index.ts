@@ -418,7 +418,7 @@ async function listGooglePlayers() {
 
 function validateRewardConfig(raw: unknown) {
   if (!isObject(raw)) throw new Error("Reward harus berupa objek JSON.");
-  const allowed = new Set(["coins", "crystals", "goblin_coins", "meat"]);
+  const allowed = new Set(["coins", "crystals", "goblin_coins", "event_eyes", "meat"]);
   const reward: Record<string, number> = {};
   for (const [key, value] of Object.entries(raw)) {
     if (!allowed.has(key)) throw new Error(`Jenis reward tidak didukung: ${key}`);

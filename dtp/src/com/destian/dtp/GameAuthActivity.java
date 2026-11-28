@@ -219,7 +219,7 @@ public final class GameAuthActivity extends Activity {
                             startActivity(setup);
                         } else {
                             status.setText("Akun Google terverifikasi. Selamat datang, " + profile.optString("nickname", "Pemain") + ".");
-                            startActivity(new Intent(GameAuthActivity.this, GameOnlineHubActivity.class));
+                            android.widget.Toast.makeText(GameAuthActivity.this, "Login Google berhasil.", android.widget.Toast.LENGTH_SHORT).show();
                         }
                         finish();
                     }

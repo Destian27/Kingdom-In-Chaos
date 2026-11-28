@@ -29,11 +29,6 @@ def test_review_gateway_requires_confirmation_and_limits_payload():
     assert "KIC_REVIEW_ALLOWED_ORIGINS" in ts
 
 
-def test_adapter_exposes_pvp_state_rpc():
-    java = (ROOT / "dtp/src/com/destian/dtp/SupabaseGameBackend.java").read_text()
-    activity = (ROOT / "dtp/src/com/destian/dtp/GameOnlineHubActivity.java").read_text()
-    assert "get_my_pvp_match_state" in java
-    assert "Periksa Status Match PvP" in activity
 
 
 def test_docs_do_not_claim_complete_native_restoration():

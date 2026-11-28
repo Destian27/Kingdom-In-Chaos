@@ -52,11 +52,31 @@ public final class GameGiftCodeActivity extends Activity {
             runOnUiThread(() -> {
                 redeemButton.setEnabled(true);
                 if (failure != null) { status.setText("Kode tidak dapat diklaim: " + failure.getMessage()); return; }
-                JSONObject wallet = data == null ? null : data.optJSONObject("economy");
-                status.setText("Kode berhasil diklaim!\nSaldo terbaru: " + (wallet == null ? "Hadiah masuk ke akun." : "Koin " + wallet.optString("coins", "0") + " • DM " + wallet.optString("crystals", "0") + " • Daging " + wallet.optString("meat", "0")));
+                JSONObject claim = data == null ? null : data.optJSONObject("claim");
+                JSONObject rewards = claim == null ? null : claim.optJSONObject("rewards");
+                if (claim != null && rewards != null) {
+                    // Masukkan hadiah ke saldo native; diterapkan otomatis saat pemain kembali ke game.
+                    NativeGameRuntimeSync.queueCodeClaim(getApplicationContext(), claim.optString("claim_id", ""), rewards);
+                }
+                status.setText("Kode berhasil diklaim!\n" + describeRewards(rewards)
+                        + "\nHadiah masuk ke game saat kamu kembali ke layar permainan.");
                 codeInput.setText("");
             });
         }, "kic-redeem-gift-code").start();
+    }
+
+    private static String describeRewards(JSONObject r) {
+        if (r == null) return "Hadiah masuk ke akun.";
+        StringBuilder out = new StringBuilder("Hadiah:");
+        appendReward(out, "Mata Event", r.optLong("event_eyes", 0));
+        appendReward(out, "Kristal", r.optLong("crystals", 0));
+        appendReward(out, "Koin", r.optLong("coins", 0));
+        appendReward(out, "Koin Goblin", r.optLong("goblin_coins", 0));
+        return out.toString();
+    }
+
+    private static void appendReward(StringBuilder out, String label, long value) {
+        if (value > 0) out.append("\n• ").append(label).append(" +").append(value);
     }
 
     private int dp(int n) { return (int)(n * getResources().getDisplayMetrics().density + 0.5f); }

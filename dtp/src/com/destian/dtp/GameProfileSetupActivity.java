@@ -189,7 +189,7 @@ public final class GameProfileSetupActivity extends Activity {
                         String id = savedProfile == null ? playerId : savedProfile.optString("player_id", playerId);
                         status.setText("Berhasil terdaftar. ID Pemain: " + id);
                         getIntent().putExtra("player_id", id);
-                        startActivity(new android.content.Intent(GameProfileSetupActivity.this, GameOnlineHubActivity.class));
+                        android.widget.Toast.makeText(GameProfileSetupActivity.this, "Profil tersimpan. ID Pemain: " + id, android.widget.Toast.LENGTH_LONG).show();
                         finish();
                     }
                 });

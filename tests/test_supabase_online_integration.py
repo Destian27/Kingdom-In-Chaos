@@ -65,17 +65,3 @@ def test_docs_disclose_native_bridge_limit():
     assert "native" in readme and "verifier" in readme
 
 
-def test_java_online_hub_is_registered_and_reachable_from_game():
-    manifest = (ROOT / "kingdom-in-chaos-decompiled/AndroidManifest.xml").read_text()
-    app = (ROOT / "dtp/src/com/destian/dtp/DtpApp.java").read_text()
-    overlay = (ROOT / "dtp/src/com/destian/dtp/GameOnlineOverlay.java").read_text()
-    hub = (ROOT / "dtp/src/com/destian/dtp/GameOnlineHubActivity.java").read_text()
-    assert 'android:name="com.destian.dtp.GameOnlineHubActivity"' in manifest
-    assert 'android:exported="false"' in manifest.split('android:name="com.destian.dtp.GameOnlineHubActivity"')[0][-250:]
-    assert "GameOnlineOverlay.install(a)" in app
-    # v17.14.8: tombol overlay dihapus; Hub dibuka dari alur login Google.
-    assert "GameOnlineHubActivity.class" in (ROOT / "dtp/src/com/destian/dtp/GameAuthActivity.java").read_text()
-    assert "GooglePlayerBackend" in hub
-    assert "Lanjutkan dengan Google" in hub
-    assert "signUp(" not in hub and "signInWithPassword(" not in hub
-    assert "native" in hub.lower() and "not" in hub.lower()

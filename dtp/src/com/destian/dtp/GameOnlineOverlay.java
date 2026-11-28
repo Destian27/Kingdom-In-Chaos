@@ -91,7 +91,9 @@ public final class GameOnlineOverlay {
 
     /**
      * v17.14.8: area sentuh tak terlihat di atas tombol bawaan game.
-     * Tombol LOGIN (kiri atas) membuka pemilih akun Google, atau Hub Online bila sudah login.
+     * Tombol LOGIN (kiri atas) membuka pemilih akun Google, atau dialog akun bila sudah login.
+     * v17.14.19: Hub Online, Surat, dan Daging Misi DIHAPUS. Tombol KODE HADIAH asli game (kiri bawah
+     * layar Toko) kini langsung membuka halaman klaim kode.
      * v17.14.18: area Bakat DIHAPUS agar tombol Bakat asli game (menu kanan) berfungsi lagi.
      * Sentuhan di luar area tidak dikonsumsi sehingga game tetap menerimanya.
      * Koordinat relatif terhadap tinggi layar.
@@ -106,10 +108,13 @@ public final class GameOnlineOverlay {
             setTag(TAG_HOTSPOTS);
         }
 
-        /** 0 = LOGIN, 2 = avatar/nama panggilan, -1 = di luar area (1 = Bakat, tidak dipakai lagi). */
+        /** 0 = LOGIN, 2 = avatar/nama panggilan, 3 = Kode Hadiah, -1 = di luar area (1 = Bakat, tidak dipakai). */
         private int zoneAt(float x, float y) {
             float h = getHeight(), w = getWidth();
             if (h <= 0 || w <= 0) return -1;
+            // v17.14.19: tombol "Kode Hadiah" asli game (pojok kiri bawah Toko). Dicek lebih dulu
+            // dari kotak avatar karena sebagian areanya bertumpuk.
+            if (x >= 0.15f * h && x <= 0.37f * h && y >= 0.92f * h && y <= 1.0f * h) return 3;
             // LOGIN: kiri 0.020H, atas 0.138H, lebar 0.264H, tinggi 0.107H
             if (x >= 0.020f * h && x <= 0.284f * h && y >= 0.138f * h && y <= 0.245f * h) return 0;
             // v17.14.10: kotak avatar + nama panggilan (kiri bawah beranda) -> Google lebih dulu,
@@ -139,11 +144,36 @@ public final class GameOnlineOverlay {
         private void open(int zone) {
             try {
                 GooglePlayerBackend backend = new GooglePlayerBackend(activity.getApplicationContext());
-                // Belum login -> pemilih akun Google; sudah login -> Hub Online.
-                activity.startActivity(new Intent(activity, backend.hasAccount()
-                        ? GameOnlineHubActivity.class : GameAuthActivity.class));
+                if (zone == 3) {
+                    // Kode Hadiah: butuh akun Google; belum login -> pemilih akun dulu.
+                    if (backend.hasAccount()) {
+                        activity.startActivity(new Intent(activity, GameGiftCodeActivity.class));
+                    } else {
+                        Toast.makeText(activity, "Login Google dulu untuk memakai Kode Hadiah.", Toast.LENGTH_LONG).show();
+                        activity.startActivity(new Intent(activity, GameAuthActivity.class));
+                    }
+                    return;
+                }
+                if (backend.hasAccount()) showAccountDialog(activity, backend);
+                else activity.startActivity(new Intent(activity, GameAuthActivity.class));
             } catch (RuntimeException ignored) { }
         }
+    }
+
+    /** Dialog akun kecil pengganti Hub Online: menampilkan akun Google aktif dan tombol keluar. */
+    private static void showAccountDialog(final Activity activity, final GooglePlayerBackend backend) {
+        String name = backend.getSavedAccountName();
+        new AlertDialog.Builder(activity)
+                .setTitle("Akun Google")
+                .setMessage("Masuk sebagai:\n" + (name == null || name.isEmpty() ? "-" : name))
+                .setPositiveButton("Tutup", null)
+                .setNegativeButton("Keluar Google", new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface dialog, int which) {
+                        backend.clearAccount();
+                        Toast.makeText(activity, "Sudah keluar dari akun Google.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .show();
     }
 
     private static void removeLegacyButtons(FrameLayout root) {

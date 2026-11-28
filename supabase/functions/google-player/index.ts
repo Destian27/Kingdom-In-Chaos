@@ -337,6 +337,15 @@ Deno.serve(async (request: Request) => {
       const code = typeof body.code === "string" ? body.code.trim().toUpperCase() : "";
       if (!/^[A-Z0-9-]{4,40}$/.test(code)) throw new Error("Format kode hadiah tidak valid.");
       data = await requireData<any>(service.rpc("game_google_redeem_reward_code", { p_google_sub: identity.sub, p_code: code }));
+    } else if (action === "get_code_claims") {
+      // v17.14.19: klaim kode hadiah terbaru yang hadiahnya harus masuk ke saldo native (pemulihan).
+      const player = await requireData<any>(service.from("game_google_players")
+        .select("player_uuid").eq("google_sub", identity.sub).single());
+      const claims = await requireData<any[]>(service.from("game_reward_code_claims")
+        .select("claim_id, reward_applied, claimed_at").eq("player_uuid", player.player_uuid)
+        .eq("native_credit", true).order("claimed_at", { ascending: false }).limit(100));
+      data = { claims };
+      readOnlyPoll = true;
     } else if (action === "get_mail") {
       data = await getPlayerInbox(identity);
     } else if (action === "claim_mail") {

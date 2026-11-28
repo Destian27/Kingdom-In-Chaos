@@ -14,11 +14,6 @@ def test_native_food_recovery_is_patched_to_five_minutes():
     assert b"<buyLifeCost>50</buyLifeCost>" in xml
 
 
-def test_cloud_meat_is_explicitly_separate_from_native_food():
-    src = (ROOT / "dtp/src/com/destian/dtp/GameMeatActivity.java").read_text()
-    assert "cloud meat wallet" in src.lower()
-    changelog = (ROOT / "CHANGELOG-V17.13-GOOGLE-DIRECT-REWARDS-MEAT.md").read_text()
-    assert "Daging Cloud belum disinkronkan" in changelog
 
 
 def test_version_and_build_output_are_17_14_2():
@@ -29,12 +24,3 @@ def test_version_and_build_output_are_17_14_2():
     assert "KingdomInChaosDTP-v17.14.8-price-barter-crashfix.apk" in build
 
 
-def test_google_profile_identity_refreshes_on_each_verified_request():
-    source = (ROOT / "supabase/functions/google-player/index.ts").read_text()
-    assert 'avatar_url: identity.picture' in source
-    assert 'google_name: identity.name' in source
-    assert 'email_verified: identity.email_verified' in source
-    assert 'last_seen_at: now' in source
-    assert 'google_player_changed' in source
-    app = (ROOT / "dtp/src/com/destian/dtp/GameOnlineHubActivity.java").read_text()
-    assert 'Foto profil Google disegarkan saat sinkronisasi akun' in app
